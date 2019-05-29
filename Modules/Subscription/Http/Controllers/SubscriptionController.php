@@ -637,306 +637,212 @@ class SubscriptionController extends Controller
 
 	public function print_subscription(Request $request, $id_subscription){
 		$input = $request->all();
-		//Se l'id_subscription è preview, allora devo stampare Anteprima del template senza i dati dell'iscrizione
-		if($id_subscription == 'preview'){
-			$event = Event::findOrFail(Session::get('work_event'));
-			if($event->template_file == null){
-				$template = new \PhpOffice\PhpWord\TemplateProcessor(url(Storage::url('public/template/subscription_template.docx')));
+
+		$sub = Subscription::findOrFail($id_subscription);
+		$event = Event::findOrFail($sub->id_event);
+		$oratorio = Oratorio::findOrFail($event->id_oratorio);
+		//utente a cui è intestata l'iscrizione
+		$user = User::findOrFail($sub->id_user);
+
+		//cerco il padre
+		if(Module::find('famiglia') != null && Module::find('famiglia')->enabled()){
+			$padre = ComponenteFamiglia::getPadre($user->id);
+			$madre = ComponenteFamiglia::getMadre($user->id);
+		}else{
+			$padre = "";
+			$madre = "";
+		}
+
+		$storagePath  = Storage::disk('public')->getDriver()->getAdapter()->getPathPrefix();
+		// if($event->template_file == null){
+		// 	$template = new \PhpOffice\PhpWord\TemplateProcessor($storagePath."/template/subscription_template.docx");
+		// }else{
+		// 	$template = new \PhpOffice\PhpWord\TemplateProcessor($storagePath.$event->template_file);
+		// }
+
+		$modulo = Modulo::find($input['id_modulo']);
+		$template = new \PhpOffice\PhpWord\TemplateProcessor($storagePath.$modulo->path_file);
+
+		//controllo se nel modulo devono essere stampati i dati anagrafici o, al loro posto, il valore di una specifica
+		if($event->stampa_anagrafica == 1){
+			$template->setValue('nominativo', '');
+			$template->cloneBlock('dati_anagrafici');
+		}else{
+			$template->replaceBlock('dati_anagrafici', 'dati2');
+			$array_specifiche = json_decode($event->spec_iscrizione);
+			$anagrafica = EventSpecValue::where(['id_subscription' => $sub->id])->whereIn('id_eventspec', $array_specifiche)->get();
+			if(count($anagrafica)>0){
+				$nominativo = "";
+				foreach($anagrafica as $a){
+					$nominativo .= $a->valore." ";
+				}
+				$template->setValue('nominativo', $nominativo);
 			}else{
-				$template = new \PhpOffice\PhpWord\TemplateProcessor(url(Storage::url('public/'.$event->template_file)));
+				$template->setValue('nominativo', 'Valore non valido!');
 			}
-			$oratorio = Oratorio::findOrFail($event->id_oratorio);
-			$template->setValue('nome_oratorio', $oratorio->nome);
-			$template->setValue('nome_parrocchia', $oratorio->nome_parrocchia);
-			$template->setValue('nome_evento', $event->nome);
-			$template->setValue('id_subscription', "Anteprima");
-			//specifiche generali
-			$specs = (new EventSpec)->select()
-			->where([['event_specs.id_event', $event->id], ['event_specs.general', 1]])
-			->orderBy('event_specs.ordine', 'asc')->get();
-			if(count($specs)>0){
-				$template->cloneRow('specifica_g', count($specs));
-				$i = 1;
-				foreach($specs as $spec){
-					$template->setValue('specifica_g#'.$i, $spec->label);
-					$template->setValue('valore_g#'.$i, '');
-					$costi = json_decode($spec->price, true);
-					$acconti = json_decode($spec->acconto, true);
-					if(isset($costi['0'])){
-						$costo = $costi['0'];
-					}else{
-						$costo = 0;
-					}
-					if(isset($acconti['0'])){
-						$acconto = $acconti['0'];
-					}else{
-						$acconto = 0;
-					}
-					$template->setValue('costo_g#'.$i, $costo."€");
-					$template->setValue('acconto_g#'.$i, $acconto."€");
-					if($costo == 0){
+		}
+
+		$template->setValue('nome_oratorio', $oratorio->nome);
+		$template->setValue('email_oratorio', $oratorio->email);
+		$template->setValue('nome_parrocchia', $oratorio->nome_parrocchia);
+		$template->setValue('indirizzo_parrocchia', $oratorio->indirizzo_parrocchia);
+		$template->setValue('nome_diocesi', $oratorio->nome_diocesi);
+		$template->setValue('luogo_data_modulo', $oratorio->luogo_firma_moduli.", ".$sub->created_at);
+		$template->setValue('nome_evento', $event->nome);
+		$template->setValue('id_subscription', $sub->id);
+		$template->setValue('padre', $padre!=null?$padre->full_name:'');
+		$template->setValue('madre', $madre!=null?$madre->full_name:'');
+		$template->setValue('figlio', $user->full_name);
+		$template->setValue('patologie', $user->patologie);
+		$template->setValue('allergie', $user->allergie);
+		$template->setValue('note', $user->note);
+		$template->setValue('luogo_nascita', Comune::find($user->id_comune_nascita)->nome);
+		$template->setValue('data_nascita', $user->nato_il);
+		$template->setValue('comune_residenza', Comune::find($user->id_comune_residenza)->nome);
+		$template->setValue('indirizzo', $user->via);
+		$template->setValue('tessera_sanitaria', $user->tessera_sanitaria);
+		$template->setValue('telefono', $user->telefono);
+		$template->setValue('cellulare', $user->cell_number);
+		$template->setValue('email', $user->email);
+		$cell = ($madre != null)?"Madre: ".$madre->cell_number:"";
+		$cell .= ($padre != null)?" - Padre".$padre->cell_number:"";
+		$email = ($madre != null)?"Madre: ".$madre->email:"";
+		$email .= ($padre != null)?" - Padre: ".$padre->email:"";
+		$template->setValue('cellulare_genitore', $cell);
+		$template->setValue('email_genitore', $email);
+
+		//classe frequentata
+		$spec_classe = EventSpec::where([['id_event', $event->id], ['label', 'LIKE', '%classe%']])->first();
+		if($spec_classe != null){
+			$event_spec_value = EventSpecValue::where([['id_eventspec', $spec_classe->id], ['id_subscription', $sub->id]])->first();
+			if($event_spec_value == null){
+				$template->setValue('classe_frequentata', '');
+			}else{
+				$nome_classe = EventSpec::getPrintableValue($spec_classe->id_type, $event_spec_value->valore);
+				$template->setValue('classe_frequentata', $nome_classe);
+			}
+		}else{
+			$template->setValue('classe_frequentata', '');
+		}
+
+		//consensi
+		if($sub->consenso_affiliazione == true){
+			$template->setValue('consenso_affiliazione_si', "X");
+			$template->setValue('consenso_affiliazione_no', "");
+		}else{
+			$template->setValue('consenso_affiliazione_si', "");
+			$template->setValue('consenso_affiliazione_no', "X");
+		}
+
+		if($sub->consenso_dati_sanitari == true){
+			$template->setValue('consenso_dati_sanitari_si', "X");
+			$template->setValue('consenso_dati_sanitari_no', "");
+		}else{
+			$template->setValue('consenso_dati_sanitari_si', "");
+			$template->setValue('consenso_dati_sanitari_no', "X");
+		}
+
+		//specifiche generali
+		$importo_totale = 0;
+		$acconto_totale = 0;
+		$da_pagare = 0;
+		$specs = (new EventSpecValue)->select('event_spec_values.id_eventspec', 'event_specs.label', 'event_spec_values.valore', 'event_spec_values.id', 'event_specs.id_type', 'event_spec_values.costo', 'event_spec_values.acconto', 'event_spec_values.pagato')
+		->leftJoin('event_specs', 'event_specs.id', '=', 'event_spec_values.id_eventspec')
+		->where([['event_spec_values.id_subscription', $sub->id], ['event_specs.general', 1]])
+		->orderBy('event_specs.ordine', 'asc')->get();
+		if(count($specs)>0){
+			$template->cloneRow('specifica_g', count($specs));
+			$i = 1;
+			foreach($specs as $spec){
+				$template->setValue('specifica_g#'.$i, $spec->label);
+				$template->setValue('valore_g#'.$i, EventSpec::getPrintableValue($spec->id_type, $spec->valore));
+				if(($spec->id_type==-2 && $spec->valore == 1) || $spec->id_type!=-2){
+					$template->setValue('costo_g#'.$i, $spec->costo);
+					$template->setValue('acconto_g#'.$i, $spec->acconto);
+					$importo_totale += $spec->costo;
+					$acconto_totale += $spec->acconto;
+					if($spec->costo == 0){
 						$template->setValue('pagato_g#'.$i, '');
 					}else{
-						$template->setValue('pagato_g#'.$i, 'NO');
-					}
-
-					$i++;
-				}
-			}
-
-			//specifiche Settimanali
-			$weeks = (new Week)->select('id', 'from_date', 'to_date')->where('id_event', $event->id)->orderBy('from_date', 'asc')->get();
-			if(count($weeks)>0){
-				//clono il blocco settimana per il numero di settimane trovate
-				$template->cloneBlock('settimana', count($weeks));
-				$w = 1;
-				foreach($weeks as $week){
-					$i = 1;
-					$template->setValue('nome_settimana#'.$w, "Settimana $w - dal ".$week->from_date." al ".$week->to_date);
-					$specs = (new EventSpec)->select()
-					->where([['event_specs.id_event', $event->id], ['event_specs.general', 0]])
-					->orderBy('event_specs.ordine', 'asc')->get();
-					if(count($specs)>0){
-						//prima di clonare la riga, devo sapere quante sono dal json_decode
-						$c=0;
-						foreach($specs as $spec){
-							$valid = json_decode($spec->valid_for, true);
-							if(isset($valid[$week->id]) && $valid[$week->id] == 1) $c++;
+						if($spec->pagato == 1){
+							$template->setValue('pagato_g#'.$i, 'SI');
+						}else{
+							$template->setValue('pagato_g#'.$i, 'NO');
 						}
-						if($c>0) $template->cloneRow('specifica_w#'.$w, $c);
-						//ora posso popolare la tabella clonata
-						foreach($specs as $spec){
-							$valid = json_decode($spec->valid_for, true);
-							if(isset($valid[$week->id]) && $valid[$week->id] == 1){
-								$template->setValue('specifica_w#'.$w.'#'.$i, $spec->label);
-								$template->setValue('valore_w#'.$w.'#'.$i, '');
-								$costi = json_decode($spec->price, true);
-								$acconti = json_decode($spec->acconto, true);
-								if(isset($acconti[$week->id])){
-									$acconto = $acconti[$week->id];
-								}else{
-									$acconto = 0;
-								}
-								$template->setValue('costo_w#'.$w.'#'.$i, $costo."€");
-								$template->setValue('acconto_w#'.$w.'#'.$i, $acconto."€");
-								if($costo == 0){
-									$template->setValue('pagato_w#'.$w.'#'.$i, '');
+
+					}
+					if($spec->pagato == false){
+						$da_pagare += $spec->costo-$spec->acconto;
+					}
+				}else{
+					$template->setValue('costo_g#'.$i, '');
+					$template->setValue('acconto_g#'.$i, '');
+					$template->setValue('pagato_g#'.$i, '');
+				}
+
+
+
+
+
+				$i++;
+			}
+		}
+
+		//specifiche Settimanali
+		$weeks = (new Week)->select('id', 'from_date', 'to_date')->where('id_event', $sub->id_event)->orderBy('from_date', 'asc')->get();
+		if(count($weeks)>0){
+			$template->cloneBlock('settimana', count($weeks));
+			$w = 1;
+			foreach($weeks as $week){
+				$i = 1;
+				$template->setValue('nome_settimana#'.$w, "Settimana $w - dal ".$week->from_date." al ".$week->to_date);
+				$specs = (new EventSpecValue)->select('event_spec_values.id_eventspec', 'event_specs.label', 'event_spec_values.valore', 'event_spec_values.id', 'event_specs.id_type', 'event_spec_values.costo', 'event_spec_values.acconto', 'event_spec_values.pagato', 'event_specs.valid_for')
+				->leftJoin('event_specs', 'event_specs.id', '=', 'event_spec_values.id_eventspec')
+				->where([['event_spec_values.id_subscription', $sub->id], ['event_specs.general', 0], ['event_spec_values.id_week', $week->id]])
+				->orderBy('event_specs.ordine', 'asc')->get();
+				if(count($specs)>0){
+					$template->cloneRow('specifica_w#'.$w, count($specs));
+					foreach($specs as $spec){
+						$template->setValue('specifica_w#'.$w.'#'.$i, $spec->label);
+						$template->setValue('valore_w#'.$w.'#'.$i, EventSpec::getPrintableValue($spec->id_type, $spec->valore));
+						if(($spec->id_type==-2 && $spec->valore == 1) || $spec->id_type!=-2){
+							$template->setValue('costo_w#'.$w.'#'.$i, $spec->costo);
+							$template->setValue('acconto_w#'.$w.'#'.$i, $spec->acconto);
+							$importo_totale += $spec->costo;
+							$acconto_totale += $spec->acconto;
+							if($spec->costo == 0){
+								$template->setValue('pagato_w#'.$w.'#'.$i, '');
+							}else{
+								if($spec->pagato == 1){
+									$template->setValue('pagato_w#'.$w.'#'.$i, 'SI');
 								}else{
 									$template->setValue('pagato_w#'.$w.'#'.$i, 'NO');
 								}
-								$i++;
 							}
+
+							if($spec->pagato == false){
+								$da_pagare += ($spec->costo-$spec->acconto);
+							}
+						}else{
+							$template->setValue('pagato_w#'.$w.'#'.$i, '');
+							$template->setValue('costo_w#'.$w.'#'.$i, '');
+							$template->setValue('acconto_w#'.$w.'#'.$i, '');
 						}
+
+
+						$i++;
 					}
-					$w++;
 				}
+				$w++;
 			}
 		}else{
-			$sub = Subscription::findOrFail($id_subscription);
-			$event = Event::findOrFail($sub->id_event);
-			$oratorio = Oratorio::findOrFail($event->id_oratorio);
-			//utente a cui è intestata l'iscrizione
-			$user = User::findOrFail($sub->id_user);
-
-			//cerco il padre
-			if(Module::find('famiglia') != null && Module::find('famiglia')->enabled()){
-				$padre = ComponenteFamiglia::getPadre($user->id);
-				$madre = ComponenteFamiglia::getMadre($user->id);
-			}else{
-				$padre = "";
-				$madre = "";
-			}
-
-			$storagePath  = Storage::disk('public')->getDriver()->getAdapter()->getPathPrefix();
-			// if($event->template_file == null){
-			// 	$template = new \PhpOffice\PhpWord\TemplateProcessor($storagePath."/template/subscription_template.docx");
-			// }else{
-			// 	$template = new \PhpOffice\PhpWord\TemplateProcessor($storagePath.$event->template_file);
-			// }
-
-			$modulo = Modulo::find($input['id_modulo']);
-			$template = new \PhpOffice\PhpWord\TemplateProcessor($storagePath.$modulo->path_file);
-
-			//controllo se nel modulo devono essere stampati i dati anagrafici o, al loro posto, il valore di una specifica
-			if($event->stampa_anagrafica == 1){
-				$template->setValue('nominativo', '');
-				$template->cloneBlock('dati_anagrafici');
-			}else{
-				$template->replaceBlock('dati_anagrafici', 'dati2');
-				$array_specifiche = json_decode($event->spec_iscrizione);
-				$anagrafica = EventSpecValue::where(['id_subscription' => $sub->id])->whereIn('id_eventspec', $array_specifiche)->get();
-				if(count($anagrafica)>0){
-					$nominativo = "";
-					foreach($anagrafica as $a){
-						$nominativo .= $a->valore." ";
-					}
-					$template->setValue('nominativo', $nominativo);
-				}else{
-					$template->setValue('nominativo', 'Valore non valido!');
-				}
-			}
-
-			$template->setValue('nome_oratorio', $oratorio->nome);
-			$template->setValue('email_oratorio', $oratorio->email);
-			$template->setValue('nome_parrocchia', $oratorio->nome_parrocchia);
-			$template->setValue('indirizzo_parrocchia', $oratorio->indirizzo_parrocchia);
-			$template->setValue('nome_diocesi', $oratorio->nome_diocesi);
-			$template->setValue('luogo_data_modulo', $oratorio->luogo_firma_moduli.", ".$sub->created_at);
-			$template->setValue('nome_evento', $event->nome);
-			$template->setValue('id_subscription', $sub->id);
-			$template->setValue('padre', $padre!=null?$padre->full_name:'');
-			$template->setValue('madre', $madre!=null?$madre->full_name:'');
-			$template->setValue('figlio', $user->full_name);
-			$template->setValue('patologie', $user->patologie);
-			$template->setValue('allergie', $user->allergie);
-			$template->setValue('note', $user->note);
-			$template->setValue('luogo_nascita', Comune::find($user->id_comune_nascita)->nome);
-			$template->setValue('data_nascita', $user->nato_il);
-			$template->setValue('comune_residenza', Comune::find($user->id_comune_residenza)->nome);
-			$template->setValue('indirizzo', $user->via);
-			$template->setValue('tessera_sanitaria', $user->tessera_sanitaria);
-			$template->setValue('telefono', $user->telefono);
-			$template->setValue('cellulare', $user->cell_number);
-			$template->setValue('email', $user->email);
-			$cell = ($madre != null)?"Madre: ".$madre->cell_number:"";
-			$cell .= ($padre != null)?" - Padre".$padre->cell_number:"";
-			$email = ($madre != null)?"Madre: ".$madre->email:"";
-			$email .= ($padre != null)?" - Padre: ".$padre->email:"";
-			$template->setValue('cellulare_genitore', $cell);
-			$template->setValue('email_genitore', $email);
-
-			//classe frequentata
-			$spec_classe = EventSpec::where([['id_event', $event->id], ['label', 'LIKE', '%classe%']])->first();
-			if($spec_classe != null){
-				$event_spec_value = EventSpecValue::where([['id_eventspec', $spec_classe->id], ['id_subscription', $sub->id]])->first();
-				if($event_spec_value == null){
-					$template->setValue('classe_frequentata', '');
-				}else{
-					$nome_classe = EventSpec::getPrintableValue($spec_classe->id_type, $event_spec_value->valore);
-					$template->setValue('classe_frequentata', $nome_classe);
-				}
-			}else{
-				$template->setValue('classe_frequentata', '');
-			}
-
-			//consensi
-			if($sub->consenso_affiliazione == true){
-				$template->setValue('consenso_affiliazione_si', "X");
-				$template->setValue('consenso_affiliazione_no', "");
-			}else{
-				$template->setValue('consenso_affiliazione_si', "");
-				$template->setValue('consenso_affiliazione_no', "X");
-			}
-
-			if($sub->consenso_dati_sanitari == true){
-				$template->setValue('consenso_dati_sanitari_si', "X");
-				$template->setValue('consenso_dati_sanitari_no', "");
-			}else{
-				$template->setValue('consenso_dati_sanitari_si', "");
-				$template->setValue('consenso_dati_sanitari_no', "X");
-			}
-
-			//specifiche generali
-			$importo_totale = 0;
-			$acconto_totale = 0;
-			$da_pagare = 0;
-			$specs = (new EventSpecValue)->select('event_spec_values.id_eventspec', 'event_specs.label', 'event_spec_values.valore', 'event_spec_values.id', 'event_specs.id_type', 'event_spec_values.costo', 'event_spec_values.acconto', 'event_spec_values.pagato')
-			->leftJoin('event_specs', 'event_specs.id', '=', 'event_spec_values.id_eventspec')
-			->where([['event_spec_values.id_subscription', $sub->id], ['event_specs.general', 1]])
-			->orderBy('event_specs.ordine', 'asc')->get();
-			if(count($specs)>0){
-				$template->cloneRow('specifica_g', count($specs));
-				$i = 1;
-				foreach($specs as $spec){
-					$template->setValue('specifica_g#'.$i, $spec->label);
-					$template->setValue('valore_g#'.$i, EventSpec::getPrintableValue($spec->id_type, $spec->valore));
-					if(($spec->id_type==-2 && $spec->valore == 1) || $spec->id_type!=-2){
-						$template->setValue('costo_g#'.$i, $spec->costo);
-						$template->setValue('acconto_g#'.$i, $spec->acconto);
-						$importo_totale += $spec->costo;
-						$acconto_totale += $spec->acconto;
-						if($spec->costo == 0){
-							$template->setValue('pagato_g#'.$i, '');
-						}else{
-							if($spec->pagato == 1){
-								$template->setValue('pagato_g#'.$i, 'SI');
-							}else{
-								$template->setValue('pagato_g#'.$i, 'NO');
-							}
-
-						}
-						if($spec->pagato == false){
-							$da_pagare += $spec->costo-$spec->acconto;
-						}
-					}else{
-						$template->setValue('costo_g#'.$i, '');
-						$template->setValue('acconto_g#'.$i, '');
-						$template->setValue('pagato_g#'.$i, '');
-					}
-
-
-
-
-
-					$i++;
-				}
-			}
-
-			//specifiche Settimanali
-			$weeks = (new Week)->select('id', 'from_date', 'to_date')->where('id_event', $sub->id_event)->orderBy('from_date', 'asc')->get();
-			if(count($weeks)>0){
-				$template->cloneBlock('settimana', count($weeks));
-				$w = 1;
-				foreach($weeks as $week){
-					$i = 1;
-					$template->setValue('nome_settimana#'.$w, "Settimana $w - dal ".$week->from_date." al ".$week->to_date);
-					$specs = (new EventSpecValue)->select('event_spec_values.id_eventspec', 'event_specs.label', 'event_spec_values.valore', 'event_spec_values.id', 'event_specs.id_type', 'event_spec_values.costo', 'event_spec_values.acconto', 'event_spec_values.pagato', 'event_specs.valid_for')
-					->leftJoin('event_specs', 'event_specs.id', '=', 'event_spec_values.id_eventspec')
-					->where([['event_spec_values.id_subscription', $sub->id], ['event_specs.general', 0], ['event_spec_values.id_week', $week->id]])
-					->orderBy('event_specs.ordine', 'asc')->get();
-					if(count($specs)>0){
-						$template->cloneRow('specifica_w#'.$w, count($specs));
-						foreach($specs as $spec){
-							$template->setValue('specifica_w#'.$w.'#'.$i, $spec->label);
-							$template->setValue('valore_w#'.$w.'#'.$i, EventSpec::getPrintableValue($spec->id_type, $spec->valore));
-							if(($spec->id_type==-2 && $spec->valore == 1) || $spec->id_type!=-2){
-								$template->setValue('costo_w#'.$w.'#'.$i, $spec->costo);
-								$template->setValue('acconto_w#'.$w.'#'.$i, $spec->acconto);
-								$importo_totale += $spec->costo;
-								$acconto_totale += $spec->acconto;
-								if($spec->costo == 0){
-									$template->setValue('pagato_w#'.$w.'#'.$i, '');
-								}else{
-									if($spec->pagato == 1){
-										$template->setValue('pagato_w#'.$w.'#'.$i, 'SI');
-									}else{
-										$template->setValue('pagato_w#'.$w.'#'.$i, 'NO');
-									}
-								}
-
-								if($spec->pagato == false){
-									$da_pagare += ($spec->costo-$spec->acconto);
-								}
-							}else{
-								$template->setValue('pagato_w#'.$w.'#'.$i, '');
-								$template->setValue('costo_w#'.$w.'#'.$i, '');
-								$template->setValue('acconto_w#'.$w.'#'.$i, '');
-							}
-
-
-							$i++;
-						}
-					}
-					$w++;
-				}
-			}else{
-				$template->deleteBlock('settimana');
-			}
-
-			$template->setValue('importo_totale', number_format($importo_totale,2));
-			$template->setValue('acconto_totale', number_format($acconto_totale,2));
-			$template->setValue('da_pagare', number_format($da_pagare,2));
+			$template->deleteBlock('settimana');
 		}
+
+		$template->setValue('importo_totale', number_format($importo_totale,2));
+		$template->setValue('acconto_totale', number_format($acconto_totale,2));
+		$template->setValue('da_pagare', number_format($da_pagare,2));
+
 
 
 

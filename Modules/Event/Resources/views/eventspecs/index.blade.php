@@ -200,7 +200,6 @@ $contabilita = (Module::find('contabilita') != null && Module::find('contabilita
           <i onclick='eventspecs_add({{$id_event}});' class='btn btn-primary' style='width: 33%'>
             <i class='fa fa-plus' aria-hidden='true'></i>Aggiungi specifica
           </i>
-          <a href="{{ route('subscription.print', ['id_subscription' => 'preview'])}}" class='btn btn-primary' style='width: 33%'>Anteprima modulo d'iscrizione</a>
           {!! Form::close() !!}
 
         </div>

@@ -2,6 +2,7 @@
 use Modules\Event\Entities\Week;
 use Modules\User\Entities\User;
 use Modules\Event\Entities\Event;
+use Modules\Event\Entities\EventSpecValue;
 $weeks = Week::select('id', 'from_date', 'to_date')->where('id_event', $event->id)->orderBy('from_date', 'asc')->get();
 $weeks_json = Week::where('id_event', $event->id)->orderBy('from_date', 'asc')->pluck('id')->toArray();
 array_push($weeks_json, 0); //id della tabella specifiche generali
@@ -130,6 +131,7 @@ $(document).ready(function(){
       processing: true,
       serverSide: true,
       rowId: 'DT_RowId',
+      pageLength: 20,
       dom: 'rtip',
       language: { "url": "{{ asset('Italian.json') }}" },
       ajax: {
