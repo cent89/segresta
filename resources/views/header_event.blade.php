@@ -6,7 +6,7 @@ use Modules\Oratorio\Entities\Oratorio;
 
 
 <div class="container">
-	@if(Entrust::hasRole(['admin']) || Entrust::hasRole(['owner']))
+	@if(Auth::user()->can('edit-event') || Auth::user()->can('edit-admin-iscrizioni') )
 	<?php
 	$oratorio = null;
 	if(Session::get('session_oratorio') != null){

@@ -19,7 +19,7 @@ class RoleController extends Controller
   ];
 
   public function __construct(){
-    //$this->middleware('permission:manage-users');
+    $this->middleware('permission:edit-permission');
   }
 
   public function index(){

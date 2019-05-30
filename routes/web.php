@@ -29,7 +29,7 @@ Route::get('/informativa', function(){
 //////////////////ADMIN/////////////////////////////////
 /////////////////////////////////////////////////////////
 
-Route::group(['prefix' => 'admin', 'middleware' => ['role:admin', 'verified']], function() {
+Route::group(['prefix' => 'admin', 'middleware' => ['verified']], function() {
 	Route::get('role', ['as' =>'role.index', 'uses' => 'RoleController@index']);
 	Route::post('role/updatePermission', ['as' =>'role.updatePermission', 'uses' => 'RoleController@updatePermission']);
 	Route::get('role/create', ['as' =>'role.create', 'uses' => 'RoleController@create']);
