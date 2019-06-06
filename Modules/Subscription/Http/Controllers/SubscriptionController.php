@@ -97,7 +97,6 @@ class SubscriptionController extends Controller
 		->addColumn('action', function ($entity) use ($moduli){
 			$remove = "<button class='btn btn-sm btn-danger btn-block' id='editor_remove'><i class='fas fa-trash-alt'></i> Rimuovi</button>";
 			$open = "<button class='btn btn-sm btn-primary btn-block' onclick='load_iscrizione(".$entity->id.")' type='button'><i class='fas fa-flag'></i> Apri</button>";
-			//$print = Form::open(['method' => 'GET', 'route' => ['subscription.print', $entity->id]])."<button class='btn btn-sm btn-primary btn-block'><i class='far fa-file-pdf'></i> Stampa</button>".Form::close();
 
 			if(count($moduli) > 0){
 				$print = "<div>".Form::open(['method' => 'GET', 'route' => ['subscription.print', $entity->id]]).
@@ -112,7 +111,13 @@ class SubscriptionController extends Controller
 			if(!Auth::user()->can('edit-iscrizioni')){
 				$remove = "";
 			}
-			return $open.$print.$remove;
+
+			if(Module::find('contabilita')!=null && Module::find('contabilita')->enabled() && !Auth::user()->hasRole('user') && Auth::user()->can('edit-contabilita')){
+				$ricevuta = Form::open(['method' => 'GET', 'route' => ['contabilita.ricevuta', $entity->id]])."<button class='btn btn-sm btn-primary btn-block'><i class='fas fa-hammer'></i> Genera ricevuta</button>".Form::close();
+			}else{
+				$ricevuta = "";
+			}
+			return $open.$print.$ricevuta.$remove;
 		})
 		->addColumn('user_label', function ($sub) use ($event){
 			if($event->stampa_anagrafica == 0){

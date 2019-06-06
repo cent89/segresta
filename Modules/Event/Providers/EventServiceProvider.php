@@ -50,10 +50,10 @@ class EventServiceProvider extends ServiceProvider
     ->prepend("<i class='far fa-file-word'></i> ")
     ->data('permissions', ['view-modulo', 'edit-modulo'])->data('order', 23);
 
-    // $menuList->get('eventi')
-    // ->add('Strumenti', array('route'  => 'events.strumenti'))
-    // ->prepend("<i class='fas fa-gavel' aria-hidden='true'></i> ")
-    // ->data('permissions', ['adminmodule', 'all'])->data('order', 22);
+    $menuList->get('eventi')
+    ->add('Strumenti', array('route'  => 'events.strumenti'))
+    ->prepend("<i class='fas fa-gavel' aria-hidden='true'></i> ")
+    ->data('permissions', ['view-event'])->data('order', 24);
 
   }
 

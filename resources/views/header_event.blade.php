@@ -8,13 +8,18 @@ use Modules\Oratorio\Entities\Oratorio;
 <div class="container">
 	@if(!Auth::guest() && (Auth::user()->can('edit-event') || Auth::user()->can('edit-admin-iscrizioni')) )
 	<?php
+	$user = Auth::user();
 	$oratorio = null;
+	$event = null;
 	if(Session::get('session_oratorio') != null){
 		$oratorio = Oratorio::where('id', Session::get('session_oratorio'))->first();
 	}
 
 	if(Session::get('work_event') != null){
-		$event=Event::where('id', Session::get('work_event'))->first();
+		$event = Event::where('id', Session::get('work_event'))->first();
+	}else if($oratorio != null && $user->last_id_event != null){
+		$event = Event::where('id', $user->last_id_event)->first();
+		if($event != null) Session::put('work_event', $event->id);
 	}
 
 	$buttons_1 = array(
@@ -41,10 +46,10 @@ use Modules\Oratorio\Entities\Oratorio;
 	);
 	$buttons = array();
 
-	$event = null;
-	if(Session::get('work_event') != null){
-		$event = Event::find(Session::get('work_event'));
-	}
+	// $event = null;
+	// if(Session::get('work_event') != null){
+	// 	$event = Event::find(Session::get('work_event'));
+	// }
 	?>
 	<div style="height: 55px; margin-top: 10px; padding: 10px; background-color: red">
 			@if($event != null &&  $event->id_oratorio == Session::get('session_oratorio'))
@@ -53,24 +58,12 @@ use Modules\Oratorio\Entities\Oratorio;
 				 - <i>{{ (strlen(strip_tags($event->descrizione)) > 60) ? substr(strip_tags($event->descrizione), 0, 60) . '...' : strip_tags($event->descrizione) }}</i>
 			 </div>
 			<?php $buttons=$buttons_1; ?>
-			@else
-				@if($oratorio != null && $oratorio->last_id_event>0 && Event::findOrFail($oratorio->last_id_event)->count()>0)
-				<?php
-				Session::put('work_event', $oratorio->last_id_event);
-				$event = Event::where('id', Session::get('work_event'))->first();
-				?>
-				<div style="padding: 5px; float:left; margin-right: 5px; background-color: #FF6347;" >
-					<b>{{$event->nome}}</b>
-					 - <i>{{ (strlen(strip_tags($event->descrizione)) > 60) ? substr(strip_tags($event->descrizione), 0, 60) . '...' : strip_tags($event->descrizione) }}</i>
-				 </div>
-				<?php $buttons = $buttons_1; ?>
+
 				@else
 				<div style="float:left; margin-right: 5px;">Non hai specificato nessun evento!</div>
 				<?php $buttons = $buttons_2; ?>
 				@endif
-
-
-			@endif
+					
 			<div style="float:left; margin-right: 5px;"> <i class="fa fa-star" aria-hidden="true"></i>
 				Accesso rapido: </div>
 				@foreach ($buttons as $button)

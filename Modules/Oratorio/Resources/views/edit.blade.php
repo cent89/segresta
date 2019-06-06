@@ -54,6 +54,18 @@ use Modules\Oratorio\Entities\Oratorio;
 
 					<div class="form-row">
 						<div class="form-group col">
+							{!! Form::label('cf_parrocchia', 'Codice fiscale parrocchia') !!}
+							{!! Form::text('cf_parrocchia', null, ['class' => 'form-control']) !!}
+						</div>
+
+						<div class="form-group col">
+							{!! Form::label('piva_parrocchia', 'P.IVA parrocchia') !!}
+							{!! Form::text('piva_parrocchia', null, ['class' => 'form-control']) !!}
+						</div>
+					</div>
+
+					<div class="form-row">
+						<div class="form-group col">
 							{!! Form::label('nome_diocesi', 'Nome della Diocesi') !!}
 							{!! Form::text('nome_diocesi', null, ['class' => 'form-control']) !!}
 						</div>

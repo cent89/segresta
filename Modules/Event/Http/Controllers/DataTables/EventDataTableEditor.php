@@ -65,11 +65,10 @@ class EventDataTableEditor extends DataTablesEditor
   }
 
   public function deleted(Model $model, array $data){
-    $oratorio = Oratorio::find(Session::get('session_oratorio'));
-    if($model->id == $oratorio->last_id_event){
-      $oratorio->last_id_event = null;
-      $oratorio->save();
-    }
+    // if($model->id == Auth::user()->last_id_event){
+    //   $oratorio->last_id_event = null;
+    //   $oratorio->save();
+    // }
   }
 
 }

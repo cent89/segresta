@@ -10,15 +10,21 @@ use Modules\Event\Entities\EventSpec;
 @section('content')
 <div class="container">
 	<div class="row">
-		<h1><i class="fas fa-gavel" aria-hidden="true"></i> Strumenti</h1>
-		<p class="lead">Alcuni strumenti utili per il tuo evento</p>
-		<hr>
-	</div>
-	<div class="row">
-		<div class="col-md-8 col-md-offset-2" style="margin-left: 5%; width: 90%;">
-			<div class="panel panel-default panel-left">
-				<div class="panel-heading">Genera Squadre</div>
-				<div class="panel-body">
+    <div class="col">
+      <div class="card bg-transparent border-0">
+        <h1><i class='fas fa-gavel'></i> Strumenti</h1>
+        <p class="lead">Alcuni strumenti utili per il tuo evento</p>
+        <hr>
+      </div>
+    </div>
+  </div>
+
+	<div class="row justify-content-center" style="margin-top: 20px;">
+    <div class="col">
+      <div class="card">
+				<div class="card-header">Genera squadre</div>
+        <div class="card-body">
+
 					<p>Con questo strumento puoi assegnare tutti gli iscritti ad un determinato numero di squadre. L'assegnamento viene fatto in modo casuale, tenendo conto delle presenze settimanali e di un vincolo che puoi decidere tu.</p>
 
 					{!! Form::open(['route' => 'eventspecs.riempi_specifica']) !!}
@@ -50,11 +56,14 @@ use Modules\Event\Entities\EventSpec;
 
 				</div>
 			</div>
+		</div>
 
-			<div class="panel panel-default panel-right">
-				<div class="panel-heading">Elimina specifica da tutte le iscrizioni</div>
-				<div class="panel-body">
+		<div class="col">
+      <div class="card">
+				<div class="card-header">Elimina specifica da tutte le iscrizioni</div>
+        <div class="card-body">
 					<p>Se per sbaglio hai generato o inserito una specifica in tutte le iscrizioni, puoi eliminarla in un colpo solo.</p>
+					<p>Se nell'iscrizione è presente la stessa specifica più volte, verrà eliminata solo quella più recente.</p>
 
 					{!! Form::open(['route' => 'eventspecs.elimina_specifica']) !!}
 
@@ -72,11 +81,12 @@ use Modules\Event\Entities\EventSpec;
 					{!! Form::close() !!}
 				</div>
 			</div>
+		</div>
 
-
-			<div class="panel panel-default panel-right">
-				<div class="panel-heading">Aggiungi specifica in tutte le iscrizioni</div>
-				<div class="panel-body">
+		<div class="col">
+      <div class="card">
+				<div class="card-header">Aggiungi specifica in tutte le iscrizioni</div>
+        <div class="card-body">
 					<p>Con questo strumento puoi aggiungere una specifica in tutte le iscrizioni già esistenti, selezionando anche il valore predefinito da associare.</p>
 
 					{!! Form::open(['route' => 'eventspecs.aggiungi_specifica']) !!}
@@ -104,6 +114,8 @@ use Modules\Event\Entities\EventSpec;
 				</div>
 			</div>
 		</div>
+
+
 	</div>
 </div>
 @endsection

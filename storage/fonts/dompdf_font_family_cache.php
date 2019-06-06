@@ -83,4 +83,7 @@
   'nunito' => array(
     'normal' => $fontDir . '/2ee5a7797d02fe4d560048b698835802',
   ),
+  'encode sans condensed' => array(
+    'normal' => $fontDir . '/706596a1cccc6c8f4939f0e48052411f',
+  ),
 ) ?>

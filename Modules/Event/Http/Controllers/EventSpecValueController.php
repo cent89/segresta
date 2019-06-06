@@ -79,7 +79,7 @@ class EventSpecValueController extends Controller
 			$edit = "<div style=''><div style='display: flow-root'><button class='btn btn-sm btn-primary btn-block' id='editor_edit' style='float: left; width: 50%; margin-right: 2px;'><i class='fas fa-pencil-alt'></i> Modifica</button>";
       $remove = "<button class='btn btn-sm btn-danger btn-block' id='editor_remove'><i class='fas fa-trash-alt'></i> Rimuovi</button>";
 
-			if(!Auth::user()->can('edit-iscrizioni') || $subscription->confirmed == 1){
+			if(!Auth::user()->can('edit-iscrizioni')){
 				$remove = "";
 			}
 
@@ -118,12 +118,17 @@ class EventSpecValueController extends Controller
 
 	public function valore_field(Request $request){
     $input = $request->all();
-    $eventspecvalue = EventSpecValue::find($input['id_eventspecvalue']);
-    if($eventspecvalue == null){
+    // $eventspecvalue = EventSpecValue::find($input['id_eventspecvalue']);
+    // if($eventspecvalue == null){
+    //   return json_encode($input['id_eventspecvalue']);
+    // }
+		//
+		// $event_spec = EventSpec::find($eventspecvalue->id_eventspec);
+		
+		$event_spec = EventSpec::leftJoin('event_spec_values', 'event_specs.id', 'event_spec_values.id_eventspec')->where('event_spec_values.id', $input['id_eventspecvalue'])->first();
+		if($event_spec == null){
       return json_encode($input['id_eventspecvalue']);
     }
-
-		$event_spec = EventSpec::find($eventspecvalue->id_eventspec);
 
     if($event_spec->id_type > 0){
       $types = TypeSelect::where('id_type', $event_spec->id_type)->orderBy('ordine', 'ASC')->pluck('id', 'option');
@@ -412,15 +417,18 @@ class EventSpecValueController extends Controller
 			$i++;
 		}
 
-		Session::flash('flash_message', 'Squadre generate!');
-		return redirect()->route('subscription.index');
+		//Session::flash('flash_message', 'Squadre generate!');
+		//return redirect()->route('subscription.index');
 
 		//echo "<br><br><h1>Gruppi defintivi:</h1>";
 		//var_dump($gruppi_generati);
 	}
 
 	public function elimina_specifica(Request $request){
-		EventSpecValue::where('id_eventspec', $request['id_eventspec'])->delete();
+		foreach(Subscription::where('id_event', Session::get('work_event'))->get() as $sub){
+			EventSpecValue::where([['id_eventspec', $request['id_eventspec']], ['id_subscription', $sub->id]])->orderBy('created_at', 'DESC')->first()->delete();
+		}
+
 		Session::flash('flash_message', 'Specifica eliminata da tutte le iscrizioni!');
 		return redirect()->route('subscription.index');
 	}

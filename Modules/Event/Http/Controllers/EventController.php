@@ -98,9 +98,9 @@ class EventController extends Controller
 	* @return Response
 	*/
 	public function work(Request $request, $id_event){
-		$oratorio = Oratorio::findOrFail(Session::get('session_oratorio'));
-		$oratorio->last_id_event = $id_event;
-		$oratorio->save();
+		$user = Auth::user();
+		$user->last_id_event = $id_event;
+		$user->save();
 		Session::put('work_event', $id_event);
 		return redirect()->route('subscription.index');
 	}
