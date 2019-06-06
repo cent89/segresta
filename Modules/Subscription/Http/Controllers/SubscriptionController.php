@@ -87,14 +87,19 @@ class SubscriptionController extends Controller
 		->select('subscriptions.*', 'users.name', 'users.cognome')
 		->leftJoin('users', 'subscriptions.id_user', 'users.id')
 		->where('id_event', $input['id_event'])
-		->orderBy('created_at', 'DESC');
+		->orderBy('users.cognome', 'ASC');
 
 		$event = Event::find($input['id_event']);
 		$array_moduli = json_decode($event->id_moduli);
 		$moduli = Modulo::whereIn('id', $array_moduli)->orderBy('label', 'ASC')->pluck('label', 'id');
+		$contabilita_abilitata = false;
+		$mod_cont = Module::find('contabilita');
+		if($mod_cont!=null && $mod_cont->enabled() && Auth::user()->can('edit-contabilita')){
+			$contabilita_abilitata = true;
+		}
 
 		return $datatables->eloquent($builder)
-		->addColumn('action', function ($entity) use ($moduli){
+		->addColumn('action', function ($entity) use ($moduli, $contabilita_abilitata){
 			$remove = "<button class='btn btn-sm btn-danger btn-block' id='editor_remove'><i class='fas fa-trash-alt'></i> Rimuovi</button>";
 			$open = "<button class='btn btn-sm btn-primary btn-block' onclick='load_iscrizione(".$entity->id.")' type='button'><i class='fas fa-flag'></i> Apri</button>";
 
@@ -112,7 +117,7 @@ class SubscriptionController extends Controller
 				$remove = "";
 			}
 
-			if(Module::find('contabilita')!=null && Module::find('contabilita')->enabled() && !Auth::user()->hasRole('user') && Auth::user()->can('edit-contabilita')){
+			if($contabilita_abilitata){
 				$ricevuta = Form::open(['method' => 'GET', 'route' => ['contabilita.ricevuta', $entity->id]])."<button class='btn btn-sm btn-primary btn-block'><i class='fas fa-hammer'></i> Genera ricevuta</button>".Form::close();
 			}else{
 				$ricevuta = "";
@@ -154,11 +159,6 @@ class SubscriptionController extends Controller
 		->filterColumn('user_label', function($query, $keyword) {
 			$sql = "CONCAT(users.cognome,' ',users.name)  like ?";
 			$query->whereRaw($sql, ["%{$keyword}%"]);
-		})
-		->addColumn('specs', function ($sub){
-			$click = "load_spec_subscription(".$sub->id.")";
-			$check = "<i style= \"color:#3e93c3; cursor: pointer;\" onclick=\"$click\" class='fa fa-flag fa-2x' aria-hidden='true'></i>";
-			return $check;
 		})
 		->addColumn('DT_RowId', function ($entity){
 			return $entity->id;
