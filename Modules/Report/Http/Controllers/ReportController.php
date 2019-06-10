@@ -109,7 +109,7 @@ class ReportController extends Controller
 			$report = new Report();
 			$report->titolo = "Il mio nuovo report";
 			$report->id_event = Session::get('work_event');
-			$report->function_name = 'report.gen_eventspec';
+			$report->route = 'report.gen_eventspec';
 			$input['format'] = 'excel';
 			$report->report = json_encode($input);
 			$report->save();
@@ -140,7 +140,7 @@ class ReportController extends Controller
 			$report = new Report();
 			$report->titolo = "Il mio nuovo report";
 			$report->id_event = Session::get('work_event');
-			$report->function_name = 'report.gen_weekspec';
+			$report->route = 'report.gen_weekspec';
 			$input['format'] = 'excel';
 			$report->report = json_encode($input);
 			$report->save();
