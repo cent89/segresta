@@ -30,8 +30,7 @@
     "filp/whoops": "^2.3",
     "doctrine/dbal": "v2.4.2",
     "fzaninotto/faker": "~1.4",
-    "ixudra/curl": "6.*",
-    "spatie/laravel-medialibrary": "^7.6"
+    "ixudra/curl": "6.*"
   },
   "require-dev": {
     "mockery/mockery": "0.9.*",
