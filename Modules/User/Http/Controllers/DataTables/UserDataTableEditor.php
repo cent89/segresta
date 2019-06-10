@@ -116,7 +116,7 @@ class UserDataTableEditor extends DataTablesEditor
       $componente->save();
     }
 
-    return $data;
+    return $model;
   }
 
   public function updating(Model $model, array $data)

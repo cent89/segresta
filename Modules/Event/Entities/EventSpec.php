@@ -7,9 +7,12 @@ use Modules\Oratorio\Entities\TypeSelect;
 use Modules\Oratorio\Entities\Type;
 use Session;
 use Modules\Event\Entities\Week;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class EventSpec extends Model
+class EventSpec extends Model implements Auditable
 {
+  use \OwenIt\Auditing\Auditable;
+  
   protected $fillable = ['id_event', 'ordine', 'valid_for', 'general', 'label', 'descrizione', 'id_type', 'hidden',
   'price', 'acconto', 'id_cassa', 'id_tipopagamento', 'id_modopagamento', 'descrizione'];
 
@@ -65,6 +68,15 @@ class EventSpec extends Model
     }
 
     return $options;
+  }
+
+  public function transformAudit(array $data): array
+  {
+    if (Session::has('session_oratorio')) {
+      $data['id_oratorio'] = Session::get('session_oratorio');
+    }
+
+    return $data;
   }
 
 

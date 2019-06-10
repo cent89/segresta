@@ -49,7 +49,12 @@ class OratorioServiceProvider extends ServiceProvider
     $menuList->get('oratorio')
     ->add('Ruoli e permessi', array('route'  => 'role.index'))
     ->prepend("<i class='fas fa-ruler-combined' aria-hidden='true'></i> ")
-    ->data('permissions', ['edit-permission'])->data('order', 12);
+    ->data('permissions', ['edit-permission'])->data('order', 13);
+
+    $menuList->get('oratorio')
+    ->add('Log Attività', array('route'  => 'oratorio.audit'))
+    ->prepend("<i class='fas fa-stream'></i> ")
+    ->data('permissions', ['edit-permission'])->data('order', 14);
 
   }
 

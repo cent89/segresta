@@ -6,22 +6,24 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Zizaco\Entrust\Traits\EntrustUserTrait;
 use Carbon\Carbon;
+use OwenIt\Auditing\Contracts\Auditable;
+use Session;
 
-class UserOratorio extends Authenticatable
+class UserOratorio extends Authenticatable implements Auditable
 {
-    use Notifiable;
-    use EntrustUserTrait;
+  use \OwenIt\Auditing\Auditable;
+  use Notifiable;
+  use EntrustUserTrait;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-	protected $table = 'user_oratorio';
-	protected $fillable = ['id_user', 'id_oratorio'];
+  protected $table = 'user_oratorio';
+  protected $fillable = ['id_user', 'id_oratorio'];
 
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array */
+  public function transformAudit(array $data): array
+  {
+    if (Session::has('session_oratorio')) {
+      $data['id_oratorio'] = Session::get('session_oratorio');
+    }
+
+    return $data;
+  }
 }

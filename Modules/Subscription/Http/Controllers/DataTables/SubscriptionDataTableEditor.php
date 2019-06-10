@@ -55,11 +55,6 @@ class SubscriptionDataTableEditor extends DataTablesEditor
     return $data;
   }
 
-  public function created(Model $model, array $data)
-  {
-    return $data;
-  }
-
   public function updating(Model $model, array $data)
   {
     if($model->confirmed == 0 && $data['confirmed'] == 1){

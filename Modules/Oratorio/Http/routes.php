@@ -9,4 +9,6 @@ Route::group(['middleware' => ['web',  'verified'], 'prefix' => 'admin', 'namesp
 	Route::get('type/{id}/opzioni', ['as' =>'type.opzioni', 'uses' => 'TypeController@opzioni']);
 	Route::get('typeselect/getData', ['as' => 'typeselect.data', 'uses' => 'TypeSelectController@data']);
 	Route::get('oratorio/view', ['as' => 'oratorio.index', 'uses' => 'OratorioController@show']);
+	Route::get('oratorio/audit', ['as' => 'oratorio.audit', 'uses' => 'OratorioController@audit']);
+	Route::get('oratorio/log_audit', ['as' => 'oratorio.log_audit', 'uses' => 'OratorioController@log_audit']);
 });

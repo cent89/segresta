@@ -15,6 +15,8 @@ use App\RoleUser;
 use App\Permission;
 use Modules\User\Entities\User;
 use Modules\Oratorio\Entities\UserOratorio;
+use Modules\Oratorio\Entities\Audit;
+use Yajra\DataTables\DataTables;
 use Auth;
 use Input;
 use File;
@@ -22,13 +24,14 @@ use Image;
 use Session;
 use Storage;
 use Mail;
+use DB;
 
 class OratorioController extends Controller
 {
 
   public function __construct(){
-    $this->middleware('permission:edit-oratorio')->only(['show', 'update']);
-  }  
+    $this->middleware('permission:edit-oratorio')->only(['show', 'update', 'audit']);
+  }
 
   /**
   * Display the specified resource.
@@ -119,5 +122,23 @@ class OratorioController extends Controller
 
   public function neworatorio(Request $request){
     return view('neworatorio');
+  }
+
+  public function audit(Request $request){
+    return view('oratorio::audit');
+  }
+
+  public function log_audit(Request $request, Datatables $datatables){
+    $input = $request->all();
+
+    $builder = Audit::query()
+    ->select('audits.*', DB::raw("CONCAT(users.name,' ' ,users.cognome) as user_label"))
+    ->leftJoin('users', 'users.id', 'audits.user_id')
+    ->where('id_oratorio', Session::get('session_oratorio'))
+    ->orderBy('created_at', 'DESC');
+
+    return $datatables->eloquent($builder)
+    ->rawColumns([])
+    ->toJson();
   }
 }

@@ -69,10 +69,6 @@ class ModuloDataTableEditor extends DataTablesEditor
     return $data;
   }
 
-  public function created(Model $model, array $data)
-  {
-  }
-
   public function deleted(Model $model, array $data){
     if($model->path_file != ""){
       Storage::delete('public/'.$model->path_file);

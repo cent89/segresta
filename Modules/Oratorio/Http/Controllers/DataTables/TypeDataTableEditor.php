@@ -16,6 +16,11 @@ class TypeDataTableEditor extends DataTablesEditor
 {
   protected $model = Type::class;
 
+  public $message = [
+    'label.required' => 'Devi specificare una nome',
+    'description.required' => 'Devi specificare una descrizione',
+  ];
+
   /**
   * Get create action validation rules.
   *
@@ -23,11 +28,26 @@ class TypeDataTableEditor extends DataTablesEditor
   */
   public function createRules()
   {
-    return [];
+    return [
+        'label' => 'required',
+        'description' => 'required',
+    ];
   }
 
   public function createMessages(){
-    return [];
+    return $this->message;
+  }
+
+  public function editRules(Model $model)
+  {
+    return [
+      'label' => 'required',
+      'description' => 'required',
+    ];
+  }
+
+  public function editMessages(){
+    return $this->message;
   }
 
   /**
@@ -55,10 +75,6 @@ class TypeDataTableEditor extends DataTablesEditor
   public function creating(Model $model, array $data)
   {
     return $data;
-  }
-
-  public function created(Model $model, array $data)
-  {
   }
 
   public function updating(Model $model, array $data)

@@ -11,11 +11,13 @@ use Illuminate\Support\Facades\Config;
 use Session;
 use App\Notifications\VerificaEmail;
 use App\Notifications\ResetPassword;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail, Auditable
 {
   use Notifiable;
   use EntrustUserTrait;
+  use \OwenIt\Auditing\Auditable;
 
   /**
   * The attributes that are mass assignable.
@@ -62,9 +64,9 @@ class User extends Authenticatable implements MustVerifyEmail
   {
     if(Session::has('session_oratorio')){
       //if($this->email == config('app.owner_email')){
-        //return $this->belongsToMany(Config::get('entrust.role'), Config::get('entrust.role_user_table'), Config::get('entrust.user_foreign_key'), Config::get('entrust.role_foreign_key'))->where('roles.id_oratorio', null);
+      //return $this->belongsToMany(Config::get('entrust.role'), Config::get('entrust.role_user_table'), Config::get('entrust.user_foreign_key'), Config::get('entrust.role_foreign_key'))->where('roles.id_oratorio', null);
       //}else{
-        return $this->belongsToMany(Config::get('entrust.role'), Config::get('entrust.role_user_table'), Config::get('entrust.user_foreign_key'), Config::get('entrust.role_foreign_key'))->where('roles.id_oratorio', Session::get('session_oratorio'));
+      return $this->belongsToMany(Config::get('entrust.role'), Config::get('entrust.role_user_table'), Config::get('entrust.user_foreign_key'), Config::get('entrust.role_foreign_key'))->where('roles.id_oratorio', Session::get('session_oratorio'));
       //}
     }else{
       return $this->belongsToMany(Config::get('entrust.role'), Config::get('entrust.role_user_table'), Config::get('entrust.user_foreign_key'), Config::get('entrust.role_foreign_key'));
@@ -79,6 +81,15 @@ class User extends Authenticatable implements MustVerifyEmail
   public function sendPasswordResetNotification($token)
   {
     $this->notify(new ResetPassword($token));
+  }
+
+  public function transformAudit(array $data): array
+  {
+    if (Session::has('session_oratorio')) {
+      $data['id_oratorio'] = Session::get('session_oratorio');
+    }
+
+    return $data;
   }
 
 }

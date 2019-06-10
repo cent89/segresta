@@ -4,9 +4,12 @@ namespace Modules\Oratorio\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Session;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Type extends Model
+class Type extends Model implements Auditable
 {
+	use \OwenIt\Auditing\Auditable;
+	
 	protected $fillable = ['label', 'description', 'id_oratorio'];
 
 	const TEXT_TYPE = -1;
@@ -63,4 +66,13 @@ class Type extends Model
 		$type = Type::find($key);
 		return $type != null? $type->label : "";
 	}
+
+	public function transformAudit(array $data): array
+  {
+    if (Session::has('session_oratorio')) {
+      $data['id_oratorio'] = Session::get('session_oratorio');
+    }
+
+    return $data;
+  }
 }

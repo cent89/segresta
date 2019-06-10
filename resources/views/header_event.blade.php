@@ -63,7 +63,7 @@ use Modules\Oratorio\Entities\Oratorio;
 				<div style="float:left; margin-right: 5px;">Non hai specificato nessun evento!</div>
 				<?php $buttons = $buttons_2; ?>
 				@endif
-					
+
 			<div style="float:left; margin-right: 5px;"> <i class="fa fa-star" aria-hidden="true"></i>
 				Accesso rapido: </div>
 				@foreach ($buttons as $button)

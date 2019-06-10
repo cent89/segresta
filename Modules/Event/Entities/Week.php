@@ -4,9 +4,13 @@ namespace Modules\Event\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use OwenIt\Auditing\Contracts\Auditable;
+use Session;
 
-class Week extends Model
+class Week extends Model implements Auditable
 {
+  use \OwenIt\Auditing\Auditable;
+  
   /**
   * The attributes that are mass assignable.
   *
@@ -41,5 +45,14 @@ class Week extends Model
     if($value != null){
       $this->attributes['to_date'] = Carbon::createFromFormat('d/m/Y', $value)->toDateString();
     }
+  }
+
+  public function transformAudit(array $data): array
+  {
+    if (Session::has('session_oratorio')) {
+      $data['id_oratorio'] = Session::get('session_oratorio');
+    }
+
+    return $data;
   }
 }
