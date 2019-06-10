@@ -20,7 +20,6 @@ class CreateReportTable extends Migration
             $table->text('report');
             $table->string('titolo');
             $table->string('reoute');
-
             $table->timestamps();
         });
     }
