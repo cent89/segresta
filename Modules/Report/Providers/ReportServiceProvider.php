@@ -44,6 +44,11 @@ class ReportServiceProvider extends ServiceProvider
     ->add('Specifiche settimanali', array('route'  => 'report.weekspec'))
     ->prepend("<i class='far fa-file-alt' aria-hidden='true'></i> ")
     ->data('permissions', ['generate-report'])->data('order', 42);
+
+    $menuList->get('report')
+    ->add('Report salvati (modelli)', array('route'  => 'report.index'))
+    ->prepend("<i class='far fa-file-alt'></i> ")
+    ->data('permissions', ['generate-report'])->data('order', 40);
   }
 
   /**

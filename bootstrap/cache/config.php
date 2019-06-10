@@ -111,6 +111,46 @@
       'edit-attributo' => 'Modifica gli attributi degli utenti',
     ),
   ),
+  'audit' => 
+  array (
+    'implementation' => 'OwenIt\\Auditing\\Models\\Audit',
+    'user' => 
+    array (
+      'morph_prefix' => 'user',
+      'guards' => 
+      array (
+        0 => 'web',
+        1 => 'api',
+      ),
+    ),
+    'resolver' => 
+    array (
+      'user' => 'OwenIt\\Auditing\\Resolvers\\UserResolver',
+      'ip_address' => 'OwenIt\\Auditing\\Resolvers\\IpAddressResolver',
+      'user_agent' => 'OwenIt\\Auditing\\Resolvers\\UserAgentResolver',
+      'url' => 'OwenIt\\Auditing\\Resolvers\\UrlResolver',
+    ),
+    'events' => 
+    array (
+      0 => 'created',
+      1 => 'updated',
+      2 => 'deleted',
+      3 => 'restored',
+    ),
+    'strict' => false,
+    'timestamps' => false,
+    'threshold' => 0,
+    'driver' => 'database',
+    'drivers' => 
+    array (
+      'database' => 
+      array (
+        'table' => 'audits',
+        'connection' => NULL,
+      ),
+    ),
+    'console' => false,
+  ),
   'auth' => 
   array (
     'defaults' => 
@@ -1048,5 +1088,75 @@
   'whatsapp' => 
   array (
     'name' => 'Whatsapp',
+  ),
+  'medialibrary' => 
+  array (
+    'disk_name' => 'public',
+    'max_file_size' => 10485760,
+    'queue_name' => '',
+    'media_model' => 'Spatie\\MediaLibrary\\Models\\Media',
+    's3' => 
+    array (
+      'domain' => 'https://.s3.amazonaws.com',
+    ),
+    'remote' => 
+    array (
+      'extra_headers' => 
+      array (
+        'CacheControl' => 'max-age=604800',
+      ),
+    ),
+    'responsive_images' => 
+    array (
+      'width_calculator' => 'Spatie\\MediaLibrary\\ResponsiveImages\\WidthCalculator\\FileSizeOptimizedWidthCalculator',
+      'use_tiny_placeholders' => true,
+      'tiny_placeholder_generator' => 'Spatie\\MediaLibrary\\ResponsiveImages\\TinyPlaceholderGenerator\\Blurred',
+    ),
+    'url_generator' => NULL,
+    'path_generator' => NULL,
+    'image_optimizers' => 
+    array (
+      'Spatie\\ImageOptimizer\\Optimizers\\Jpegoptim' => 
+      array (
+        0 => '--strip-all',
+        1 => '--all-progressive',
+      ),
+      'Spatie\\ImageOptimizer\\Optimizers\\Pngquant' => 
+      array (
+        0 => '--force',
+      ),
+      'Spatie\\ImageOptimizer\\Optimizers\\Optipng' => 
+      array (
+        0 => '-i0',
+        1 => '-o2',
+        2 => '-quiet',
+      ),
+      'Spatie\\ImageOptimizer\\Optimizers\\Svgo' => 
+      array (
+        0 => '--disable=cleanupIDs',
+      ),
+      'Spatie\\ImageOptimizer\\Optimizers\\Gifsicle' => 
+      array (
+        0 => '-b',
+        1 => '-O3',
+      ),
+    ),
+    'image_generators' => 
+    array (
+      0 => 'Spatie\\MediaLibrary\\ImageGenerators\\FileTypes\\Image',
+      1 => 'Spatie\\MediaLibrary\\ImageGenerators\\FileTypes\\Webp',
+      2 => 'Spatie\\MediaLibrary\\ImageGenerators\\FileTypes\\Pdf',
+      3 => 'Spatie\\MediaLibrary\\ImageGenerators\\FileTypes\\Svg',
+      4 => 'Spatie\\MediaLibrary\\ImageGenerators\\FileTypes\\Video',
+    ),
+    'image_driver' => 'gd',
+    'ffmpeg_path' => '/usr/bin/ffmpeg',
+    'ffprobe_path' => '/usr/bin/ffprobe',
+    'temporary_directory_path' => NULL,
+    'jobs' => 
+    array (
+      'perform_conversions' => 'Spatie\\MediaLibrary\\Jobs\\PerformConversions',
+      'generate_responsive_images' => 'Spatie\\MediaLibrary\\Jobs\\GenerateResponsiveImages',
+    ),
   ),
 );

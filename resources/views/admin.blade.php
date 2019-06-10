@@ -3,6 +3,7 @@ use Modules\Event\Entities\Week;
 use Modules\Event\Entities\Event;
 use Modules\Subscription\Entities\Subscription;
 use Modules\User\Entities\User;
+use Modules\Report\Entities\Report;
 use App\OwnerMessage;
 use Modules\Sms\Http\Controllers\SmsController;
 use Modules\Whatsapp\Http\Controllers\WhatsappController;
@@ -10,6 +11,8 @@ use Carbon\Carbon;
 
 $aggiornamenti=file_get_contents("https://segresta.it/aggiornamenti.php");
 $aggiornamenti=json_decode($aggiornamenti, JSON_FORCE_OBJECT);
+
+$report = Report::where('id_event', Session::get('work_event'))->get();
 ?>
 
 @extends('layouts.app')
@@ -71,6 +74,27 @@ $aggiornamenti=json_decode($aggiornamenti, JSON_FORCE_OBJECT);
           @else
           Il modulo SMS non è attivo.
           @endif
+        </div>
+      </div>
+    </div>
+
+    <div class="col-4">
+      <div class="card">
+        <div class="card-header">Report rapidi</div>
+        <div class="card-body">
+
+          @if(count($report)>0)
+          @foreach($report as $r)
+          {!! Form::open(['route' => $r->route]) !!}
+          {!! Form::hidden('report', $r->report) !!}
+          {!! Form::submit($r->titolo, ['class' => 'btn btn-primary form-control']) !!}
+          {!! Form::close() !!}
+          @endforeach
+          @else
+          <p>Nessun report ancora salvato!</p>
+          @endif
+
+
         </div>
       </div>
     </div>

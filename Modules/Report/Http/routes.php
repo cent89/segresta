@@ -9,7 +9,7 @@ Route::group(['middleware' => ['web', 'verified'], 'prefix' => 'admin', 'namespa
 	Route::get('report/user', ['as' => 'report.user', 'uses' => 'ReportController@user']);
 	Route::post('report/gen_user', ['as' => 'report.gen_user', 'uses' => 'ReportController@gen_user']);
 
-	//report 2 prova
-	Route::get('report/report2', ['as' => 'report.report2', 'uses' => 'ReportController@report2']);
+	Route::resource('report', 'ReportController', ['only' => ['store', 'index']]);
+	Route::get('report/getData', ['as' =>'report.data', 'uses' => 'ReportController@data']);
 
 });

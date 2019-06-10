@@ -244,6 +244,7 @@ use Modules\Attributo\Entities\Attributo;
 								{!! Form::radio('format', 'html', false) !!} HTML
 								{!! Form::radio('format', 'pdf', true) !!} PDF
 								{!! Form::radio('format', 'excel', false) !!} Excel
+								{!! Form::radio('format', 'save', false) !!} Salva come modello
 								<br><br>
 								Mostra i filtri applicati nella parte alta della pagina
 								{!! Form::hidden('mostra_fitri', '0') !!}

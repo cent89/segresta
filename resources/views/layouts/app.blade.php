@@ -348,7 +348,7 @@ use Modules\Oratorio\Entities\Oratorio;
     $('#eventspecsOp').modal('hide');
   }
 
-  
+
 
     /**
     Funzione che viene richiamata quando un select cambia valore; viene popolato lo span (#span_type)
