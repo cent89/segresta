@@ -124,7 +124,7 @@ class EventSpecValueController extends Controller
     // }
 		//
 		// $event_spec = EventSpec::find($eventspecvalue->id_eventspec);
-		
+
 		$event_spec = EventSpec::leftJoin('event_spec_values', 'event_specs.id', 'event_spec_values.id_eventspec')->where('event_spec_values.id', $input['id_eventspecvalue'])->first();
 		if($event_spec == null){
       return json_encode($input['id_eventspecvalue']);
@@ -426,7 +426,8 @@ class EventSpecValueController extends Controller
 
 	public function elimina_specifica(Request $request){
 		foreach(Subscription::where('id_event', Session::get('work_event'))->get() as $sub){
-			EventSpecValue::where([['id_eventspec', $request['id_eventspec']], ['id_subscription', $sub->id]])->orderBy('created_at', 'DESC')->first()->delete();
+			$spec = EventSpecValue::where([['id_eventspec', $request['id_eventspec']], ['id_subscription', $sub->id]])->orderBy('created_at', 'DESC')->first();
+			if($spec != null) $spec->delete();
 		}
 
 		Session::flash('flash_message', 'Specifica eliminata da tutte le iscrizioni!');

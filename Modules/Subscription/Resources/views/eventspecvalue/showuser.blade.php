@@ -55,7 +55,7 @@ $weeks_json = json_encode($weeks_json);
   <h2>Informazioni settimanali</h2>
 
   @foreach($weeks as $w)
-  <h3>Settimana {{ $w->id}}</h3>
+  <h3>Settimana {{ $w->from_date}} - {{ $w->to_date}}</h3>
   <table class='table table-bordered' id="spec_table_{{$w->id}}" style="width: 100%">
     <thead>
       <tr>
