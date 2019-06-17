@@ -25,7 +25,7 @@ use Modules\Famiglia\Entities\ComponenteFamiglia;
 
 </head>
 <?php
-function stampa_tabella($input, $whereRaw, $format){
+function stampa_tabella($input, $whereRaw, $format, $stampa_famiglia){
 	$event = Event::findOrFail(Session::get('work_event'));
 	$weeks = Week::where('id_event', Session::get('work_event'))->orderBy('from_date', 'ASC')->get();
 	$w=0;
@@ -155,8 +155,8 @@ function stampa_tabella($input, $whereRaw, $format){
 					}
 					if($stampa_famiglia){
 						//stampo info su padre e madre
-						$padre = ComponenteFamiglia::getPadre($sub->id_user);
-						$madre = ComponenteFamiglia::getMadre($sub->id_user);
+						$padre = ComponenteFamiglia::getPadre($sub->id);
+						$madre = ComponenteFamiglia::getMadre($sub->id);
 						echo "<td>".($padre!=null?$padre->full_name:'')."</td><td>".($padre!=null?$padre->cell_number:'')."</td>";
 						echo "<td>".($madre!=null?$madre->full_name:'')."</td><td>".($madre!=null?$madre->cell_number:'')."</td>";
 					}
