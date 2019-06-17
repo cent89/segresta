@@ -10,6 +10,7 @@ use Modules\Event\Entities\EventSpec;
 use Modules\Oratorio\Entities\TypeSelect;
 use Modules\Attributo\Entities\Attributo;
 use Modules\Attributo\Entities\AttributoUser;
+use Modules\Famiglia\Entities\ComponenteFamiglia;
 ?>
 
 <html>
@@ -37,6 +38,12 @@ function stampa_tabella($input, $whereRaw, $format){
 			echo "<tr>";
 			echo "<th>ID</th>";
 			echo "<th>Utente</th>";
+			if($stampa_famiglia){
+				echo "<th>Padre</th>";
+				echo "<th>Telefono</th>";
+				echo "<th>Madre</th>";
+				echo "<th>Telefono</th>";
+			}
 			echo "<th>Confermata</th>";
 			//intestazione campi da inserire nel report
 			$columnSpecs1 = (new EventSpec)
@@ -145,6 +152,13 @@ function stampa_tabella($input, $whereRaw, $format){
 						}
 					}else{
 						echo "<td>".$sub->cognome." ".$sub->name."</td>";
+					}
+					if($stampa_famiglia){
+						//stampo info su padre e madre
+						$padre = ComponenteFamiglia::getPadre($sub->id_user);
+						$madre = ComponenteFamiglia::getMadre($sub->id_user);
+						echo "<td>".($padre!=null?$padre->full_name:'')."</td><td>".($padre!=null?$padre->cell_number:'')."</td>";
+						echo "<td>".($madre!=null?$madre->full_name:'')."</td><td>".($madre!=null?$madre->cell_number:'')."</td>";
 					}
 					echo "<td>";
 					if($sub->confirmed=='1'){
@@ -497,7 +511,7 @@ function stampa_tabella($input, $whereRaw, $format){
 			$i++;
 		}
 
-		stampa_tabella($input, $whereRaw, $input['format']);
+		stampa_tabella($input, $whereRaw, $input['format'], $input['stampa_famiglia']);
 		?>
 		<br>
 

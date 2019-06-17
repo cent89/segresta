@@ -580,8 +580,13 @@ class SubscriptionController extends Controller
 					//cerco i genitori
 					$padre = ComponenteFamiglia::getPadre($sub->id_user);
 					$madre = ComponenteFamiglia::getMadre($sub->id_user);
-					array_push($user_array, $padre->id);
-					array_push($user_array, $madre->id);
+					if($padre != null){
+						array_push($user_array, $padre->id);
+					}
+					if($madre != null){
+						array_push($user_array, $madre->id);
+					}
+
 				}
 
 			}

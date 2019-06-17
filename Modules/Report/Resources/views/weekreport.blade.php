@@ -517,7 +517,7 @@ function stampa_tabella($input, $whereRaw, $format, $stampa_famiglia){
 			$i++;
 		}
 
-		stampa_tabella($input, $whereRaw, $input['format'], $input['stampa_famiglia']);
+		stampa_tabella($input, $whereRaw, $input['format'], $input['stampa_famiglia']=="1"?true:false);
 		?>
 		<br>
 

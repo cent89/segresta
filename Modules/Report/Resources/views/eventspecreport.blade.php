@@ -134,8 +134,8 @@ function stampa_tabella($input, $whereRaw, $format, $stampa_famiglia){
 				//stampo info su padre e madre
 				$padre = ComponenteFamiglia::getPadre($sub->id_user);
 				$madre = ComponenteFamiglia::getMadre($sub->id_user);
-				echo "<td>".$padre->full_name."</td><td>".$padre->cell_number."</td>";
-				echo "<td>".$madre->full_name."</td><td>".$madre->cell_number."</td>";
+				echo "<td>".($padre!=null?$padre->full_name:'')."</td><td>".($padre!=null?$padre->cell_number:'')."</td>";
+				echo "<td>".($madre!=null?$madre->full_name:'')."</td><td>".($madre!=null?$madre->cell_number:'')."</td>";
 			}
 			echo "<td>".$sub->type."</td>";
 			echo "<td>";
