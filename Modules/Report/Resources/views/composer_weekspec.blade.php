@@ -245,6 +245,16 @@ use Modules\Attributo\Entities\Attributo;
 								{!! Form::radio('format', 'pdf', true) !!} PDF
 								{!! Form::radio('format', 'excel', false) !!} Excel
 								{!! Form::radio('format', 'save', false) !!} Salva come modello
+
+								@if(Module::find('famiglia') != null && Module::find('famiglia')->enabled())
+								<br><br>
+								<h4>Passo 6: Aggiungere le informazioni su Padre e Madre?</h4>
+								{!! Form::radio('stampa_famiglia', 1, false) !!} SI
+								{!! Form::radio('stampa_famiglia', 0, true) !!} NO
+								@else
+                {!! Form::hidden('stampa_famiglia', '0') !!}
+                @endif
+
 								<br><br>
 								Mostra i filtri applicati nella parte alta della pagina
 								{!! Form::hidden('mostra_fitri', '0') !!}

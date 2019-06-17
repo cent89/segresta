@@ -192,8 +192,18 @@ use Modules\Event\Entities\Week;
                   <h4>Come vuoi contattare gli utenti?</h4>
                   {!! Form::radio('type', 'sms', true) !!} SMS<br>
                   {!! Form::radio('type', 'email', false) !!} Email<br>
-                  {!! Form::radio('type', 'telegram', false) !!} Telegram<br>
                 </div>
+
+                @if(Module::find('famiglia') != null && Module::find('famiglia')->enabled())
+                <div class="form-group">
+                  <h4>Vuoi contattare il ragazzo iscritto all'evento o i suoi genitori (padre e madre)?</h4>
+                  {!! Form::radio('invia_a', 'ragazzo', true) !!} Ragazzo<br>
+                  {!! Form::radio('invia_a', 'genitori', false) !!} Genitori<br>
+                </div>
+                @else
+                {!! Form::hidden('invia_a', 'ragazzo') !!}
+                @endif
+
 
                 <div class="form-group">
                   {!! Form::submit('Invia!', ['class' => 'btn btn-primary form-control']) !!}

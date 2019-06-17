@@ -573,7 +573,17 @@ class SubscriptionController extends Controller
 			// }
 
 			if($filter_ok){
-				array_push($user_array, $sub->id_user);
+				if($input['invia_a'] == 'ragazzo'){
+					//invio al ragazzo
+					array_push($user_array, $sub->id_user);
+				}else{
+					//cerco i genitori
+					$padre = ComponenteFamiglia::getPadre($sub->id_user);
+					$madre = ComponenteFamiglia::getMadre($sub->id_user);
+					array_push($user_array, $padre->id);
+					array_push($user_array, $madre->id);
+				}
+
 			}
 		}
 

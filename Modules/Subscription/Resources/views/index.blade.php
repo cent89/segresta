@@ -161,7 +161,7 @@ if("{{ Module::find('email') != null && Module::find('email')->enabled() }}"){
 table = $('#subscriptionTable').DataTable({
   responsive: true,
   processing: true,
-  serverSide: true,
+  serverSide: "{{ $event->stampa_anagrafica?true:false }}",
   lengthChange: true,
   lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
   dom: 'Blfrtip',
