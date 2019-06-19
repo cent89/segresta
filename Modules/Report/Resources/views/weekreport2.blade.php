@@ -18,8 +18,8 @@ use Modules\Famiglia\Entities\ComponenteFamiglia;
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<link href="{{ asset('/css/app.css') }}" rel="stylesheet">
 	<link href="{{ asset('/css/segresta-style.css') }}" rel="stylesheet">
-	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 	<link href="{{ asset('css/jquery-ui.css') }}" rel="stylesheet">
+	<script src="https://kit.fontawesome.com/b4d6e50f05.js"></script>
 	<title>Report</title>
 
 
@@ -175,13 +175,13 @@ function stampa_tabella($input, $whereRaw, $format, $stampa_famiglia){
 						if($format=='excel'){
 							echo "SI";
 						}else{
-							echo "<i class='fa fa-check-square-o'></i> ";
+							echo "<i class='far fa-check-circle'></i> ";
 						}
 					}else{
 						if($format=='excel'){
 							echo "NO";
 						}else{
-							echo "<i class='fa fa-square-o'></i> ";
+							echo "<i class='far fa-circle'></i> ";
 						}
 					}
 					echo "</td>";
@@ -212,13 +212,13 @@ function stampa_tabella($input, $whereRaw, $format, $stampa_famiglia){
 										if($format=='excel'){
 											echo "SI";
 										}else{
-											echo "<i class='fa fa-check-square-o fa-2x'></i> ";
+											echo "<i class='far fa-check-circle fa-2x'></i> ";
 										}
 									}else{
 										if($format=='excel'){
 											echo "NO";
 										}else{
-											echo "<i class='fa fa-square-o fa-2x'></i> ";
+											echo "<i class='far fa-circle fa-2x'></i> ";
 										}
 									}
 									break;
@@ -234,13 +234,13 @@ function stampa_tabella($input, $whereRaw, $format, $stampa_famiglia){
 								if($format=='excel'){
 									echo "SI";
 								}else{
-									echo "<i class='fa fa-check-square-o fa-2x'></i> ";
+									echo "<i class='far fa-check-circle fa-2x'></i> ";
 								}
 							}else{
 								if($format=='excel'){
 									echo "NO";
 								}else{
-									echo "<i class='fa fa-square-o fa-2x'></i> ";
+									echo "<i class='far fa-circle fa-2x'></i> ";
 								}
 							}
 							echo "</td>";
@@ -279,13 +279,13 @@ function stampa_tabella($input, $whereRaw, $format, $stampa_famiglia){
 										if($format=='excel'){
 											echo "SI";
 										}else{
-											echo "<i class='fa fa-check-square-o fa-2x'></i> ";
+											echo "<i class='far fa-check-circle fa-2x'></i> ";
 										}
 									}else{
 										if($format=='excel'){
 											echo "NO";
 										}else{
-											echo "<i class='fa fa-square-o fa-2x'></i> ";
+											echo "<i class='far fa-circle fa-2x'></i> ";
 										}
 									}
 									break;
@@ -301,13 +301,13 @@ function stampa_tabella($input, $whereRaw, $format, $stampa_famiglia){
 								if($format=='excel'){
 									echo "SI";
 								}else{
-									echo "<i class='fa fa-check-square-o fa-2x'></i> ";
+									echo "<i class='far fa-check-circle fa-2x'></i> ";
 								}
 							}else{
 								if($format=='excel'){
 									echo "NO";
 								}else{
-									echo "<i class='fa fa-square-o fa-2x'></i> ";
+									echo "<i class='far fa-circle fa-2x'></i> ";
 								}
 							}
 							echo "</td>";
@@ -351,13 +351,13 @@ function stampa_tabella($input, $whereRaw, $format, $stampa_famiglia){
 											if($format=='excel'){
 												echo "SI";
 											}else{
-												echo "<i class='fa fa-check-square-o fa-2x'></i> ";
+												echo "<i class='far fa-check-circle fa-2x'></i> ";
 											}
 										}else{
 											if($format=='excel'){
 												echo "NO";
 											}else{
-												echo "<i class='fa fa-square-o fa-2x'></i> ";
+												echo "<i class='far fa-circle fa-2x'></i> ";
 											}
 										}
 										break;

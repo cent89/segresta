@@ -256,8 +256,8 @@ use Modules\Attributo\Entities\Attributo;
                 @endif
 
 								<h4>Passo 7: Mostra solo gli utenti che hanno pagato tutte le specifiche</h4>
-								{!! Form::hidden('solo_pagato', '0') !!}
-								{!! Form::checkbox('solo_pagato', '1', true) !!}
+								{!! Form::radio('solo_pagato', 1, true) !!} SI
+								{!! Form::radio('solo_pagato', 0, false) !!} NO
 
 								<br><br>
 								Mostra i filtri applicati nella parte alta della pagina

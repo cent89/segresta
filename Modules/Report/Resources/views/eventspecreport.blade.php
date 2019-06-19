@@ -21,7 +21,7 @@ use Modules\Famiglia\Entities\ComponenteFamiglia;
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<link href="{{ asset('/css/app.css') }}" rel="stylesheet">
 	<link href="{{ asset('/css/segresta-style.css') }}" rel="stylesheet">
-	<link href="{{ asset('/css/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet">
+	<script src="https://kit.fontawesome.com/b4d6e50f05.js"></script>
 	<link href="{{ asset('css/jquery-ui.css') }}" rel="stylesheet">
 	<title>Report</title>
 
@@ -148,13 +148,13 @@ function stampa_tabella($input, $whereRaw, $format, $stampa_famiglia){
 				if($format=='excel'){
 					echo "SI";
 				}else{
-					echo "<i class='fa fa-check-square-o'></i> ";
+					echo "<i class='far fa-check-circle'></i> ";
 				}
 			}else{
 				if($format=='excel'){
 					echo "NO";
 				}else{
-					echo "<i class='fa fa-square-o'></i> ";
+					echo "<i class='far fa-circle'></i> ";
 				}
 			}
 			echo "</td>";
@@ -191,13 +191,13 @@ function stampa_tabella($input, $whereRaw, $format, $stampa_famiglia){
 									if($format=='excel'){
 										echo "SI";
 									}else{
-										echo "<i class='fa fa-check-square-o fa-2x'></i> ";
+										echo "<i class='far fa-check-circle fa-2x'></i> ";
 									}
 								}else{
 									if($format=='excel'){
 										echo "NO";
 									}else{
-										echo "<i class='fa fa-square-o fa-2x'></i> ";
+										echo "<i class='far fa-circle fa-2x'></i> ";
 									}
 								}
 								break;
@@ -242,13 +242,13 @@ function stampa_tabella($input, $whereRaw, $format, $stampa_famiglia){
 									if($format=='excel'){
 										echo "SI";
 									}else{
-										echo "<i class='fa fa-check-square-o fa-2x'></i> ";
+										echo "<i class='far fa-check-circle fa-2x'></i> ";
 									}
 								}else{
 									if($format=='excel'){
 										echo "NO";
 									}else{
-										echo "<i class='fa fa-square-o fa-2x'></i> ";
+										echo "<i class='far fa-circle fa-2x'></i> ";
 									}
 								}
 								break;
