@@ -101,7 +101,12 @@ function stampa_tabella($input, $whereRaw, $format, $stampa_famiglia){
 					foreach($input['week_filter'][$w] as $filter_id){
 						if($filter_id>0 && $filter_ok){
 							//if(isset($filter_values[$f])){
-							$specs = EventSpecValue::where([['id_subscription', $sub->id_sub],['id_week', $week->id], ['id_eventspec', $filter_id], ['valore', $filter_values[$f]]])->orderBy('id_eventspec')->get();
+							if($input['solo_pagato'] == 1){
+								$specs = EventSpecValue::where([['id_subscription', $sub->id_sub],['id_week', $week->id], ['id_eventspec', $filter_id], ['valore', $filter_values[$f]], ['pagato', 1]])->orderBy('id_eventspec')->get();
+							}else{
+								$specs = EventSpecValue::where([['id_subscription', $sub->id_sub],['id_week', $week->id], ['id_eventspec', $filter_id], ['valore', $filter_values[$f]]])->orderBy('id_eventspec')->get();
+							}
+
 							if(count($specs)==0) $filter_ok=false;
 							//}
 						}
@@ -114,7 +119,12 @@ function stampa_tabella($input, $whereRaw, $format, $stampa_famiglia){
 				$filter_values = array_values($input['spec_filter_value']);
 				foreach($input['spec_filter'] as $filter_id){
 					if($filter_id>0 && $filter_ok){
-						$specs = EventSpecValue::where([['id_subscription', $sub->id_sub], ['id_eventspec', $filter_id], ['valore', $filter_values[$f]]])->orderBy('id_eventspec')->get();
+						if($input['solo_pagato'] == 1){
+							$specs = EventSpecValue::where([['id_subscription', $sub->id_sub], ['id_eventspec', $filter_id], ['valore', $filter_values[$f]]])->orderBy('id_eventspec')->get();
+						}else{
+							$specs = EventSpecValue::where([['id_subscription', $sub->id_sub], ['id_eventspec', $filter_id], ['valore', $filter_values[$f]], ['pagato', 1]])->orderBy('id_eventspec')->get();
+						}
+
 						if(count($specs)==0) $filter_ok=false;
 					}
 					$f++;

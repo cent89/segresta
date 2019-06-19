@@ -190,6 +190,10 @@ use Modules\Attributo\Entities\Attributo;
 							{!! Form::hidden('stampa_famiglia', '0') !!}
 							@endif
 
+							<h4>Passo 6: Mostra solo gli utenti che hanno pagato tutte le specifiche</h4>
+							{!! Form::hidden('solo_pagato', '0') !!}
+							{!! Form::checkbox('solo_pagato', '1', true) !!}
+
 							{!! Form::submit('Genera!', ['class' => 'btn btn-primary form-control']) !!}
 							{!! Form::close() !!}
 						</div>

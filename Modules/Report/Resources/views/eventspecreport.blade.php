@@ -87,7 +87,12 @@ function stampa_tabella($input, $whereRaw, $format, $stampa_famiglia){
 		foreach($input['spec_order'] as $index){
 			$id_filter = $input['filter'][$index];
 			if($id_filter>0 && $filter_ok){
-				$e = EventSpecValue::where([['id_eventspec', $id_filter], ['valore', $filter_values[$r]], ['id_subscription', $sub->id_subs] ])->get();
+				if($input['solo_pagato'] == 1){
+					$e = EventSpecValue::where([['id_eventspec', $id_filter], ['valore', $filter_values[$r]], ['id_subscription', $sub->id_subs], ['pagato', 1]])->get();
+				}else{
+					$e = EventSpecValue::where([['id_eventspec', $id_filter], ['valore', $filter_values[$r]], ['id_subscription', $sub->id_subs]])->get();
+				}
+
 				if(count($e)==0){
 					$filter_ok=false;
 				}
