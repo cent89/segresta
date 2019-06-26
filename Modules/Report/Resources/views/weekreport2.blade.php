@@ -102,7 +102,9 @@ function stampa_tabella($input, $whereRaw, $format, $stampa_famiglia){
 						if($filter_id>0 && $filter_ok){
 							//if(isset($filter_values[$f])){
 							if($input['solo_pagato'] == 1){
-								$specs = EventSpecValue::where([['id_subscription', $sub->id_sub],['id_week', $week->id], ['id_eventspec', $filter_id], ['valore', $filter_values[$f]], ['pagato', 1]])->orderBy('id_eventspec')->get();
+								$specs = EventSpecValue::where([['id_subscription', $sub->id_sub],['id_week', $week->id], ['id_eventspec', $filter_id], ['valore', $filter_values[$f]], ['pagato', 1]])
+								->orWhere([['id_subscription', $sub->id_sub],['id_week', $week->id], ['id_eventspec', $filter_id], ['valore', $filter_values[$f]], ['costo', 0], ['acconto', 0]])
+								->orderBy('id_eventspec')->get();
 							}else{
 								$specs = EventSpecValue::where([['id_subscription', $sub->id_sub],['id_week', $week->id], ['id_eventspec', $filter_id], ['valore', $filter_values[$f]]])->orderBy('id_eventspec')->get();
 							}
@@ -120,9 +122,11 @@ function stampa_tabella($input, $whereRaw, $format, $stampa_famiglia){
 				foreach($input['spec_filter'] as $filter_id){
 					if($filter_id>0 && $filter_ok){
 						if($input['solo_pagato'] == 1){
-							$specs = EventSpecValue::where([['id_subscription', $sub->id_sub], ['id_eventspec', $filter_id], ['valore', $filter_values[$f]]])->orderBy('id_eventspec')->get();
+							$specs = EventSpecValue::where([['id_subscription', $sub->id_sub], ['id_eventspec', $filter_id], ['valore', $filter_values[$f]], ['pagato', 1]])
+							->orWhere([['id_subscription', $sub->id_sub], ['id_eventspec', $filter_id], ['valore', $filter_values[$f]], ['costo', 0], ['acconto', 0]])
+							->orderBy('id_eventspec')->get();
 						}else{
-							$specs = EventSpecValue::where([['id_subscription', $sub->id_sub], ['id_eventspec', $filter_id], ['valore', $filter_values[$f]], ['pagato', 1]])->orderBy('id_eventspec')->get();
+							$specs = EventSpecValue::where([['id_subscription', $sub->id_sub], ['id_eventspec', $filter_id], ['valore', $filter_values[$f]]])->orderBy('id_eventspec')->get();
 						}
 
 						if(count($specs)==0) $filter_ok=false;

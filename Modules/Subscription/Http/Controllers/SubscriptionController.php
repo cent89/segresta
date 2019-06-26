@@ -549,19 +549,49 @@ class SubscriptionController extends Controller
 		->get();
 
 		$user_array = array();
+		$event = Event::findOrFail(Session::get('work_event'));
+		$weeks = Week::where('id_event', Session::get('work_event'))->orderBy('from_date', 'ASC')->get();
+		$w=0;
+
+		foreach($weeks as $week){
 		foreach($subs as $sub){
-			$r=0;
 			$filter_ok=true;
-			if($filter == null) $filter = array();
-			foreach($filter as $f){
-				if($f==1 && $filter_ok){
-					$e = EventSpecValue::where([['id_eventspec', $filter_id[$r]], ['valore', $filter_value[$r]], ['id_subscription', $sub->id_subs] ])->get();
-					if(count($e)==0) $filter_ok=false;
+			$filter_values = array_values($input['week_filter_value'][$w]);
+			$f=0;
+			if(isset($input['week_filter'][$w]) && count($input['week_filter'][$w])>0){
+				foreach($input['week_filter'][$w] as $filter_id){
+					if($filter_id>0 && $filter_ok){
+						//if(isset($filter_values[$f])){
+						$specs = EventSpecValue::where([['id_subscription', $sub->id_subs],['id_week', $week->id], ['id_eventspec', $filter_id], ['valore', $filter_values[$f]]])->orderBy('id_eventspec')->get();
+						if(count($specs)==0) $filter_ok=false;
+						//}
+					}
+					$f++;
 				}
-				$r++;
 			}
 
-			$r=0;
+			//filtro sulle specs1
+			$f=0;
+			$filter_values = array_values($input['spec_filter_value']);
+			foreach($input['spec_filter'] as $filter_id){
+				if($filter_id>0 && $filter_ok){
+					$specs = EventSpecValue::where([['id_subscription', $sub->id_subs], ['id_eventspec', $filter_id], ['valore', $filter_values[$f]]])->orderBy('id_eventspec')->get();
+					if(count($specs)==0) $filter_ok=false;
+				}
+				$f++;
+			}
+			// $r=0;
+			// $filter_ok=true;
+			// if($filter == null) $filter = array();
+			// foreach($filter as $f){
+			// 	if($f==1 && $filter_ok){
+			// 		$e = EventSpecValue::where([['id_eventspec', $filter_id[$r]], ['valore', $filter_value[$r]], ['id_subscription', $sub->id_subs] ])->get();
+			// 		if(count($e)==0) $filter_ok=false;
+			// 	}
+			// 	$r++;
+			// }
+			//
+			// $r=0;
 			// if(count($att_filter)>0){
 			// 	foreach($att_filter as $fa){
 			// 		if($fa==1 && $filter_ok){
@@ -591,6 +621,8 @@ class SubscriptionController extends Controller
 
 			}
 		}
+		$w++;
+	}
 
 		$json = json_encode(array_values(array_unique($user_array)));
 		switch($type){
