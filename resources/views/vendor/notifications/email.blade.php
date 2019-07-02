@@ -12,7 +12,7 @@ Ciao!
 
 {{-- Intro Lines --}}
 @foreach ($introLines as $line)
-{{ $line }}
+{!! $line !!}
 
 @endforeach
 
@@ -35,7 +35,7 @@ Ciao!
 
 {{-- Outro Lines --}}
 @foreach ($outroLines as $line)
-{{ $line }}
+{!! $line !!}
 
 @endforeach
 
