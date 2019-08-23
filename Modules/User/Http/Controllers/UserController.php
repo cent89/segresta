@@ -329,5 +329,30 @@ class UserController extends Controller
 
   }
 
+  public function users_list(Request $request){
+    $input = $request->all();
+    $list = array();
+
+    if($request->has('initialValue') && $input['initialValue'] == "true"){
+      $val = str_replace('"', '', $input['value']);
+      $user = User::where('id', $val)->orderBy('name', 'ASC')->first();
+      return str_replace('\\', '/', json_encode(array('id' => $user->id, 'text' => $user->full_name), JSON_UNESCAPED_SLASHES));
+
+    }else{
+      $users = User::leftJoin('user_oratorio', 'user_oratorio.id_user', 'users.id')
+      ->where('cognome', 'LIKE', ($request->has('term')?$input['term']:'').'%')
+      ->where('user_oratorio.id_oratorio', Session::get('session_oratorio'))
+      ->orderBy('cognome', 'ASC');
+    }
+
+    foreach ($users->get() as $user) {
+      array_push($list, array('id' => $user->id, 'text' => $user->full_name));
+    }
+
+    return str_replace('\\', '/', json_encode(array('results' => $list), JSON_UNESCAPED_SLASHES));
+  }
+
+
+
 
 }

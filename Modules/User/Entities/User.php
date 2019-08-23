@@ -83,6 +83,13 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
     $this->notify(new ResetPassword($token));
   }
 
+  public function isMaggiorenne(){
+    //$data_nascita = Carbon::createFromFormat('d/m/Y', $this->attributes['nato_il']);
+    $data_nascita = Carbon::parse($this->attributes['nato_il']);
+
+    return $data_nascita->diffInDays(Carbon::now()) >= 6570;
+  }
+
   public function transformAudit(array $data): array
   {
     if (Session::has('session_oratorio')) {

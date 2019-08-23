@@ -24,7 +24,7 @@ Route::group(['middleware' => ['web', 'verified'], 'prefix' => 'admin', 'namespa
 	Route::post('eventspecs/aggiungi_specifica', ['as' => 'eventspecs.aggiungi_specifica', 'uses' => 'EventSpecValueController@aggiungi_specifica']);
 });
 
-Route::group(['middleware' => ['web', 'verified'], 'prefix' => 'admin', 'namespace' => 'Modules\Event\Http\Controllers'], function()
+Route::group(['middleware' => ['web'], 'namespace' => 'Modules\Event\Http\Controllers'], function()
 {
 	Route::get('events/{id_event}/show', ['as' => 'events.show', 'uses' => 'EventController@show']);
 });

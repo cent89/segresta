@@ -49,18 +49,19 @@ class HomeController extends Controller
 
     }
     Session::reflash();
-    if(Auth::user()->hasRole('user')){
-      return view('home');
-    }else{
-      return redirect()->route('admin');
-    }
+    return view('home');
+
+    // if(Auth::user()->hasRole('user')){
+    // }else{
+    //   return redirect()->route('admin');
+    // }
 
 
   }
 
   public function admin(){
     Session::reflash();
-    
+
     if(Session::get('session_oratorio')==null || Session::get('session_oratorio')==''){
       return redirect()->route('home');
     }

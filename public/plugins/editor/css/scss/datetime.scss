@@ -7,7 +7,8 @@ div.editor-datetime {
 	z-index: 2050;
     border: 1px solid #ccc;
 	box-shadow: 0 5px 15px -5px rgba(0,0,0,.5);
-	padding-bottom: 5px;
+	padding: 0 20px 6px 20px;
+	width: 275px;
 
 	div.editor-datetime-title {
 		text-align: center;
@@ -16,7 +17,12 @@ div.editor-datetime {
 
 	table {
 		border-spacing: 0;
-		margin: 6px 13px;
+		margin: 12px 0;
+		width: 100%;
+
+		&.editor-datetime-table-nospace {
+			margin-top: -12px;
+		}
 
 		th {
 			font-size: 0.8em;
@@ -33,16 +39,21 @@ div.editor-datetime {
 			padding: 0;
 		}
 
-		td.day {
-			text-align: right;
+		td.selectable {
+			text-align: center;
 			background: #f5f5f5;
 
 			&.disabled {
 				color: #aaa;
 				background: white;
+
+				button:hover {
+					color: #aaa;
+					background: white;
+				}
 			}
 
-			&.today {
+			&.now {
 				background-color: #ddd;
 				
 				button {
@@ -74,14 +85,26 @@ div.editor-datetime {
 			background: transparent;
 			font-size: inherit;
 			color: inherit;
-			text-align: inherit;
-			padding: 5px 9px;
+			text-align: center;
+			padding: 4px 0;
 			cursor: pointer;
 			margin: 0;
+
+			span {
+				display: inline-block;
+				min-width: 14px;
+				text-align: right;
+			}
 		}
 
 		&.weekNumber th {
 			width: 12.5%;
+		}
+	}
+
+	div.editor-datetime-calendar {
+		table {
+			margin-top: 0;
 		}
 	}
 
@@ -119,6 +142,10 @@ div.editor-datetime {
 
 		> span {
 			vertical-align: middle;
+		}
+
+		th {
+			text-align: left;
 		}
 
 		div.editor-datetime-timeblock {

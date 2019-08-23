@@ -37,6 +37,7 @@ use App\Permission;
                 <th>Anno</th>
                 <th>Descrizione</th>
                 <th>Attivo</th>
+                <th>Link pubblico</th>
                 <th>Iscrizioni<br>multiple</th>
                 <th style="width: 20%"></th>
               </tr>
@@ -143,6 +144,7 @@ $(document).ready(function(){
         },
         className: "dt-body-center"
       },
+      { data: 'link_pubblico' },
       {
         data:   "more_subscriptions",
         render: function ( data, type, row ) {

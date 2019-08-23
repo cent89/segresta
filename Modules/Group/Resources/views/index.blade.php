@@ -36,6 +36,7 @@ use App\Permission;
                 <th>Id</th>
                 <th>Nome</th>
                 <th>Descrizione</th>
+                <th>Responsabile</th>
                 <th style="width: 20%;">Operazioni</th>
               </tr>
             </thead>
@@ -87,6 +88,14 @@ $(document).ready(function(){
     fields: [
       {label: "Nome", name: "nome"},
       {label: "Descrizione", name: "descrizione"},
+      {label: "Responsabile", name: "id_responsabile", type:"select2", opts:{
+        ajax: {
+          method: 'GET',
+          url: "{{ route('user.users_list') }}",
+          dataType: 'json'
+        },
+      }
+      },
       {label: "Id oratorio", name: "id_oratorio", type: "hidden", default: "{{ Session::get('session_oratorio') }}"},
     ]
   });
@@ -197,6 +206,7 @@ $(document).ready(function(){
       { data: 'id', name: 'id', visible: false},
       { data: 'nome', name: 'nome' },
       { data: 'descrizione', name: 'descrizione' },
+      { data: 'responsabile_label', editField: 'id_responsabile' },
       { data: 'action', orderable: false, searchable: false}
     ],
     select: {

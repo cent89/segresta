@@ -52,6 +52,33 @@ class GroupUserController extends Controller
     ->toJson();
   }
 
+	// Elenco dei gruppi a cui appartiene l'utente selezionato
+	public function data_users(Request $request, Datatables $datatables){
+    $input = $request->all();
+
+    $builder = Group::query()
+    ->select('groups.*', 'group_users.id as groupusers_id')
+		->leftJoin('group_users', 'group_users.id_group', 'groups.id')
+    // ->whereIn('users.id', GroupUser::where('id_group', $input['id_group'])->pluck('id_user'))
+		->where('group_users.id_user', $input['id_user'])
+    ->orderBy('groups.nome', 'ASC');
+
+    return $datatables->eloquent($builder)
+    ->addColumn('action', function ($entity){
+      $remove = "<button class='btn btn-sm btn-danger btn-block' id='editor_remove'><i class='fas fa-trash-alt'></i> Rimuovi dal gruppo</button>";
+			if(!Auth::user()->can('edit-gruppo')){
+        $remove = "";
+      }
+
+      return $remove;
+    })
+    ->addColumn('DT_RowId', function ($entity){
+      return $entity->groupusers_id;
+    })
+    ->rawColumns(['action', 'check'])
+    ->toJson();
+  }
+
 	public function store(GroupUserDataTableEditor $editor){
     return $editor->process(request());
   }

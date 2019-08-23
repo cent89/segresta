@@ -8,6 +8,7 @@ use Modules\Oratorio\Entities\Oratorio;
 use App\LicenseType;
 use Modules\Oratorio\Entities\UserOratorio;
 use Modules\Famiglia\Entities\ComponenteFamiglia;
+use Modules\Famiglia\Entities\Famiglia;
 
 $user_oratorio = UserOratorio::where('id_user', Auth::user()->id)->get();
 
@@ -87,6 +88,19 @@ if($modulo_famiglia){
               <div class="card-header">Famiglia</div>
               <div class="card-body" style="text-align: center">
                 <!--  Controlla se è stata definita la Famiglia -->
+                @if(Auth::user()->isMaggiorenne())
+                <!--  Elenco i figli -->
+                <?php
+                $fam = Famiglia::where('id_user', Auth::user()->id)->first();
+                if($fam != null){
+                  foreach(ComponenteFamiglia::where('id_famiglia', $fam->id)->get() as $componente){
+                    $c = User::find($componente->id_user);
+                    $legame = ComponenteFamiglia::getTipoLegameLabel($componente->tipo_legame);
+                    echo $c->full_name." - ".$legame."<br>";
+                  }
+                }
+                 ?>
+                @else
                 @if($padre == null || $madre == null)
                 <p><i class='fas fa-exclamation-circle faa-flash animated' style='color: Tomato;'></i> Sembra che tu non abbia definito la tua famiglia. Questo è un dato molto utile per il tuo oratorio!</p>
                 @else
@@ -122,11 +136,21 @@ if($modulo_famiglia){
                     <br>{{ $madre->full_name }}<br>Madre
                   </div>
                 </div>
+                @endif <!-- End famiglia -->
                 @endif
               </div>
               <div class="card-footer"><a href="{{ route('famiglia.user') }}" class="btn btn-sm btn-primary btn-block">Apri famiglia</a></div>
             </div>
             @endif
+
+            <div class="card">
+              <div class="card-header">Amministratore</div>
+              <div class="card-body">
+                Entra nella sezione amministrativa di Segresta
+              </div>
+              <div class="card-footer"><a href="{{ route('admin') }}" class="btn btn-sm btn-primary btn-block">Apri amministrazione</a></div>
+            </div>
+
 
             <div class="card">
               <div class="card-header">Aiuto</div>

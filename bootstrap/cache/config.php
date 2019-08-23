@@ -604,7 +604,7 @@
   'filesystems' => 
   array (
     'default' => 'local',
-    'cloud' => 's3',
+    'cloud' => 'webdav',
     'disks' => 
     array (
       'local' => 
@@ -619,13 +619,13 @@
         'visibility' => 'public',
         'url' => 'http://localhost:8000/storage',
       ),
-      's3' => 
+      'webdav' => 
       array (
-        'driver' => 's3',
-        'key' => 'your-key',
-        'secret' => 'your-secret',
-        'region' => 'your-region',
-        'bucket' => 'your-bucket',
+        'driver' => 'webdav',
+        'baseUri' => 'https://cloud.elephantech.it/remote.php/webdav/',
+        'userName' => 'oratorio',
+        'password' => 'Oratorio2019!',
+        'pathPrefix' => '',
       ),
     ),
   ),
@@ -1157,6 +1157,15 @@
     array (
       'perform_conversions' => 'Spatie\\MediaLibrary\\Jobs\\PerformConversions',
       'generate_responsive_images' => 'Spatie\\MediaLibrary\\Jobs\\GenerateResponsiveImages',
+    ),
+  ),
+  'volontario' => 
+  array (
+    'name' => 'Volontario',
+    'permissions' => 
+    array (
+      'view-volontario' => 'Vedi elenco volontari',
+      'edit-volontario' => 'Modifica elenco volontari',
     ),
   ),
 );

@@ -3,6 +3,7 @@ use Modules\User\Entities\User;
 Route::group(['middleware' => ['web', 'verified'], 'prefix' => 'admin', 'namespace' => 'Modules\User\Http\Controllers'], function()
 {
   Route::resource('user', 'UserController', ['only' => ['store', 'index']]);
+  Route::get('user/users_list', ['as' =>'user.users_list', 'uses' => 'UserController@users_list']);
   //Route::get('user/destroy', ['as' => 'user.destroy', 'uses' => 'UserController@destroy']);
   //Route::get('user/edit', ['as' => 'user.edit', 'uses' => 'UserController@edit']);
   //Route::get('user/print', ['as' => 'user.printprofile', 'uses' => 'UserController@print_userprofile']);

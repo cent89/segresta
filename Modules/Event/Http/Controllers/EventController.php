@@ -83,11 +83,15 @@ class EventController extends Controller
 		->addColumn('DT_RowId', function ($entity){
       return $entity->id;
     })
+		->addColumn('link_pubblico', function ($entity){
+      $link = route('events.show', ['id_event' => $entity->id]);
+			return "<a href='$link'>$link</a>";
+    })
 		->addColumn('descrizione_label', function ($entity){
 			$max_length = 900;
       return (strlen(strip_tags($entity->descrizione)) > $max_length) ? substr(strip_tags($entity->descrizione), 0, $max_length) . '...' : strip_tags($entity->descrizione);
     })
-    ->rawColumns(['action', 'descrizione_label'])
+    ->rawColumns(['action', 'descrizione_label', 'link_pubblico'])
     ->toJson();
   }
 

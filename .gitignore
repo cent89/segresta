@@ -5,6 +5,7 @@ Modules/Contabilita
 Modules/Whatsapp
 Modules/Famiglia
 Modules/Diocesi
+Modules/Volontario
 resources/views/piwik.blade.php
 
 /node_modules

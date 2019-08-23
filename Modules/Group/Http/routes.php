@@ -16,6 +16,7 @@ Route::group(['middleware' => ['web', 'verified'], 'prefix' => 'admin', 'namespa
 	Route::post('groupusers/store_user', ['as' => 'groupusers.store_user', 'uses' => 'GroupUserController@store_user']);
 	Route::get('groupusers/{id_user}/destroy', 'GroupUserController@destroy');
 	Route::get('groupusers/getData', ['as' =>'groupusers.data', 'uses' => 'GroupUserController@data']);
+	Route::get('groupusers/getDataUsers', ['as' =>'groupusers.data_users', 'uses' => 'GroupUserController@data_users']);
 	Route::match(['get'], 'groupusers/select', ['as' => 'groupusers.select', 'uses' => 'GroupUserController@select']);
 	//Route::post('groupusers/create', ['as' => 'groupusers.new', 'uses' => 'GroupUserController@create']);
 	Route::get('groups/dropdown', function(){

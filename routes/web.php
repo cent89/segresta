@@ -92,6 +92,6 @@ Route::get('comune/lista', ['as' =>'comune.lista', 'uses' => 'ComuneController@l
 
 
 
-Route::get('/whatsapp', ['as' => 'whatsapp', 'uses' => 'HomeController@whatsapp']);
+// Route::get('/whatsapp', ['as' => 'whatsapp', 'uses' => 'HomeController@whatsapp']);
 
 ?>

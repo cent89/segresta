@@ -105,6 +105,13 @@
       0 => 'OwenIt\\Auditing\\AuditingServiceProvider',
     ),
   ),
+  'pbmedia/laravel-webdav' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Pbmedia\\FilesystemProviders\\WebDAVServiceProvider',
+    ),
+  ),
   'spatie/laravel-cookie-consent' => 
   array (
     'providers' => 

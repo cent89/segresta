@@ -3,6 +3,7 @@ use Modules\Event\Entities\Event;
 use Modules\Event\Entities\Week;
 use Modules\Oratorio\Entities\TypeSelect;
 use Modules\Oratorio\Entities\Type;
+use Modules\User\Entities\User;
 use Modules\Oratorio\Entities\Oratorio;
 use Modules\Event\Entities\EventSpec;
 use Modules\User\Entities\Group;
@@ -19,6 +20,7 @@ $specs = (new EventSpec)
 $weeks = Week::select('id', 'from_date', 'to_date')->where('id_event', $event->id)->orderBy('from_date', 'asc')->get();
 $index = 0;
 $oratorio = Oratorio::find(Session::get('session_oratorio'));
+$user = User::find($id_user);
 
 if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 	$padre = ComponenteFamiglia::getPadre($id_user);
@@ -59,10 +61,10 @@ if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 
 					{!! Form::hidden('id_event', $event->id) !!}
 
-
 					<nav>
 						<div class="nav nav-tabs" id="nav-tab" role="tablist">
-							@if($event->select_famiglia)
+							@if(!$event->isOneSpecEvent())
+							@if($event->select_famiglia && !$user->isMaggiorenne())
 							<a class="nav-item nav-link active" id="nav-famiglia-tab" data-toggle="tab" href="#nav-famiglia" role="tab" aria-controls="nav-famiglia" aria-selected="true">Utente</a>
 							<a class="nav-item nav-link" id="nav-generali-tab" data-toggle="tab" href="#nav-generali" role="tab" aria-controls="nav-generali" aria-selected="false">Informazioni generali</a>
 							@else
@@ -72,13 +74,15 @@ if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 							@if(count($weeks)>0)
 							<a class="nav-item nav-link" id="nav-settimanali-tab" data-toggle="tab" href="#nav-settimanali" role="tab" aria-controls="nav-settimanali" aria-selected="false">Informazioni settimanali</a>
 							@endif
+							@endif
+
 							<a class="nav-item nav-link" id="nav-salva-tab" data-toggle="tab" href="#nav-salva" role="tab" aria-controls="nav-salva" aria-selected="false">Salva</a>
 						</div>
 					</nav>
 
 					<div class="tab-content" id="nav-tabContent">
 						<!--  Se abilitata la sezione di un membro della famiglia, genero un select con nome variabile id_user-->
-						@if($event->select_famiglia)
+						@if($event->select_famiglia && !$user->isMaggiorenne())
 						<div class="tab-pane fade show active" id="nav-famiglia" role="tabpanel" aria-labelledby="nav-famiglia-tab" style="margin-top: 20px;">
 							{!! Form::label('id_user', 'Seleziona un componente della famiglia per cui stai eseguendo l\'iscrizione all\'evento') !!}
 							{!! Form::select('id_user', ComponenteFamiglia::getComponenti($id_user), null, ['class' => 'form-control', 'required'])!!}
@@ -89,7 +93,9 @@ if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 						{!! Form::hidden('id_user', $id_user) !!}
 						@endif
 
-						<div class="tab-pane fade @if(!$event->select_famiglia) show active @endif" id="nav-generali" role="tabpanel" aria-labelledby="nav-generali-tab" style="margin-top: 20px;">
+						@if(!$event->isOneSpecEvent())
+
+						<div class="tab-pane fade @if(!($event->select_famiglia && !$user->isMaggiorenne() )) show active @endif" id="nav-generali" role="tabpanel" aria-labelledby="nav-generali-tab" style="margin-top: 20px;">
 							@foreach($specs as $spec)
 							<?php
 							$price = json_decode($spec->price, true);
@@ -268,8 +274,26 @@ if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 						</div>
 						@endif
 
+						@else
+						<?php
+						// se arrivo qui, ho una sola specifica per tutto l'evento, e questa è bool
+						$spec = EventSpec::select()
+			      ->where([['id_event', $event->id], ['id_type', Type::BOOL_TYPE]])
+						->first();
 
-						<div class="tab-pane fade" id="nav-salva" role="tabpanel" aria-labelledby="nav-salva-tab" style="margin-top: 20px;">
+						$price = json_decode($spec->price, true);
+						 ?>
+						{!! Form::hidden('id_spec[0]', $spec->id) !!}
+						{!! Form::hidden('id_week[0]', 0) !!}
+						{!! Form::hidden('specs[0]', 1) !!}
+						{!! Form::hidden('costo[0]', $price[0]) !!}
+						{!! Form::hidden('acconto[0]', 0) !!}
+						{!! Form::hidden('pagato[0]', 0) !!}
+
+						@endif <!-- Controllo se l'evento ha una sola specifica -->
+
+
+						<div class="tab-pane fade @if($event->isOneSpecEvent() ) show active @endif" id="nav-salva" role="tabpanel" aria-labelledby="nav-salva-tab" style="margin-top: 20px;">
 							<h3 style="text-align: center">
 								Raccolta dati per l’attività "{{ $event->nome }}" (art. 16, L. n. 222/85) promosse da {{ $oratorio->nome_parrocchia }}
 							</h3>
@@ -328,7 +352,7 @@ if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 								{{ $oratorio->nome_parrocchia }} dichiara che i dati conferiti saranno utilizzati, quando necessario, ogniqualvolta Vostro/a figlio/a sarà affidato
 								alle sue cure nell’ambito della conduzione dell'evento "{{ $event->nome }}" e non saranno diffusi o comunicati ad altri soggetti.
 								L’eventuale mancanza di comunicazione di elementi sanitari necessari al sicuro accudimento del minore ricade sotto l’esclusiva responsabilità della famiglia;
-								il relativo consenso in tema di tutela della riservatezza È NECESSARIO per permettere alla Parrocchia di realizzare in sicurezza le iniziative inerenti il Cre.
+								il relativo consenso in tema di tutela della riservatezza È NECESSARIO per permettere alla Parrocchia di realizzare in sicurezza le iniziative inerenti l'evento in questione.
 								È comunque possibile richiedere alla Parrocchia la cancellazione dei propri dati.
 							</p>
 
@@ -357,9 +381,15 @@ if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 								<li>il titolare del trattamento è l’ente {{ $oratorio->nome_parrocchia }},
 									con sede in {{ $oratorio->indirizzo_parrocchia }}, legalmente rappresentata dal parroco pro tempore; </li>
 									<li>per contattare il titolare del trattamento può essere utilizzata la mail {{ $oratorio->email }};</li>
+
+									@if($user->isMaggiorenne())
+									<li>le foto ed i video saranno trattati unicamente per:
+									@else
 									<li>le foto ed i video del figlio/della figlia saranno trattati unicamente per:
+									@endif
+
 									<ul>
-										<li>dare evidenza delle attività promosse dalla Parrocchia alle quali ha partecipato il figlio/la figlia,
+										<li>dare evidenza delle attività promosse dalla Parrocchia alle quali ha partecipato @if(!$user->isMaggiorenne()) il figlio/la figlia @endif,
 											anche attraverso pubblicazioni cartacee (bollettino parrocchiale, bacheca in oratorio, volantino …),
 											nonché la 	pagina web e i “social” della Parrocchia;
 										</li>
@@ -376,6 +406,19 @@ if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 									<li>{{ $oratorio->nome_parrocchia }} non utilizza processi decisionali automatizzati, compresa la profilazione di cui all’articolo 22, paragrafi 1 e 4 del Regolamento UE 2016/679.</li>
 								</li>
 							</ol>
+							@if($user->isMaggiorenne())
+							<p>Io sottoscritto {{ $user->full_name }}</p>
+							<div class="form-row">
+								<div class="form-group col" style="text-align: center">
+									{!! Form::label('consenso_foto', 'Autorizzo') !!}
+									{!! Form::radio('consenso_foto', 1, null, ['class' => 'form-control', 'required']) !!}
+								</div>
+								<div class="form-group col" style="text-align: center">
+									{!! Form::label('consenso_foto', 'Non autorizzo') !!}
+									{!! Form::radio('consenso_foto', 0, null, ['class' => 'form-control', 'required']) !!}
+								</div>
+							</div>
+							@else
 							<p>
 								Noi sottoscritti, genitori del minore oggetto di questa iscrizione:
 							</p>
@@ -394,10 +437,11 @@ if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 									{!! Form::radio('consenso_foto', 0, null, ['class' => 'form-control', 'required']) !!}
 								</div>
 							</div>
+							@endif
 
 
 							<p>
-								{{ $oratorio->nome_parrocchia }} a trattare le foto ed i video relativi a nostro/a figlio/figlia secondo le finalità
+								{{ $oratorio->nome_parrocchia }} a trattare le foto ed i video @if(!$user->isMaggiorenne()) relativi a nostro/a figlio/figlia @endif secondo le finalità
 								e nei limiti indicati nel foglio informativo che ci è stato consegnato.
 							</p>
 

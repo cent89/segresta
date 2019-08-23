@@ -18,9 +18,6 @@ class AppServiceProvider extends ServiceProvider
   {
     //creo il menu prima che tutto venga inizializzato
     //così ogni modulo, nel boot, pò aggiungere la sua voce.
-    if(config('app.force_https')){
-      $url->forceScheme('https');
-    }
 
     Schema::defaultStringLength(191);
     Menu::make('SegrestaNavBar', function($menu){});

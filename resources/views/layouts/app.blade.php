@@ -27,7 +27,7 @@ use Modules\Oratorio\Entities\Oratorio;
   <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
   <script src="https://cdn.jsdelivr.net/bootstrap.datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
 
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.min.css"/>
+  <!-- <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.min.css"/> -->
 
   <!-- Fonts -->
   <link rel="dns-prefetch" href="https://fonts.gstatic.com">
@@ -47,7 +47,11 @@ use Modules\Oratorio\Entities\Oratorio;
   <link rel="stylesheet" href="https://cdn.datatables.net/select/1.2.4/css/select.bootstrap.min.css">
   <link rel="stylesheet" href="{{asset('plugins/editor/css/editor.dataTables.css') }}">
   <link rel="stylesheet" href="{{asset('plugins/editor/css/editor.bootstrap.css') }}">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css">
 
+
+  <link rel="stylesheet" type="text/css" href="{{asset('plugins/datatables/datatables.min.css')}}"/>
+  <script type="text/javascript" src="{{ asset('plugins/datatables/datatables.min.js')}}"></script>
 
 
   <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
@@ -62,9 +66,11 @@ use Modules\Oratorio\Entities\Oratorio;
   <script src="https://cdn.datatables.net/rowreorder/1.2.5/js/dataTables.rowReorder.min.js"></script>
   <script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
   <script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.full.min.js"></script>
 
   <script src="{{asset('plugins/editor/js/dataTables.editor.js')}}"></script>
   <script src="{{asset('plugins/editor/js/editor.title.js')}}"></script>
+  <script src="{{asset('plugins/editor/js/editor.select2.js')}}"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper-utils.min.js"></script>
   <script src="{{asset('/js/bootstrap-confirmation.js')}}"></script>
@@ -82,9 +88,253 @@ use Modules\Oratorio\Entities\Oratorio;
 
   <!-- FullCalendar -->
 
-  <script src="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.min.js"></script>
+  <!-- <script src="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.min.js"></script>
   <script src="{{ asset('/js/fullcalendar/scheduler.min.js') }}"></script>
-  <script src="{{ asset('/js/fullcalendar/locale/it.js') }}"></script>
+  <script src="{{ asset('/js/fullcalendar/locale/it.js') }}"></script> -->
+
+  <script>
+  //select2
+  (function( factory ){
+    if ( typeof define === 'function' && define.amd ) {
+      // AMD
+      define( ['jquery', 'datatables', 'datatables-editor'], factory );
+    }
+    else if ( typeof exports === 'object' ) {
+      // Node / CommonJS
+      module.exports = function ($, dt) {
+        if ( ! $ ) { $ = require('jquery'); }
+        factory( $, dt || $.fn.dataTable || require('datatables') );
+      };
+    }
+    else if ( jQuery ) {
+      // Browser standard
+      factory( jQuery, jQuery.fn.dataTable );
+    }
+  }(function( $, DataTable ) {
+    'use strict';
+
+
+    if ( ! DataTable.ext.editorFields ) {
+      DataTable.ext.editorFields = {};
+    }
+
+    var _fieldTypes = DataTable.Editor ?
+    DataTable.Editor.fieldTypes :
+    DataTable.ext.editorFields;
+
+    _fieldTypes.select2 = {
+      _addOptions: function ( conf, opts ) {
+        var elOpts = conf._input[0].options;
+
+        elOpts.length = 0;
+
+        if ( opts ) {
+          DataTable.Editor.pairs( opts, conf.optionsPair, function ( val, label, i ) {
+            elOpts[i] = new Option( label, val );
+          } );
+        }
+      },
+
+      create: function ( conf ) {
+        conf._input = $('<select/>')
+        .attr( $.extend( {
+          id: DataTable.Editor.safeId( conf.id )
+        }, conf.attr || {} ) );
+
+        var options = $.extend( {
+          width: '100%'
+        }, conf.opts );
+
+        _fieldTypes.select2._addOptions( conf, conf.options || conf.ipOpts );
+        conf._input.select2( options );
+
+        var open;
+        conf._input
+        .on( 'select2:open', function () {
+          open = true;
+        } )
+        .on( 'select2:close', function () {
+          open = false;
+        } );
+
+        // On open, need to have the instance update now that it is in the DOM
+        this.one( 'open.select2-'+DataTable.Editor.safeId( conf.id ), function () {
+          conf._input.select2( options );
+
+          if ( open ) {
+            conf._input.select2( 'open' );
+          }
+        } );
+
+        return conf._input[0];
+      },
+
+      get: function ( conf ) {
+        var val = conf._input.val();
+        val =  conf._input.prop('multiple') && val === null ?
+        [] :
+        val;
+
+        return conf.separator ?
+        val.join( conf.separator ) :
+        val;
+      },
+
+      set: function ( conf, val ) {
+        if ( conf.separator && ! $.isArray( val ) ) {
+          val = val.split( conf.separator );
+        }
+
+        // Clear out any existing tags
+        if ( conf.opts && conf.opts.tags ) {
+          conf._input.val([]);
+        }
+
+        // The value isn't present in the current options list, so we need to add it
+        // in order to be able to select it. Note that this makes the set action async!
+        // It doesn't appear to be possible to add an option to select2, then change
+        // its label and update the display
+        var needAjax = false;
+
+        if ( conf.opts && conf.opts.ajax ) {
+          if ( $.isArray( val ) ) {
+            for ( var i=0, ien=val.length ; i<ien ; i++ ) {
+              if ( conf._input.find('option[value="'+val[i]+'"]').length === 0 ) {
+                needAjax = true;
+                break;
+              }
+            }
+          }
+          else {
+            if ( conf._input.find('option[value="'+val+'"]').length === 0 ) {
+              needAjax = true;
+            }
+          }
+        }
+
+        if ( needAjax && val ) {
+          $.ajax( $.extend( {
+            beforeSend: function ( jqXhr, settings ) {
+              // Add an initial data request to the server, but don't
+              // override `data` since the dev might be using that
+              var initData = 'initialValue=true&value='+
+              JSON.stringify(val);
+
+              if ( typeof conf.opts.ajax.url === 'function' ) {
+                settings.url = conf.opts.ajax.url();
+              }
+
+              if ( settings.type === 'GET' ) {
+                settings.url += settings.url.indexOf('?') === -1 ?
+                '?'+initData :
+                '&'+initData;
+              }
+              else {
+                settings.data = settings.data ?
+                settings.data +'&'+ initData :
+                initData;
+              }
+            },
+            success: function ( json ) {
+              var addOption = function ( option ) {
+                if ( conf._input.find('option[value="'+option.id+'"]').length === 0 ) {
+                  $('<option/>')
+                  .attr('value', option.id)
+                  .text( option.text )
+                  .appendTo( conf._input );
+                }
+              }
+
+              if ( $.isArray( json ) ) {
+                for ( var i=0, ien=json.length ; i<ien ; i++ ) {
+                  addOption( json[i] );
+                }
+              }
+              else if ( json.results && $.isArray( json.results ) ) {
+                for ( var i=0, ien=json.results.length ; i<ien ; i++ ) {
+                  addOption( json.results[i] );
+                }
+              }
+              else {
+                addOption( json );
+              }
+
+              conf._input
+              .val( val )
+              .trigger( 'change', {editor: true} );
+            }
+          }, conf.opts.ajax ) );
+        }
+        else {
+          conf._input
+          .val( val )
+          .trigger( 'change', {editor: true} );
+        }
+      },
+
+      enable: function ( conf ) {
+        $(conf._input).removeAttr( 'disabled' );
+      },
+
+      disable: function ( conf ) {
+        $(conf._input).attr( 'disabled', 'disabled' );
+      },
+
+      // Non-standard Editor methods - custom to this plug-in
+      inst: function ( conf ) {
+        var args = Array.prototype.slice.call( arguments );
+        args.shift();
+
+        return conf._input.select2.apply( conf._input, args );
+      },
+
+      update: function ( conf, data ) {
+        var val = _fieldTypes.select2.get( conf );
+
+        _fieldTypes.select2._addOptions( conf, data );
+
+        // Restore null value if it was, to let the placeholder show
+        if ( val === null ) {
+          _fieldTypes.select2.set( conf, null );
+        }
+
+        $(conf._input).trigger('change', {editor: true} );
+      },
+
+      focus: function ( conf ) {
+        if ( conf._input.is(':visible') && conf.onFocus === 'focus' ) {
+          conf._input.select2('open');
+        }
+      },
+
+      owns: function ( conf, node ) {
+        if ( $(node).closest('.select2-container').length || $(node).closest('.select2').length || $(node).hasClass('select2-selection__choice__remove') ) {
+          return true;
+        }
+        return false;
+      }
+    };
+
+
+  }));
+  //END SELECT 2
+
+  function getUrlParameter(sParam) {
+    var sPageURL = window.location.search.substring(1),
+    sURLVariables = sPageURL.split('&'),
+    sParameterName,
+    i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+      sParameterName = sURLVariables[i].split('=');
+
+      if (sParameterName[0] === sParam) {
+        return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+      }
+    }
+  }
+
+  </script>
 
 
 </head>
@@ -350,52 +600,195 @@ use Modules\Oratorio\Entities\Oratorio;
 
 
 
-    /**
-    Funzione che viene richiamata quando un select cambia valore; viene popolato lo span (#span_type)
-    con un input del tipo corretto (seelct, testo, checkbox).
+  /**
+  Funzione che viene richiamata quando un select cambia valore; viene popolato lo span (#span_type)
+  con un input del tipo corretto (seelct, testo, checkbox).
 
-    sel: il select
-    multiple: se viene generato un select, indica se sono possibili scelte multiple
-    name: il name da dare all'input generato
-    id: l'id da dare all'input generato
-    **/
-    function change_type(sel, multiple='', name='valore', id='valore', show_checkbox_hidden=true, span_id="span_type"){
-      $.get("{{ url('types/type')}}",
-      {id_eventspec: sel.value},
-      function(data) {
-        $.each(data, function(index, element) {
-          var row = "";
-          if(element.id>0){
-            row = "<select id='"+id+"' name='"+name+"' "+multiple+" class='form-control'></select>";
-            $.get("{{ url('types/options')}}",
-            {id_type: element.id },
+  sel: il select
+  multiple: se viene generato un select, indica se sono possibili scelte multiple
+  name: il name da dare all'input generato
+  id: l'id da dare all'input generato
+  **/
+  function change_type(sel, multiple='', name='valore', id='valore', show_checkbox_hidden=true, span_id="span_type"){
+    $.get("{{ url('types/type')}}",
+    {id_eventspec: sel.value},
+    function(data) {
+      $.each(data, function(index, element) {
+        var row = "";
+        if(element.id>0){
+          row = "<select id='"+id+"' name='"+name+"' "+multiple+" class='form-control'></select>";
+          $.get("{{ url('types/options')}}",
+          {id_type: element.id },
+          function(data2) {
+            var model = $("#"+id+"");
+            model.empty();
+            $.each(data2, function(index_2, element_2) {
+              model.append("<option value='"+ element_2.id +"'>" + element_2.option + "</option>");
+            });
+          });
+        }else{
+          switch(element.id){
+            case -1:
+            row = "<input name='"+name+"' type='text' value='' class='form-control' style='width: 300px'/>";
+            break;
+            case -2:
+            if(show_checkbox_hidden){
+              row = "<input name='"+name+"' type='hidden' value='0'/>";
+            }
+            row += "<input name='"+name+"' type='checkbox' value='1' />";
+            break;
+            case -3:
+            row = "<input name='"+name+"' type='number' value='' class='form-control' style='width: 300px'/>";
+            break;
+            case -4:
+            row = "<select id='"+id+"' name='"+name+"'></select>";
+            $.get("{{ url('admin/groups/dropdown')}}",
+            {},
             function(data2) {
               var model = $("#"+id+"");
+              model.empty();
+              $.each(data2, function(index_2, element_2) {
+                model.append("<option value='"+ element_2.id +"'>" + element_2.nome + "</option>");
+              });
+            });
+            break;
+          }
+        }
+        $("#"+span_id).html(row);
+      });
+    });
+  }
+
+  function change_attrib(sel, t){
+    $.get("{{ url('types/type_attrib')}}",
+    {id_attrib: sel.value },
+    function(data) {
+      $.each(data, function(index, element) {
+        var row = "";
+        if(element.label=="text"){
+          row = "<input name='valore["+t+"]' type='text' value='' class='form-control' style='width: 300px'/>";
+        }else if(element.label=="checkbox"){
+          row = "<input name='valore["+t+"]' type='hidden' value='0'/>";
+          row += "<input name='valore["+t+"]' type='checkbox' value='1'/>";
+        }else{
+          row = "<select id='valore"+t+"' name='valore["+t+"]'></select>";
+          $.get("{{ url('types/options')}}",
+          {id_type: element.id },
+          function(data2) {
+            var model = $("#valore"+t);
+            model.empty();
+            $.each(data2, function(index_2, element_2) {
+              model.append("<option value='"+ element_2.id +"'>" + element_2.option + "</option>");
+            });
+          });
+        }
+        $("#span_type"+t).html(row);
+      });
+    });
+  }
+
+
+
+
+  function typeselect_add(id_type){
+    var t = parseInt($('#contatore_e').val());
+    var row = "<tr>";
+    var form = ('{{ Form::text("option[]", "", ["style" => "width: 100%"]) }}').replace(/"/g, '\'');
+    form = form.replace("option[]", "option["+t+"]");
+    row += "<input name='id_option["+t+"]' type='hidden' value='0'/>";
+    row += "<input name='id_type["+t+"]' type='hidden' value='"+id_type+"'/>";
+    row += "<td>"+form+"</td>";
+    row += "<td><input type='number' min='0' name='ordine["+t+"]' value='0'</td>";
+    row += "<td>E</td>";
+    row += "</tr>";
+
+    $('#showoptions tr:last').after(row);
+    $('#contatore_e').val((t+1));
+
+  }
+
+  function add_cassa(){
+    var t = parseInt($('#contatore_c').val());
+    var row = "<tr>";
+    row += "<td>#<input type='hidden' value='0' name='id["+t+"]'></td>";
+    row += "<td><input type='text' name='label["+t+"]' class='form-control'/></td>";
+    // row += "<td></td>";
+    row += "<td></td>";
+    row += "</tr>";
+
+    $('#table_casse tr:last').after(row);
+    $('#contatore_c').val((t+1));
+
+  }
+
+  function add_modo_pagamento(){
+    var t = parseInt($('#contatore_m').val());
+    var row = "<tr>";
+    row += "<td>#<input type='hidden' value='0' name='id["+t+"]'></td>";
+    row += "<td><input type='text' name='label["+t+"]' class='form-control'/></td>";
+    // row += "<td></td>";
+    row += "<td></td>";
+    row += "</tr>";
+
+    $('#table_modo tr:last').after(row);
+    $('#contatore_m').val((t+1));
+
+  }
+
+  function add_tipo_pagamento(){
+    var t = parseInt($('#contatore_t').val());
+    var row = "<tr>";
+    row += "<td>#<input type='hidden' value='0' name='id["+t+"]'></td>";
+    row += "<td><input type='text' name='label["+t+"]' class='form-control'/></td>";
+    // row += "<td></td>";
+    row += "<td></td>";
+    row += "</tr>";
+
+    $('#table_tipo tr:last').after(row);
+    $('#contatore_t').val((t+1));
+
+  }
+
+
+  //A seconda dell'attributo selezionato, cambio la casella dove inserire il valore (testo, checkbox, ...)
+  function change_attributo_type(sel){
+    if(sel.value<0) return;
+    $.get("{{ url('attributos/type')}}",
+    {id_attributo: sel.value },
+    function(data){
+      if(data.length>0){
+        var row = "";
+        $.each(data, function(index, element) {
+
+          if(element.id_type>0){
+            row = "<select id='valore' name='valore' class='form-control'></select>";
+            $.get("{{ url('types/options')}}",
+            {id_type: element.id_type },
+            function(data2) {
+              var model = $("#valore");
               model.empty();
               $.each(data2, function(index_2, element_2) {
                 model.append("<option value='"+ element_2.id +"'>" + element_2.option + "</option>");
               });
             });
           }else{
-            switch(element.id){
+            switch(element.id_type){
               case -1:
-              row = "<input name='"+name+"' type='text' value='' class='form-control' style='width: 300px'/>";
+              row = "<input name='valore' type='text' value='' class='form-control'/>";
               break;
               case -2:
-              if(show_checkbox_hidden){
-                row = "<input name='"+name+"' type='hidden' value='0'/>";
-              }
-              row += "<input name='"+name+"' type='checkbox' value='1' />";
+              row = "<input name='valore' type='hidden' value='0'/>";
+              row += "<input name='valore' type='checkbox' value='1' class='form-control'/>";
               break;
               case -3:
-              row = "<input name='"+name+"' type='number' value='' class='form-control' style='width: 300px'/>";
+              row = "<input name='valore' type='number' value='' class='form-control' />";
               break;
               case -4:
-              row = "<select id='"+id+"' name='"+name+"'></select>";
+              row = "<select id='valore' name='valore' class='form-control'></select>";
               $.get("{{ url('admin/groups/dropdown')}}",
               {},
               function(data2) {
-                var model = $("#"+id+"");
+                var model = $("#valore");
                 model.empty();
                 $.each(data2, function(index_2, element_2) {
                   model.append("<option value='"+ element_2.id +"'>" + element_2.nome + "</option>");
@@ -404,341 +797,198 @@ use Modules\Oratorio\Entities\Oratorio;
               break;
             }
           }
-          $("#"+span_id).html(row);
-        });
-      });
-    }
 
-    function change_attrib(sel, t){
-      $.get("{{ url('types/type_attrib')}}",
-      {id_attrib: sel.value },
-      function(data) {
+        });
+        $("#attrib_value").html(row);
+      }
+    });
+
+
+  }
+
+  function load_attrib_registration(sel){
+    var body = "";
+    $.get("{{ url('attributos/dropdown')}}",
+    {id_oratorio: sel.value },
+    function(data) {
+      if(data.length>0){
+        var t = 0;
+        body+= "INFORMAZIONI AGGIUNTIVE";
         $.each(data, function(index, element) {
+          body += "<div class='form-group'>";
+          body += "<label for='attrib_"+element.id+"' class='col-md-4 control-label'>"+element.nome+"</label>";
+          body += "<div class='col-md-6'>";
+          body += "<input type='hidden' name='id_attributo["+t+"]' value='"+element.id+"'>";
+
           var row = "";
-          if(element.label=="text"){
-            row = "<input name='valore["+t+"]' type='text' value='' class='form-control' style='width: 300px'/>";
-          }else if(element.label=="checkbox"){
-            row = "<input name='valore["+t+"]' type='hidden' value='0'/>";
-            row += "<input name='valore["+t+"]' type='checkbox' value='1'/>";
-          }else{
-            row = "<select id='valore"+t+"' name='valore["+t+"]'></select>";
-            $.get("{{ url('types/options')}}",
-            {id_type: element.id },
-            function(data2) {
-              var model = $("#valore"+t);
-              model.empty();
-              $.each(data2, function(index_2, element_2) {
-                model.append("<option value='"+ element_2.id +"'>" + element_2.option + "</option>");
-              });
-            });
-          }
-          $("#span_type"+t).html(row);
-        });
-      });
-    }
 
-
-
-
-    function typeselect_add(id_type){
-      var t = parseInt($('#contatore_e').val());
-      var row = "<tr>";
-      var form = ('{{ Form::text("option[]", "", ["style" => "width: 100%"]) }}').replace(/"/g, '\'');
-      form = form.replace("option[]", "option["+t+"]");
-      row += "<input name='id_option["+t+"]' type='hidden' value='0'/>";
-      row += "<input name='id_type["+t+"]' type='hidden' value='"+id_type+"'/>";
-      row += "<td>"+form+"</td>";
-      row += "<td><input type='number' min='0' name='ordine["+t+"]' value='0'</td>";
-      row += "<td>E</td>";
-      row += "</tr>";
-
-      $('#showoptions tr:last').after(row);
-      $('#contatore_e').val((t+1));
-
-    }
-
-    function add_cassa(){
-      var t = parseInt($('#contatore_c').val());
-      var row = "<tr>";
-      row += "<td>#<input type='hidden' value='0' name='id["+t+"]'></td>";
-      row += "<td><input type='text' name='label["+t+"]' class='form-control'/></td>";
-      // row += "<td></td>";
-      row += "<td></td>";
-      row += "</tr>";
-
-      $('#table_casse tr:last').after(row);
-      $('#contatore_c').val((t+1));
-
-    }
-
-    function add_modo_pagamento(){
-      var t = parseInt($('#contatore_m').val());
-      var row = "<tr>";
-      row += "<td>#<input type='hidden' value='0' name='id["+t+"]'></td>";
-      row += "<td><input type='text' name='label["+t+"]' class='form-control'/></td>";
-      // row += "<td></td>";
-      row += "<td></td>";
-      row += "</tr>";
-
-      $('#table_modo tr:last').after(row);
-      $('#contatore_m').val((t+1));
-
-    }
-
-    function add_tipo_pagamento(){
-      var t = parseInt($('#contatore_t').val());
-      var row = "<tr>";
-      row += "<td>#<input type='hidden' value='0' name='id["+t+"]'></td>";
-      row += "<td><input type='text' name='label["+t+"]' class='form-control'/></td>";
-      // row += "<td></td>";
-      row += "<td></td>";
-      row += "</tr>";
-
-      $('#table_tipo tr:last').after(row);
-      $('#contatore_t').val((t+1));
-
-    }
-
-
-    //A seconda dell'attributo selezionato, cambio la casella dove inserire il valore (testo, checkbox, ...)
-    function change_attributo_type(sel){
-      if(sel.value<0) return;
-      $.get("{{ url('attributos/type')}}",
-      {id_attributo: sel.value },
-      function(data){
-        if(data.length>0){
-          var row = "";
-          $.each(data, function(index, element) {
-
-            if(element.id_type>0){
-              row = "<select id='valore' name='valore' class='form-control'></select>";
-              $.get("{{ url('types/options')}}",
-              {id_type: element.id_type },
-              function(data2) {
-                var model = $("#valore");
-                model.empty();
+          if(element.id_type>0){
+            body += "<select class='form-control' id='valore"+t+"' name='attributo["+t+"]'>";
+            $.ajax({
+              async: false,
+              data: {id_type: element.id_type},
+              type: "GET",
+              url: "{{ url('types/options')}}",
+              success: function(data2) {
                 $.each(data2, function(index_2, element_2) {
-                  model.append("<option value='"+ element_2.id +"'>" + element_2.option + "</option>");
+                  body += "<option value='"+ element_2.id +"'>" + element_2.option + "</option>";
                 });
-              });
-            }else{
-              switch(element.id_type){
-                case -1:
-                row = "<input name='valore' type='text' value='' class='form-control'/>";
-                break;
-                case -2:
-                row = "<input name='valore' type='hidden' value='0'/>";
-                row += "<input name='valore' type='checkbox' value='1' class='form-control'/>";
-                break;
-                case -3:
-                row = "<input name='valore' type='number' value='' class='form-control' />";
-                break;
-                case -4:
-                row = "<select id='valore' name='valore' class='form-control'></select>";
-                $.get("{{ url('admin/groups/dropdown')}}",
-                {},
-                function(data2) {
-                  var model = $("#valore");
-                  model.empty();
-                  $.each(data2, function(index_2, element_2) {
-                    model.append("<option value='"+ element_2.id +"'>" + element_2.nome + "</option>");
-                  });
-                });
-                break;
+                body += "</select>";
               }
-            }
-
-          });
-          $("#attrib_value").html(row);
-        }
-      });
-
-
-    }
-
-    function load_attrib_registration(sel){
-      var body = "";
-      $.get("{{ url('attributos/dropdown')}}",
-      {id_oratorio: sel.value },
-      function(data) {
-        if(data.length>0){
-          var t = 0;
-          body+= "INFORMAZIONI AGGIUNTIVE";
-          $.each(data, function(index, element) {
-            body += "<div class='form-group'>";
-            body += "<label for='attrib_"+element.id+"' class='col-md-4 control-label'>"+element.nome+"</label>";
-            body += "<div class='col-md-6'>";
-            body += "<input type='hidden' name='id_attributo["+t+"]' value='"+element.id+"'>";
-
-            var row = "";
-
-            if(element.id_type>0){
+            });
+          }else{
+            switch(element.id_type){
+              case -1:
+              body += "<input name='attributo["+t+"]' type='text' value='' class='form-control' required autofocus style='width: 300px'/>";
+              break;
+              case -2:
+              body += "<input name='attributo["+t+"]' type='hidden' value='0'/>";
+              body += "<input class='form-control' name='attributo["+t+"]' type='checkbox' value='1' required />";
+              break;
+              case -3:
+              body += "<input name='attributo["+t+"]' type='number' value='' class='form-control' required style='width: 300px'/>";
+              break;
+              case -4:
               body += "<select class='form-control' id='valore"+t+"' name='attributo["+t+"]'>";
               $.ajax({
                 async: false,
-                data: {id_type: element.id_type},
                 type: "GET",
-                url: "{{ url('types/options')}}",
+                data: {id_oratorio: sel.value},
+                url: "{{ url('groups/dropdown')}}",
                 success: function(data2) {
                   $.each(data2, function(index_2, element_2) {
-                    body += "<option value='"+ element_2.id +"'>" + element_2.option + "</option>";
+                    body += "<option value='"+ element_2.id +"'>" + element_2.nome + "</option>";
                   });
                   body += "</select>";
                 }
               });
-            }else{
-              switch(element.id_type){
-                case -1:
-                body += "<input name='attributo["+t+"]' type='text' value='' class='form-control' required autofocus style='width: 300px'/>";
-                break;
-                case -2:
-                body += "<input name='attributo["+t+"]' type='hidden' value='0'/>";
-                body += "<input class='form-control' name='attributo["+t+"]' type='checkbox' value='1' required />";
-                break;
-                case -3:
-                body += "<input name='attributo["+t+"]' type='number' value='' class='form-control' required style='width: 300px'/>";
-                break;
-                case -4:
-                body += "<select class='form-control' id='valore"+t+"' name='attributo["+t+"]'>";
-                $.ajax({
-                  async: false,
-                  type: "GET",
-                  data: {id_oratorio: sel.value},
-                  url: "{{ url('groups/dropdown')}}",
-                  success: function(data2) {
-                    $.each(data2, function(index_2, element_2) {
-                      body += "<option value='"+ element_2.id +"'>" + element_2.nome + "</option>";
-                    });
-                    body += "</select>";
-                  }
-                });
-                break;
-              }
+              break;
             }
-            body += "</div>";
-            body += "</div>";
-            t++;
-          });
-        }
-        $("#attributes").html(body);
+          }
+          body += "</div>";
+          body += "</div>";
+          t++;
+        });
+      }
+      $("#attributes").html(body);
+    });
+    //t++;
+
+
+
+  }
+
+
+  function load_spec_usersubscription(id_subscription, id_event){
+    $('#spec1').load("usereventspecvalues?id_sub="+id_subscription+"&id_event="+id_event);
+    $('#spec2').load("userspecsubscriptions?id_sub="+id_subscription+"&id_event="+id_event);
+    $('#id_event').val(id_event);
+  }
+
+  function eventspec_destroy(id_eventspec, index){
+    var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+    $.ajax({
+      type: 'POST',
+      dataType: 'html',
+      data: {id_spec: id_eventspec,
+        _token: CSRF_TOKEN},
+        url: "{{route('eventspecs.destroy')}}",
+        success: function(response) {
+          //alert(response);
+          $('#row_'+index).remove();
+        },
+        error: function(XMLHttpRequest, textStatus, exception) { alert("Ajax failure\n" + XMLHttpRequest.responseText + "\n" + exception); },
+        async: true
       });
-      //t++;
-
-
-
     }
 
-
-      function load_spec_usersubscription(id_subscription, id_event){
-        $('#spec1').load("usereventspecvalues?id_sub="+id_subscription+"&id_event="+id_event);
-        $('#spec2').load("userspecsubscriptions?id_sub="+id_subscription+"&id_event="+id_event);
-        $('#id_event').val(id_event);
+    function elencovalue_destroy(id_v){
+      var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+      $.ajax({
+        type: 'POST',
+        dataType: 'html',
+        data: {id_value: id_v,
+          _token: CSRF_TOKEN},
+          url: "{{route('elenco.destroy_value')}}",
+          success: function(response) {
+            //alert(response);
+            $('#row_'+id_v).remove();
+          },
+          error: function(XMLHttpRequest, textStatus, exception) { alert("Ajax failure\n" + XMLHttpRequest + "\n" + exception); },
+          async: true
+        });
       }
 
-      function eventspec_destroy(id_eventspec, index){
-        var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+      function colonneelenco_add(){
+        var t = parseInt($('#contatore').val());
+        t = t+1;
+        var row = "<tr>";
+        row += "<td>";
+        row += "<input type='text' name='colonna["+t+"]' class='form-control'/></td>";
+        row += "</tr>";
+
+        $('#colonne_elenco tr:last').after(row);
+        $('#contatore').val(t);
+      }
+
+      function elencovalues_add(num_colonne, keys){
+        var key = jQuery.parseJSON(keys);
+        var t = parseInt($('#contatore').val());
+        t = t+1;
+        var row = "<tr>";
+        row += "<input name='id_values["+t+"]' type='hidden' value='0'/>";
+        row += "<td>#</td>";
+        var select = "<select class='form-control' id='id_user["+t+"]' name='id_user["+t+"]'>";
         $.ajax({
-          type: 'POST',
-          dataType: 'html',
-          data: {id_spec: id_eventspec,
-            _token: CSRF_TOKEN},
-            url: "{{route('eventspecs.destroy')}}",
-            success: function(response) {
-              //alert(response);
-              $('#row_'+index).remove();
-            },
-            error: function(XMLHttpRequest, textStatus, exception) { alert("Ajax failure\n" + XMLHttpRequest.responseText + "\n" + exception); },
-            async: true
-          });
+          async: false,
+          type: "GET",
+          data: {},
+          url: "{{ url('user/dropdown')}}",
+          success: function(data) {
+            $.each(data, function(index, element) {
+              select += "<option value='"+ element.id +"'>" + element.cognome + " "+element.name+"</option>";
+            });
+            select += "</select>";
+          }
+        });
+
+        row += "<td>"+select+"</td>";
+        for(var i=0; i<num_colonne; i++){
+          row += "<td>";
+          row += "<input name='colonna["+t+"]["+key[i]+"]' type='hidden' value='0'/>";
+          row += "<input class='form-control' name='colonna["+t+"]["+key[i]+"]' type='checkbox' value='1' />";
+        }
+        row += "</tr>";
+
+        $('#elenco_values tr:last').after(row);
+      }
+
+      // function redirect_check(route, method='POST', send_param=true){
+      //   var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+      //   var selected = [];
+      //   $('input[type=checkbox]').each(function() {
+      //     if ($(this).is(":checked")){
+      //       selected.push($(this).attr('value'));
+      //     }
+      //   });
+      //   if(send_param){
+      //     $.redirect(route, {check: JSON.stringify(selected), _token: CSRF_TOKEN}, method);
+      //   }else{
+      //     $.redirect(route, {}, method);
+      //   }
+      //
+      // }
+
+      function disable_select(checkbox, id_select, inverse=false){
+        if(inverse){
+          $('#'+id_select).prop('disabled', !checkbox.checked);
+        }else{
+          $('#'+id_select).prop('disabled', checkbox.checked);
         }
 
-        function elencovalue_destroy(id_v){
-          var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
-          $.ajax({
-            type: 'POST',
-            dataType: 'html',
-            data: {id_value: id_v,
-              _token: CSRF_TOKEN},
-              url: "{{route('elenco.destroy_value')}}",
-              success: function(response) {
-                //alert(response);
-                $('#row_'+id_v).remove();
-              },
-              error: function(XMLHttpRequest, textStatus, exception) { alert("Ajax failure\n" + XMLHttpRequest + "\n" + exception); },
-              async: true
-            });
-          }
+      }
 
-          function colonneelenco_add(){
-            var t = parseInt($('#contatore').val());
-            t = t+1;
-            var row = "<tr>";
-            row += "<td>";
-            row += "<input type='text' name='colonna["+t+"]' class='form-control'/></td>";
-            row += "</tr>";
-
-            $('#colonne_elenco tr:last').after(row);
-            $('#contatore').val(t);
-          }
-
-          function elencovalues_add(num_colonne, keys){
-            var key = jQuery.parseJSON(keys);
-            var t = parseInt($('#contatore').val());
-            t = t+1;
-            var row = "<tr>";
-            row += "<input name='id_values["+t+"]' type='hidden' value='0'/>";
-            row += "<td>#</td>";
-            var select = "<select class='form-control' id='id_user["+t+"]' name='id_user["+t+"]'>";
-            $.ajax({
-              async: false,
-              type: "GET",
-              data: {},
-              url: "{{ url('user/dropdown')}}",
-              success: function(data) {
-                $.each(data, function(index, element) {
-                  select += "<option value='"+ element.id +"'>" + element.cognome + " "+element.name+"</option>";
-                });
-                select += "</select>";
-              }
-            });
-
-            row += "<td>"+select+"</td>";
-            for(var i=0; i<num_colonne; i++){
-              row += "<td>";
-              row += "<input name='colonna["+t+"]["+key[i]+"]' type='hidden' value='0'/>";
-              row += "<input class='form-control' name='colonna["+t+"]["+key[i]+"]' type='checkbox' value='1' />";
-            }
-            row += "</tr>";
-
-            $('#elenco_values tr:last').after(row);
-          }
-
-          // function redirect_check(route, method='POST', send_param=true){
-          //   var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
-          //   var selected = [];
-          //   $('input[type=checkbox]').each(function() {
-          //     if ($(this).is(":checked")){
-          //       selected.push($(this).attr('value'));
-          //     }
-          //   });
-          //   if(send_param){
-          //     $.redirect(route, {check: JSON.stringify(selected), _token: CSRF_TOKEN}, method);
-          //   }else{
-          //     $.redirect(route, {}, method);
-          //   }
-          //
-          // }
-
-          function disable_select(checkbox, id_select, inverse=false){
-            if(inverse){
-              $('#'+id_select).prop('disabled', !checkbox.checked);
-            }else{
-              $('#'+id_select).prop('disabled', checkbox.checked);
-            }
-
-          }
-
-          </script>
-          @stack('scripts')
-        </body>
-        </html>
+      </script>
+      @stack('scripts')
+    </body>
+    </html>

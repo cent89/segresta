@@ -9,8 +9,8 @@ use Session;
 class Group extends Model implements Auditable
 {
   use \OwenIt\Auditing\Auditable;
-  
-  protected $fillable = ['nome', 'descrizione', 'id_oratorio'];
+
+  protected $fillable = ['nome', 'descrizione', 'id_oratorio', 'id_responsabile'];
 
   public function transformAudit(array $data): array
   {

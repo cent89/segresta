@@ -38,6 +38,7 @@ use DB;
 use URL;
 use Mail;
 use Storage;
+use Carbon\Carbon;;
 use Yajra\DataTables\DataTables;
 use Modules\Subscription\Http\Controllers\DataTables\SubscriptionDataTableEditor;
 use Modules\Subscription\Http\Controllers\DataTables\SubscriptionDataTable;
@@ -309,7 +310,9 @@ class SubscriptionController extends Controller
 			}
 		}
 		$event = Event::findOrFail($input['id_event']);
-		if($event->select_famiglia == 1 && (Module::find('famiglia') != null && Module::find('famiglia')->enabled())){
+		$user = User::find($input['id_user']);
+
+		if($event->select_famiglia == 1 && (Module::find('famiglia') != null && Module::find('famiglia')->enabled()) && !$user->isMaggiorenne()){
 			//controllo se l'utente ha collegato una famiglia con padre e madre
 			$padre = ComponenteFamiglia::getPadre($input['id_user']);
 			$madre = ComponenteFamiglia::getMadre($input['id_user']);
@@ -318,6 +321,7 @@ class SubscriptionController extends Controller
 				return redirect('home');
 			}
 		}
+
 		if($event->more_subscriptions==0){
 			$sub = (new Subscription)->where([['id_event', $event->id], ['id_user', $input['id_user']]])->get();
 			if(count($sub)>=1){
@@ -326,6 +330,9 @@ class SubscriptionController extends Controller
 			}
 
 		}
+
+		//se ho una sola specifica e questa è di tipo checkbox, allora creo automaticamente l'iscrizione e salvo, senza mostrare il modulo d'iscrizione
+
 		return view('subscription::subscribe.subscribe', ['event' => $event, 'id_user' => $input['id_user']]);
 	}
 
@@ -746,6 +753,8 @@ class SubscriptionController extends Controller
 		$template->setValue('padre', $padre!=null?$padre->full_name:'');
 		$template->setValue('madre', $madre!=null?$madre->full_name:'');
 		$template->setValue('figlio', $user->full_name);
+		$template->setValue('figlio_nome', $user->name);
+		$template->setValue('figlio_cognome', $user->cognome);
 		$template->setValue('patologie', $user->patologie);
 		$template->setValue('allergie', $user->allergie);
 		$template->setValue('note', $user->note);
@@ -766,6 +775,30 @@ class SubscriptionController extends Controller
 		$email .= ($padre != null)?" - Padre: ".$padre->email:"";
 		$template->setValue('cellulare_genitore', $cell);
 		$template->setValue('email_genitore', $email);
+
+		if($padre!=null){
+			$template->setValue('padre_data_nascita', $padre->nato_il);
+			$comune = Comune::find($padre->id_comune_nascita);
+			$nazione = Nazione::find($padre->id_nazione_nascita);
+			$template->setValue('padre_luogo_nascita', $comune != null?$comune->nome:$nazione->nome_stato);
+			$comune_residenza = Comune::find($padre->id_comune_residenza);
+			$template->setValue('padre_comune_residenza',$comune_residenza!=null?$comune_residenza->nome:"");
+			$template->setValue('padre_indirizzo', $padre->via);
+			$template->setValue('padre_cellulare', $padre->cell_number);
+			$template->setValue('padre_email', $padre->email);
+		}
+
+		if($madre!=null){
+			$template->setValue('madre_data_nascita', $madre->nato_il);
+			$comune = Comune::find($madre->id_comune_nascita);
+			$nazione = Nazione::find($madre->id_nazione_nascita);
+			$template->setValue('madre_luogo_nascita', $comune != null?$comune->nome:$nazione->nome_stato);
+			$comune_residenza = Comune::find($madre->id_comune_residenza);
+			$template->setValue('madre_comune_residenza',$comune_residenza!=null?$comune_residenza->nome:"");
+			$template->setValue('madre_indirizzo', $madre->via);
+			$template->setValue('madre_cellulare', $madre->cell_number);
+			$template->setValue('madre_email', $madre->email);
+		}
 
 		//classe frequentata
 		$spec_classe = EventSpec::where([['id_event', $event->id], ['label', 'LIKE', '%classe%']])->first();

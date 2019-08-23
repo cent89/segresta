@@ -38,9 +38,14 @@ use App\Permission;
           {!! $event->descrizione !!}
 
           <div class="card-footer">
+            @guest
+            {!! Form::open(['method' => 'GET', 'route' => 'login']) !!}
+            @else
             {!! Form::open(['route' => 'subscribe.create']) !!}
             {!! Form::hidden('id_event', $event->id); !!}
             {!! Form::hidden('id_user', Auth::user()->id); !!}
+            @endguest
+
             {!! Form::submit('Iscriviti', ['class' => 'btn btn-primary form-control']) !!}
             {!! Form::close() !!}
           </div>

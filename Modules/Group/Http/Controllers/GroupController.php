@@ -11,6 +11,7 @@ use Modules\Group\Entities\GroupUser;
 use Session;
 use Entrust;
 use Input;
+use DB;
 use Yajra\DataTables\DataTables;
 use Modules\Group\Http\Controllers\DataTables\GroupDataTableEditor;
 use Modules\Group\Http\Controllers\DataTables\GroupDataTable;
@@ -41,7 +42,8 @@ class GroupController extends Controller
     $input = $request->all();
 
     $builder = Group::query()
-    ->select('groups.*')
+    ->select('groups.*', DB::raw("CONCAT(users.cognome, ' ', users.name) as responsabile_label"))
+    ->leftJoin('users', 'users.id', 'groups.id_responsabile')
     ->where('id_oratorio', Session::get('session_oratorio'))
     ->orderBy('nome', 'ASC');
 
@@ -61,6 +63,10 @@ class GroupController extends Controller
     ->addColumn('DT_RowId', function ($entity){
       return $entity->id;
     })
+    ->filterColumn('responsabile_label', function($query, $keyword) {
+			$sql = "users.name LIKE ? OR users.cognome LIKE ?";
+			$query->whereRaw($sql, ["%{$keyword}%", "%{$keyword}%"]);
+		})
     ->rawColumns(['action'])
     ->toJson();
   }
