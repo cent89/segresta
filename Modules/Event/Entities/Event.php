@@ -25,11 +25,15 @@ class Event extends Model implements Auditable
 
     // dice se l'evento ha una sola specifica e questa è di tipo checkbox
     public function isOneSpecEvent(){
-      $count = EventSpec::select()
-      ->where([['id_event', $this->attributes['id']], ['id_type', Type::BOOL_TYPE]])
-      ->count();
+      $spec = EventSpec::select()
+      ->where('id_event', $this->attributes['id']);
 
-      return $count == 1?true:false;
+      if($spec->count() == 1 && $spec->first()->id_type == Type::BOOL_TYPE){
+        return true;
+      }else{
+        return false;
+      }
+
     }
 
     public function transformAudit(array $data): array

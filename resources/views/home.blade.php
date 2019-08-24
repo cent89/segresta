@@ -143,6 +143,8 @@ if($modulo_famiglia){
             </div>
             @endif
 
+            @if(Auth::user()->hasRole('admin'))
+
             <div class="card">
               <div class="card-header">Amministratore</div>
               <div class="card-body">
@@ -150,6 +152,7 @@ if($modulo_famiglia){
               </div>
               <div class="card-footer"><a href="{{ route('admin') }}" class="btn btn-sm btn-primary btn-block">Apri amministrazione</a></div>
             </div>
+            @endif
 
 
             <div class="card">

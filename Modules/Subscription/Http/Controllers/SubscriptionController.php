@@ -786,6 +786,12 @@ class SubscriptionController extends Controller
 			$template->setValue('padre_indirizzo', $padre->via);
 			$template->setValue('padre_cellulare', $padre->cell_number);
 			$template->setValue('padre_email', $padre->email);
+		}else{
+			$template->setValue('padre_data_nascita', '');
+			$template->setValue('padre_luogo_nascita', '');
+			$template->setValue('padre_indirizzo', '');
+			$template->setValue('padre_cellulare', '');
+			$template->setValue('padre_email', '');
 		}
 
 		if($madre!=null){
@@ -798,6 +804,12 @@ class SubscriptionController extends Controller
 			$template->setValue('madre_indirizzo', $madre->via);
 			$template->setValue('madre_cellulare', $madre->cell_number);
 			$template->setValue('madre_email', $madre->email);
+		}else{
+			$template->setValue('madre_data_nascita', '');
+			$template->setValue('madre_luogo_nascita', '');
+			$template->setValue('madre_indirizzo', '');
+			$template->setValue('madre_cellulare', '');
+			$template->setValue('madre_email', '');
 		}
 
 		//classe frequentata
