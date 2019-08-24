@@ -790,6 +790,7 @@ class SubscriptionController extends Controller
 			$template->setValue('padre_data_nascita', '');
 			$template->setValue('padre_luogo_nascita', '');
 			$template->setValue('padre_indirizzo', '');
+			$template->setValue('padre_comune_residenza','');
 			$template->setValue('padre_cellulare', '');
 			$template->setValue('padre_email', '');
 		}
@@ -808,6 +809,7 @@ class SubscriptionController extends Controller
 			$template->setValue('madre_data_nascita', '');
 			$template->setValue('madre_luogo_nascita', '');
 			$template->setValue('madre_indirizzo', '');
+			$template->setValue('madre_comune_residenza','');
 			$template->setValue('madre_cellulare', '');
 			$template->setValue('madre_email', '');
 		}
