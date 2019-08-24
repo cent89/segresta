@@ -20,6 +20,9 @@ $specs = (new EventSpec)
 $weeks = Week::select('id', 'from_date', 'to_date')->where('id_event', $event->id)->orderBy('from_date', 'asc')->get();
 $index = 0;
 $oratorio = Oratorio::find(Session::get('session_oratorio'));
+if($oratorio == null){
+	return redirect()->route('login');
+}
 $user = User::find($id_user);
 
 if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){

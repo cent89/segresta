@@ -64,6 +64,14 @@
                                 @endif
                             </div>
                         </div>
+
+                        <div  style="text-align: center; margin-top: 20px;">
+                          <h3 >Non hai ancora un account? <a href="{{ route('register') }}">Registrati!</a> </h3>
+                          </div>
+
+
+
+
                     </form>
                 </div>
             </div>
