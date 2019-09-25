@@ -46,6 +46,11 @@ class TypeDataTableEditor extends DataTablesEditor
     ];
   }
 
+  public function removeRules(Model $model)
+  {
+    return [];
+  }
+
   public function editMessages(){
     return $this->message;
   }

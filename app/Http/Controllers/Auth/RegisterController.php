@@ -79,15 +79,15 @@ class RegisterController extends Controller
       'name' => 'required|max:255',
       'email' => 'required|email|max:255|unique:users',
       'password' => 'required|min:8|confirmed',
+      'cognome' => 'required',
+      'sesso' => 'required',
+      'cell_number' => 'required|max:11',
       'nato_il' => 'required|date_format:d/m/Y',
       'id_nazione_nascita' => 'required',
       'id_provincia_nascita' => 'required_if:id_nazione_nascita,118',
       'id_comune_nascita' => 'required_if:id_nazione_nascita,118',
-      'cognome' => 'required',
-      'sesso' => 'required',
       'id_comune_residenza' => 'required',
       'via' => 'required',
-      'cell_number' => 'required|max:11',
     ]);
   }
 

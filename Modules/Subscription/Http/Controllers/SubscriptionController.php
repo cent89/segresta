@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use Modules\Subscription\Entities\Subscription;
 use Modules\Subscription\Notifications\IscrizioneApprovata;
 use Modules\Event\Entities\EventSpec;
+use Modules\Attributo\Entities\Attributo;
+use Modules\Attributo\Entities\AttributoUser;
 use Modules\Oratorio\Entities\Oratorio;
 use Modules\Modulo\Entities\Modulo;
 use App\SpecSubscription;
@@ -843,6 +845,14 @@ class SubscriptionController extends Controller
 		}else{
 			$template->setValue('consenso_dati_sanitari_si', "");
 			$template->setValue('consenso_dati_sanitari_no', "X");
+		}
+
+		//Attributi
+		foreach(Attributo::where('id_oratorio', Session::get('session_oratorio')->get()) as $attributo){
+			$valore = AttributoUser::where([['id_attributo', $attributo->id], ['id_user', $user->id]])->first();
+			if($valore != null){
+				$template->setValue('attributo_'.$attributo->id, Attributo::getPrintableValue($attributo->id_type, $valore->valore));
+			}
 		}
 
 		//specifiche generali

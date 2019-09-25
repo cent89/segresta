@@ -12,7 +12,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 class EventSpec extends Model implements Auditable
 {
   use \OwenIt\Auditing\Auditable;
-  
+
   protected $fillable = ['id_event', 'ordine', 'valid_for', 'general', 'label', 'descrizione', 'id_type', 'hidden',
   'price', 'acconto', 'id_cassa', 'id_tipopagamento', 'id_modopagamento', 'descrizione'];
 

@@ -3,6 +3,8 @@
 namespace Modules\Attributo\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\Oratorio\Entities\TypeSelect;
+use Modules\Oratorio\Entities\Type;
 use OwenIt\Auditing\Contracts\Auditable;
 use Session;
 
@@ -27,6 +29,30 @@ class Attributo extends Model implements Auditable
     }
 
     return $data;
+  }
+
+  public static function getPrintableValue($id_type, $value){
+    if($id_type > 0){
+      //il valore è da ricercare negli elenchi a scelta multipla creati dall'utente
+      $select = TypeSelect::where('id', $value)->get();
+      if(count($select)>0){
+        return $select[0]->option;
+      }else{
+        return "n/a";
+      }
+    }
+
+    switch($id_type){
+      case Type::TEXT_TYPE:
+      return $value;
+      case Type::BOOL_TYPE:
+      if($value==0) return "NO";
+      else return "SI";
+      case Type::NUMBER_TYPE:
+      return $value;
+      case Type::DATE_TYPE:
+      return $value;
+    }
   }
 
 }

@@ -29,9 +29,10 @@ use App\Nazione;
           @csrf
 
           <h3>Informazioni generali</h3>
+          <p>I campi con (*) sono obbligatori</p>
 
           <div class="form-group row">
-            <label for="name" class="col-md-4 col-form-label text-md-right">Nome</label>
+            <label for="name" class="col-md-4 col-form-label text-md-right">Nome (*)</label>
 
             <div class="col-md-6">
               <input id="name" type="text" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}" name="name" value="{{ old('name') }}" required autofocus>
@@ -45,7 +46,7 @@ use App\Nazione;
           </div>
 
           <div class="form-group row">
-            <label for="cognome" class="col-md-4 col-form-label text-md-right">Cognome</label>
+            <label for="cognome" class="col-md-4 col-form-label text-md-right">Cognome (*)</label>
 
             <div class="col-md-6">
               <input id="cognome" type="text" class="form-control{{ $errors->has('cognome') ? ' is-invalid' : '' }}" name="cognome" value="{{ old('cognome') }}" required autofocus>
@@ -59,7 +60,7 @@ use App\Nazione;
           </div>
 
           <div class="form-group row">
-            <label for="email" class="col-md-4 col-form-label text-md-right">Indirizzo email</label>
+            <label for="email" class="col-md-4 col-form-label text-md-right">Indirizzo email (*)</label>
 
             <div class="col-md-6">
               <input id="email" type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" required>
@@ -73,7 +74,7 @@ use App\Nazione;
           </div>
 
           <div class="form-group row">
-            <label for="cell_number" class="col-md-4 col-form-label text-md-right">Numero di cellulare</label>
+            <label for="cell_number" class="col-md-4 col-form-label text-md-right">Numero di cellulare (*)</label>
 
             <div class="col-md-6">
               <input id="cell_number" type="text" class="form-control{{ $errors->has('cell_number') ? ' is-invalid' : '' }}" name="cell_number" value="{{ old('cell_number') }}" required autofocus>
@@ -87,7 +88,7 @@ use App\Nazione;
           </div>
 
           <div class="form-group row">
-            <label for="sesso" class="col-md-4 col-form-label text-md-right">Sesso</label>
+            <label for="sesso" class="col-md-4 col-form-label text-md-right">Sesso (*)</label>
 
             <div class="col-md-6">
               <select id="sesso" class="form-control" name="sesso"><option value="M">Uomo</option><option value="F">Donna</option></select>
@@ -101,7 +102,7 @@ use App\Nazione;
           </div>
 
           <div class="form-group row">
-            <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Password') }}</label>
+            <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Password') }}  (*)</label>
 
             <div class="col-md-6">
               <input id="password" type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" required>
@@ -115,7 +116,7 @@ use App\Nazione;
           </div>
 
           <div class="form-group row">
-            <label for="password-confirm" class="col-md-4 col-form-label text-md-right">Conferma password</label>
+            <label for="password-confirm" class="col-md-4 col-form-label text-md-right">Conferma password  (*)</label>
 
             <div class="col-md-6">
               <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required>
@@ -125,7 +126,7 @@ use App\Nazione;
           <h3>Luogo e data di nascita</h3>
 
           <div class="form-group row">
-            <label for="nato_il" class="col-md-4 col-form-label text-md-right date">Data di nascita</label>
+            <label for="nato_il" class="col-md-4 col-form-label text-md-right date">Data di nascita (*)</label>
 
             <div class="col-md-6">
               <input id="nato_il" type="text" class="form-control{{ $errors->has('nato_il') ? ' is-invalid' : '' }}" name="nato_il" value="{{ old('nato_il') }}" required autofocus>
@@ -142,8 +143,7 @@ use App\Nazione;
             <label for="id_nazione_nascita" class="col-md-4 col-form-label text-md-right">Nazione di nascita</label>
 
             <div class="col-md-6">
-              {{ Form::select('id_nazione_nascita', Nazione::orderBy('nome_stato')->pluck('nome_stato', 'id'), 118, ['class' => $errors->has("id_provincia_nascita")?"form-control is-invalid":"form-control", 'id' => 'id_nazione_nascita', 'required', 'autofocus']) }}
-
+                {{ Form::select('id_nazione_nascita', Nazione::orderBy('nome')->pluck('nome', 'id'), old('id_nazione_nascita'), ['class' => $errors->has("id_nazione_nascita")?"form-control is-invalid":"form-control", 'id' => 'id_nazione_nascita', 'autofocus', 'placeholder' => 'Seleziona una nazione']) }}
 
               @if ($errors->has('id_nazione_nascita'))
               <span class="invalid-feedback" role="alert">
@@ -172,7 +172,7 @@ use App\Nazione;
             <label for="id_comune_nascita" class="col-md-4 col-form-label text-md-right">Comune di nascita</label>
 
             <div class="col-md-6">
-              {{ Form::select('id_comune_nascita', array(), old('id_comune_nascita'), ['class' => $errors->has("id_comune_nascita")?"form-control is-invalid":"form-control", 'id' => 'id_comune_nascita', 'autofocus']) }}
+              {{ Form::select('id_comune_nascita', array(), old('id_comune_nascita'), ['class' => $errors->has("id_comune_nascita")?"form-control is-invalid":"form-control", 'id' => 'id_comune_nascita', 'autofocus', 'required']) }}
 
               @if ($errors->has('id_comune_nascita'))
               <span class="invalid-feedback" role="alert">
@@ -188,7 +188,7 @@ use App\Nazione;
             <label for="id_provincia_residenza" class="col-md-4 col-form-label text-md-right">Provincia di residenza</label>
 
             <div class="col-md-6">
-              {{ Form::select('id_provincia_residenza', Provincia::orderBy('nome')->pluck('nome', 'id'), old('id_provincia_residenza'), ['class' => $errors->has("id_provincia_residenza")?"form-control is-invalid":"form-control", 'id' => 'id_provincia_residenza', 'required', 'autofocus']) }}
+              {{ Form::select('id_provincia_residenza', Provincia::orderBy('nome')->pluck('nome', 'id'), old('id_provincia_residenza'), ['class' => $errors->has("id_provincia_residenza")?"form-control is-invalid":"form-control", 'id' => 'id_provincia_residenza', 'autofocus', 'required']) }}
               @if ($errors->has('id_provincia_nascita'))
               <span class="invalid-feedback" role="alert">
                 <strong>{{ $errors->first('id_provincia_residenza') }}</strong>
@@ -201,7 +201,7 @@ use App\Nazione;
             <label for="id_comune_residenza" class="col-md-4 col-form-label text-md-right">Comune di residenza</label>
 
             <div class="col-md-6">
-              {{ Form::select('id_comune_residenza', array(), old('id_comune_residenza'), ['class' => $errors->has("id_comune_residenza")?"form-control is-invalid":"form-control", 'id' => 'id_comune_residenza', 'required', 'autofocus']) }}
+              {{ Form::select('id_comune_residenza', array(), old('id_comune_residenza'), ['class' => $errors->has("id_comune_residenza")?"form-control is-invalid":"form-control", 'id' => 'id_comune_residenza', 'autofocus', 'required']) }}
 
               @if ($errors->has('id_comune_residenza'))
               <span class="invalid-feedback" role="alert">
@@ -215,7 +215,7 @@ use App\Nazione;
             <label for="via" class="col-md-4 col-form-label text-md-right">Indirizzo</label>
 
             <div class="col-md-6">
-              <input id="via" type="text" class="form-control{{ $errors->has('via') ? ' is-invalid' : '' }}" name="via" value="{{ old('via') }}" required autofocus>
+              <input id="via" type="text" class="form-control{{ $errors->has('via') ? ' is-invalid' : '' }}" name="via" value="{{ old('via') }}" autofocus>
 
               @if ($errors->has('via'))
               <span class="invalid-feedback" role="alert">

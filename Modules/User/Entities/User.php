@@ -42,7 +42,7 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
   }
 
   public function setNatoIlAttribute($value){
-    $this->attributes['nato_il'] = Carbon::createFromFormat('d/m/Y', $value)->toDateString();
+    $this->attributes['nato_il'] = $value == null?null:Carbon::createFromFormat('d/m/Y', $value)->toDateString();
   }
 
   public function getFullNameAttribute(){
@@ -51,6 +51,9 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
 
   public function setIdComuneNascitaAttribute($value){
     $this->attributes['id_comune_nascita'] = $value==''?null:$value;
+  }
+  public function setIdProvinciaNascitaAttribute($value){
+    $this->attributes['id_provincia_nascita'] = $value==''?null:$value;
   }
 
 
