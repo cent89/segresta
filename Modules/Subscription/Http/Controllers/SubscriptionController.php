@@ -768,6 +768,7 @@ class SubscriptionController extends Controller
 		$template->setValue('comune_residenza',$comune_residenza!=null?$comune_residenza->nome:"");
 		$template->setValue('indirizzo', $user->via);
 		$template->setValue('tessera_sanitaria', $user->tessera_sanitaria);
+		$template->setValue('codice_fiscale', $user->cod_fiscale);
 		$template->setValue('telefono', $user->telefono);
 		$template->setValue('cellulare', $user->cell_number);
 		$template->setValue('email', $user->email);
@@ -848,10 +849,12 @@ class SubscriptionController extends Controller
 		}
 
 		//Attributi
-		foreach(Attributo::where('id_oratorio', Session::get('session_oratorio')->get()) as $attributo){
+		foreach(Attributo::where('id_oratorio', Session::get('session_oratorio'))->get() as $attributo){
 			$valore = AttributoUser::where([['id_attributo', $attributo->id], ['id_user', $user->id]])->first();
 			if($valore != null){
 				$template->setValue('attributo_'.$attributo->id, Attributo::getPrintableValue($attributo->id_type, $valore->valore));
+			}else{
+				$template->setValue('attributo_'.$attributo->id, "");
 			}
 		}
 

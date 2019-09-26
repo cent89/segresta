@@ -490,10 +490,10 @@ function invia_utenti_selezionati(action){
   $.each(table.rows('.selected').nodes(), function(i, item) {
     selected_rows.push(item.id);
   });
-  if(selected_rows.length == 0){
-    alert("Devi selezionare almeno un'utente!");
-    return;
-  }
+  // if(selected_rows.length == 0){
+  //   alert("Devi selezionare almeno un'utente!");
+  //   return;
+  // }
 
   //invio in POST l'array e faccio il redirect alla pagina corretta in  base all'azione selezionata
 
