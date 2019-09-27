@@ -314,7 +314,7 @@ class SubscriptionController extends Controller
 		$event = Event::findOrFail($input['id_event']);
 		$user = User::find($input['id_user']);
 
-		if($event->select_famiglia == 1 && (Module::find('famiglia') != null && Module::find('famiglia')->enabled()) && !$user->isMaggiorenne()){
+		if($event->select_famiglia == 1 && (Module::find('famiglia') != null && Module::find('famiglia')->enabled())){
 			//controllo se l'utente ha collegato una famiglia con padre e madre
 			$padre = ComponenteFamiglia::getPadre($input['id_user']);
 			$madre = ComponenteFamiglia::getMadre($input['id_user']);
