@@ -143,7 +143,7 @@ use App\Nazione;
             <label for="id_nazione_nascita" class="col-md-4 col-form-label text-md-right">Nazione di nascita</label>
 
             <div class="col-md-6">
-                {{ Form::select('id_nazione_nascita', Nazione::orderBy('nome')->pluck('nome', 'id'), old('id_nazione_nascita'), ['class' => $errors->has("id_nazione_nascita")?"form-control is-invalid":"form-control", 'id' => 'id_nazione_nascita', 'autofocus', 'placeholder' => 'Seleziona una nazione']) }}
+                {{ Form::select('id_nazione_nascita', Nazione::orderBy('nome_stato')->pluck('nome_stato', 'id'), old('id_nazione_nascita'), ['class' => $errors->has("id_nazione_nascita")?"form-control is-invalid":"form-control", 'id' => 'id_nazione_nascita', 'autofocus', 'placeholder' => 'Seleziona una nazione']) }}
 
               @if ($errors->has('id_nazione_nascita'))
               <span class="invalid-feedback" role="alert">

@@ -99,9 +99,9 @@ use Modules\Event\Entities\EventSpec;
 					</div>
 
 					<div class="form-group">
-						{!! Form::hidden('id_week', '0', ['id'=>'id_week']) !!}
-						{!! Form::hidden('costo', '0', ['id'=>'costo']) !!}
-						{!! Form::hidden('acconto', '0', ['id'=>'acconto']) !!}
+						{!! Form::hidden('id_week', 0, ['id'=>'id_week']) !!}
+						{!! Form::hidden('costo', 0, ['id'=>'costo']) !!}
+						{!! Form::hidden('acconto', 0, ['id'=>'acconto']) !!}
 						{!! Form::label('valore', "Valore della specifica") !!}
 						<span id="span_type3"></span>
 					</div>
@@ -132,6 +132,7 @@ $(document).ready(function(){
 	$('#pesco1').change();
 	$('#pesco2').change();
 	$('#add_spec').change();
+	$('#id_eventspec').change();
 });
 </script>
 @endpush

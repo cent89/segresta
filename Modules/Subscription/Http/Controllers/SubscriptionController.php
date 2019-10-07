@@ -562,23 +562,9 @@ class SubscriptionController extends Controller
 		$weeks = Week::where('id_event', Session::get('work_event'))->orderBy('from_date', 'ASC')->get();
 		$w=0;
 
-		foreach($weeks as $week){
 		foreach($subs as $sub){
-			$filter_ok=true;
-			$filter_values = array_values($input['week_filter_value'][$w]);
-			$f=0;
-			if(isset($input['week_filter'][$w]) && count($input['week_filter'][$w])>0){
-				foreach($input['week_filter'][$w] as $filter_id){
-					if($filter_id>0 && $filter_ok){
-						//if(isset($filter_values[$f])){
-						$specs = EventSpecValue::where([['id_subscription', $sub->id_subs],['id_week', $week->id], ['id_eventspec', $filter_id], ['valore', $filter_values[$f]]])->orderBy('id_eventspec')->get();
-						if(count($specs)==0) $filter_ok=false;
-						//}
-					}
-					$f++;
-				}
-			}
-
+			$w = 0;
+			$filter_ok = true;
 			//filtro sulle specs1
 			$f=0;
 			$filter_values = array_values($input['spec_filter_value']);
@@ -589,27 +575,49 @@ class SubscriptionController extends Controller
 				}
 				$f++;
 			}
-			// $r=0;
-			// $filter_ok=true;
-			// if($filter == null) $filter = array();
-			// foreach($filter as $f){
-			// 	if($f==1 && $filter_ok){
-			// 		$e = EventSpecValue::where([['id_eventspec', $filter_id[$r]], ['valore', $filter_value[$r]], ['id_subscription', $sub->id_subs] ])->get();
-			// 		if(count($e)==0) $filter_ok=false;
-			// 	}
-			// 	$r++;
-			// }
-			//
-			// $r=0;
-			// if(count($att_filter)>0){
-			// 	foreach($att_filter as $fa){
-			// 		if($fa==1 && $filter_ok){
-			// 			$at = AttributoUser::where([['id_user', $sub->id_user], ['id_attributo', $att_filter_id[$r]], ['valore', $att_filter_value[$r]]])->get();
-			// 			if(count($at)==0) $filter_ok=false;
-			// 		}
-			// 		$r++;
-			// 	}
-			// }
+
+			foreach($weeks as $week){
+				// $filter_ok=true;
+				$filter_values = array_values($input['week_filter_value'][$w]);
+				$f=0;
+				if(isset($input['week_filter'][$w]) && count($input['week_filter'][$w])>0){
+					foreach($input['week_filter'][$w] as $filter_id){
+						if($filter_id>0 && $filter_ok){
+							//if(isset($filter_values[$f])){
+							$specs = EventSpecValue::where([['id_subscription', $sub->id_subs],['id_week', $week->id], ['id_eventspec', $filter_id], ['valore', $filter_values[$f]]])->orderBy('id_eventspec')->get();
+							if(count($specs)==0) $filter_ok=false;
+							//}
+						}
+						$f++;
+					}
+				}
+
+
+				// $r=0;
+				// $filter_ok=true;
+				// if($filter == null) $filter = array();
+				// foreach($filter as $f){
+				// 	if($f==1 && $filter_ok){
+				// 		$e = EventSpecValue::where([['id_eventspec', $filter_id[$r]], ['valore', $filter_value[$r]], ['id_subscription', $sub->id_subs] ])->get();
+				// 		if(count($e)==0) $filter_ok=false;
+				// 	}
+				// 	$r++;
+				// }
+				//
+				// $r=0;
+				// if(count($att_filter)>0){
+				// 	foreach($att_filter as $fa){
+				// 		if($fa==1 && $filter_ok){
+				// 			$at = AttributoUser::where([['id_user', $sub->id_user], ['id_attributo', $att_filter_id[$r]], ['valore', $att_filter_value[$r]]])->get();
+				// 			if(count($at)==0) $filter_ok=false;
+				// 		}
+				// 		$r++;
+				// 	}
+				// }
+
+
+				$w++;
+			}
 
 			if($filter_ok){
 				if($input['invia_a'] == 'ragazzo'){
@@ -630,8 +638,9 @@ class SubscriptionController extends Controller
 
 			}
 		}
-		$w++;
-	}
+
+
+
 
 		$json = json_encode(array_values(array_unique($user_array)));
 		switch($type){

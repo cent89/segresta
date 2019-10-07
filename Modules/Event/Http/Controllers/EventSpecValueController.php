@@ -443,8 +443,8 @@ class EventSpecValueController extends Controller
 			$spec->id_subscription = $sub->id;
 			$spec->valore = $input['valore'];
 			$spec->id_week = $input['id_week'];
-			$spec->costo = $input['costo'];
-			$spec->acconto = $input['acconto'];
+			$spec->costo = floatval($input['costo']);
+			$spec->acconto = floatval($input['acconto']);
 			$spec->pagato = false;
 			$spec->save();
 		}

@@ -122,10 +122,10 @@ $subs = DB::table('subscriptions as sub')->select('sub.id as id_subs', 'users.*'
 						}
 					}else{
 						switch($value->id_type){
-							case -1:
+							case Type::TEXT_TYPE:
 								echo "<p>".$value->valore."</p>";
 								break;
-							case -2:
+							case Type::BOOL_TYPE:
 								$icon = "<i class='fa ";
 								if($value->valore==1){
 									$icon .= "fa-check-square-o";
@@ -135,7 +135,7 @@ $subs = DB::table('subscriptions as sub')->select('sub.id as id_subs', 'users.*'
 								$icon .= " fa-2x' aria-hidden='true'></i>";
 								echo $icon;
 								break;
-							case -3:
+							default:
 								echo "<p>".$value->valore."</p>";
 								break;
 
