@@ -21,7 +21,7 @@ use App\Nazione;
 
 
   <div class="row justify-content-center">
-    <div class="col-6">
+    <div class="col-md-6">
       <div class="card">
         <div class="card-body">
           {!! Form::open(['method' => 'POST', 'route' => ['register']]) !!}

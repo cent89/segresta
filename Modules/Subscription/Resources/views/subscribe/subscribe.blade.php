@@ -49,7 +49,7 @@ if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 	</div>
 
 	<div class="row justify-content-center" style="margin-top: 20px;">
-		<div class="col-6">
+		<div class="col-md-6">
 			<div class="card">
 				<div class="card-body">
 					{!! Form::open(['route' => 'subscribe.savesubscribe', 'id' => 'prova']) !!}

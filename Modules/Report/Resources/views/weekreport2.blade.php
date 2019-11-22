@@ -11,6 +11,8 @@ use Modules\Oratorio\Entities\TypeSelect;
 use Modules\Attributo\Entities\Attributo;
 use Modules\Attributo\Entities\AttributoUser;
 use Modules\Famiglia\Entities\ComponenteFamiglia;
+use App\Comune;
+use App\Provincia;
 ?>
 
 <html>
@@ -324,8 +326,21 @@ function stampa_tabella($input, $whereRaw, $format, $stampa_famiglia){
 
 					//SPECIFICHE UTENTE
 					if(count($input['spec_user'])>0){
-						foreach($input['spec_user'] as $user){
-							echo "<td>".$sub->$user."</td>";
+						foreach($input['spec_user'] as $field_name){
+							echo "<td>";
+							switch($field_name){
+								case 'residente':
+								$comune = Comune::find($sub->id_comune_residenza);
+								if($comune == null) break;
+								$provincia = Provincia::find($comune->id_provincia);
+								echo $comune->nome." (".$provincia->sigla_automobilistica.")";
+								break;
+
+								default: echo $sub->$field_name;
+							}
+
+							echo "</td>";
+
 						}
 					}
 

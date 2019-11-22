@@ -2,17 +2,16 @@
 use Modules\Event\Entities\Week;
 use Modules\User\Entities\Group;
 use Modules\Event\Entities\Event;
-use App\SpecSubscription;
 use Modules\User\Entities\User;
-use App\CampoWeek;
 use Modules\Subscription\Entities\Subscription;
 use Modules\Oratorio\Entities\Oratorio;
-use App\Classe;
 use Modules\Event\Entities\EventSpecValue;
 use Modules\Event\Entities\EventSpec;
 use Modules\Oratorio\Entities\TypeSelect;
 use Modules\Attributo\Entities\Attributo;
 use Modules\Attributo\Entities\AttributoUser;
+use App\Comune;
+use App\Provincia;
 ?>
 
 <html>
@@ -92,13 +91,20 @@ $subs = DB::table('subscriptions as sub')->select('sub.id as id_subs', 'users.*'
 
 		//SPECIFICHE UTENTE
 		if(count($input['spec_user'])>0){
-			foreach($input['spec_user'] as $user){
-				if($user=='photo' && $sub->$user!=''){
+			foreach($input['spec_user'] as $field_name){
+				echo "<td>";
+				switch($field_name){
+					case 'residente':
+					$comune = Comune::find($sub->id_comune_residenza);
+					if($comune == null) break;
+					$provincia = Provincia::find($comune->id_provincia);
+					echo $comune->nome." (".$provincia->sigla_automobilistica.")";
+					break;
 
-					echo "<td><img src='".url("upload/".$sub->id_oratorio."/user_profile/".$sub->photo)."' width=60px/></td>";
-				}else{
-					echo "<td>".$sub->$user."</td>";
+					default: echo $sub->$field_name;
 				}
+
+				echo "</td>";
 
 			}
 		}

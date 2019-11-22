@@ -128,7 +128,7 @@ class ReportController extends Controller
 
 		switch($input['format']){
 			case 'pdf':
-			$pdf = PDF::loadView('report::weekreport', compact('input'))->setPaper('a4', 'landscape');
+			$pdf = PDF::loadView('report::weekreport2', compact('input'))->setPaper('a4', 'landscape');
 	    return $pdf->download(camel_case("Report").".pdf");
 			break;
 			case 'excel': return Excel::download(new ReportExportWeek($input), 'report.xlsx');
@@ -141,7 +141,7 @@ class ReportController extends Controller
 			$report->titolo = "Il mio nuovo report";
 			$report->id_event = Session::get('work_event');
 			$report->route = 'report.gen_weekspec';
-			$input['format'] = 'excel';
+			$input['format'] = 'html';
 			$report->report = json_encode($input);
 			$report->save();
 			Session::flash('flash_message', 'Report salvato come modello! Ora assegnagli un nome per riconoscerlo più velocemente.');
@@ -152,7 +152,31 @@ class ReportController extends Controller
 
 	public function gen_user(Request $request){
 		$input = $request->all();
-		return view('report::users', ['input' => $input]);
+		switch($input['format']){
+			case 'pdf':
+			$pdf = PDF::loadView('report::users', compact('input'))->setPaper('a4', 'landscape');
+			return $pdf->download(camel_case("Report Utenti").".pdf");
+			break;
+			case 'excel': return Excel::download(new ReportExportUser($input), 'report.xlsx');
+			break;
+			case 'html': return view('report::users', ['input' => $input]);
+			break;
+			case 'save':
+			//salvo il json del report nel db, per richiamarlo più velocemente
+			$report = new Report();
+			$report->titolo = "Il mio nuovo report utenti";
+			$report->id_event = Session::get('work_event');
+			$report->route = 'report.gen_user';
+			$input['format'] = 'html';
+			$report->report = json_encode($input);
+			$report->save();
+			Session::flash('flash_message', 'Report salvato come modello! Ora assegnagli un nome per riconoscerlo più velocemente.');
+			return redirect()->route('report.index');
+			break;
+		}
+
+
+
 	}
 
 	public function user(Request $request){

@@ -44,12 +44,14 @@ use Modules\User\Entities\Group;
             $c[] = ['id'=>'cognome', 'label'=>'Cognome'];
             $c[] = ['id'=>'email', 'label'=>'Email'];
             $c[] = ['id'=>'cell_number', 'label'=>'Numero Cell.'];
-            $c[] = ['id'=>'username', 'label'=>'Username'];
             $c[] = ['id'=>'nato_il', 'label'=>'Data di nascita'];
             $c[] = ['id'=>'nato_a', 'label'=>'Luogo di nascita'];
             $c[] = ['id'=>'sesso', 'label'=>'Sesso'];
             $c[] = ['id'=>'residente', 'label'=>'Residenza'];
             $c[] = ['id'=>'via', 'label'=>'Indirizzo'];
+            $c[] = ['id'=>'patologie', 'label'=>'Patologie'];
+            $c[] = ['id'=>'allergie', 'label'=>'Allergie'];
+            $c[] = ['id'=>'note', 'label'=>'Note'];
 
             ?>
 
@@ -107,9 +109,17 @@ use Modules\User\Entities\Group;
 
 
               <h4>Passo 3: In quale formato vuoi il tuo report?</h4>
-              {!! Form::radio('pdf', 'pdf', true) !!} PDF
+              {!! Form::radio('format', 'html', true) !!} HTML
+              {!! Form::radio('format', 'pdf', false) !!} PDF
+              {!! Form::radio('format', 'excel', false) !!} Excel
+              {!! Form::radio('format', 'save', false) !!} Salva come modello
+
+              <br><br>
+
+
               {!! Form::submit('Genera!', ['class' => 'btn btn-primary form-control']) !!}
               {!! Form::close() !!}
+
             </div>
 
             <!--<div class="panel panel-default" style="width: 50%; float: left;">
