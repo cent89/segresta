@@ -101,6 +101,13 @@ $subs = DB::table('subscriptions as sub')->select('sub.id as id_subs', 'users.*'
 					echo $comune->nome." (".$provincia->sigla_automobilistica.")";
 					break;
 
+					case 'nato_a':
+					$comune = Comune::find($sub->id_comune_nascita);
+					if($comune == null) break;
+					$provincia = Provincia::find($comune->id_provincia);
+					echo $comune->nome." (".$provincia->sigla_automobilistica.")";
+					break;
+
 					default: echo $sub->$field_name;
 				}
 

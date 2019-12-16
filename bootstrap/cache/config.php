@@ -1166,6 +1166,8 @@
     array (
       'view-volontario' => 'Vedi elenco volontari',
       'edit-volontario' => 'Modifica elenco volontari',
+      'view-edit-gruppi-volontario' => 'Vedi elenco volontari',
+      'volontario-segreteria' => 'Gestisci i volontari come segreteria',
     ),
   ),
 );

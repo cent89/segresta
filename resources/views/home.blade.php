@@ -40,7 +40,11 @@ if($modulo_famiglia){
   $padre = ComponenteFamiglia::getPadre(Auth::user()->id);
   $madre = ComponenteFamiglia::getMadre(Auth::user()->id);
 }
+
+//controllo se è abilitato il modulo Volontario
+$modulo_volontario = (Module::find('volontario') != null && Module::find('volontario')->enabled());
 ?>
+
 
 @extends('layouts.app')
 @section('content')
@@ -152,6 +156,18 @@ if($modulo_famiglia){
               </div>
               <div class="card-footer"><a href="{{ route('admin') }}" class="btn btn-sm btn-primary btn-block">Apri amministrazione</a></div>
             </div>
+            @endif
+
+            @if($modulo_volontario)
+
+            <div class="card">
+              <div class="card-header"><i class="fas fa-hands-helping"></i> Volontario</div>
+              <div class="card-body">
+                <p>Sezione dedicata ai volontari dell'oratorio</p>
+              </div>
+              <div class="card-footer"><a href="{{ route('volontario.user') }}" class="btn btn-sm btn-primary btn-block">Apri Registro volontari</a></div>
+            </div>
+
             @endif
 
 

@@ -336,6 +336,13 @@ function stampa_tabella($input, $whereRaw, $format, $stampa_famiglia){
 								echo $comune->nome." (".$provincia->sigla_automobilistica.")";
 								break;
 
+								case 'nato_a':
+								$comune = Comune::find($sub->id_comune_nascita);
+								if($comune == null) break;
+								$provincia = Provincia::find($comune->id_provincia);
+								echo $comune->nome." (".$provincia->sigla_automobilistica.")";
+								break;
+
 								default: echo $sub->$field_name;
 							}
 

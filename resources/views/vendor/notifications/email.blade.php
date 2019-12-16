@@ -43,15 +43,15 @@ Ciao!
 @if (! empty($salutation))
 {{ $salutation }}
 @else
-@lang('Regards'),<br>{{ config('app.name') }}
+@lang('Grazie'),<br>{{ config('app.name') }}
 @endif
 
 {{-- Subcopy --}}
 @isset($actionText)
 @component('mail::subcopy')
 @lang(
-    "If you’re having trouble clicking the \":actionText\" button, copy and paste the URL below\n".
-    'into your web browser: [:actionURL](:actionURL)',
+    "Se hai probemi nell'apertura del link \":actionText\", copia e incolla l'URL qui sotto\n".
+    'nel tuo web browser: [:actionURL](:actionURL)',
     [
         'actionText' => $actionText,
         'actionURL' => $actionUrl,
