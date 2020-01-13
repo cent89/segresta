@@ -7,6 +7,7 @@ use Entrust;
 use Session;
 use Modules\Oratorio\Entities\UserOratorio;
 use Modules\Oratorio\Entities\Oratorio;
+use Modules\User\Entities\User;
 use Auth;
 use Input;
 
@@ -19,7 +20,7 @@ class HomeController extends Controller
   */
   public function __construct()
   {
-    $this->middleware('auth');
+    $this->middleware('auth')->except('login');
   }
 
   /**

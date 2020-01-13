@@ -32,6 +32,17 @@
       'Curl' => 'Ixudra\\Curl\\Facades\\Curl',
     ),
   ),
+  'laravel/horizon' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Laravel\\Horizon\\HorizonServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'Horizon' => 'Laravel\\Horizon\\Horizon',
+    ),
+  ),
   'laravel/nexmo-notification-channel' => 
   array (
     'providers' => 
@@ -117,13 +128,6 @@
     'providers' => 
     array (
       0 => 'Spatie\\CookieConsent\\CookieConsentServiceProvider',
-    ),
-  ),
-  'spatie/laravel-medialibrary' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Spatie\\MediaLibrary\\MediaLibraryServiceProvider',
     ),
   ),
   'xethron/migrations-generator' => 

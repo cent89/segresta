@@ -54,7 +54,8 @@
       32 => 'App\\Providers\\AppServiceProvider',
       33 => 'App\\Providers\\AuthServiceProvider',
       34 => 'App\\Providers\\EventServiceProvider',
-      35 => 'App\\Providers\\RouteServiceProvider',
+      35 => 'App\\Providers\\HorizonServiceProvider',
+      36 => 'App\\Providers\\RouteServiceProvider',
     ),
     'aliases' => 
     array (
@@ -344,9 +345,20 @@
       'default' => 
       array (
         'host' => 'localhost',
-        'password' => NULL,
+        'password' => 'segresta2020',
         'port' => 6379,
         'database' => 0,
+      ),
+      'horizon' => 
+      array (
+        'host' => 'localhost',
+        'password' => 'segresta2020',
+        'port' => 6379,
+        'database' => 0,
+        'options' => 
+        array (
+          'prefix' => 'horizon:',
+        ),
       ),
     ),
   ),
@@ -438,6 +450,12 @@
         3 => 'reset',
         4 => 'reload',
       ),
+    ),
+    'generator' => 
+    array (
+      'columns' => 'id,add your columns,created_at,updated_at',
+      'buttons' => 'create,export,print,reset,reload',
+      'dom' => 'Bfrtip',
     ),
   ),
   'datatables-html' => 
@@ -654,6 +672,61 @@
     array (
       'view-gruppo' => 'Visualizza la finestra dei gruppi',
       'edit-gruppo' => 'Modifica gruppi e componenti',
+    ),
+  ),
+  'horizon' => 
+  array (
+    'domain' => NULL,
+    'path' => 'horizon',
+    'use' => 'default',
+    'prefix' => 'horizon:',
+    'middleware' => 
+    array (
+      0 => 'web',
+    ),
+    'waits' => 
+    array (
+      'redis:default' => 60,
+    ),
+    'trim' => 
+    array (
+      'recent' => 60,
+      'recent_failed' => 10080,
+      'failed' => 10080,
+      'monitored' => 10080,
+    ),
+    'fast_termination' => false,
+    'memory_limit' => 64,
+    'environments' => 
+    array (
+      'production' => 
+      array (
+        'supervisor-1' => 
+        array (
+          'connection' => 'redis',
+          'queue' => 
+          array (
+            0 => 'default',
+          ),
+          'balance' => 'simple',
+          'processes' => 10,
+          'tries' => 1,
+        ),
+      ),
+      'local' => 
+      array (
+        'supervisor-1' => 
+        array (
+          'connection' => 'redis',
+          'queue' => 
+          array (
+            0 => 'default',
+          ),
+          'balance' => 'simple',
+          'processes' => 3,
+          'tries' => 1,
+        ),
+      ),
     ),
   ),
   'image' => 
@@ -943,7 +1016,7 @@
   ),
   'queue' => 
   array (
-    'default' => 'sync',
+    'default' => 'redis',
     'connections' => 
     array (
       'sync' => 
@@ -979,6 +1052,7 @@
         'connection' => 'default',
         'queue' => 'default',
         'retry_after' => 90,
+        'block_for' => 120,
       ),
     ),
     'failed' => 
@@ -1089,76 +1163,6 @@
   array (
     'name' => 'Whatsapp',
   ),
-  'medialibrary' => 
-  array (
-    'disk_name' => 'public',
-    'max_file_size' => 10485760,
-    'queue_name' => '',
-    'media_model' => 'Spatie\\MediaLibrary\\Models\\Media',
-    's3' => 
-    array (
-      'domain' => 'https://.s3.amazonaws.com',
-    ),
-    'remote' => 
-    array (
-      'extra_headers' => 
-      array (
-        'CacheControl' => 'max-age=604800',
-      ),
-    ),
-    'responsive_images' => 
-    array (
-      'width_calculator' => 'Spatie\\MediaLibrary\\ResponsiveImages\\WidthCalculator\\FileSizeOptimizedWidthCalculator',
-      'use_tiny_placeholders' => true,
-      'tiny_placeholder_generator' => 'Spatie\\MediaLibrary\\ResponsiveImages\\TinyPlaceholderGenerator\\Blurred',
-    ),
-    'url_generator' => NULL,
-    'path_generator' => NULL,
-    'image_optimizers' => 
-    array (
-      'Spatie\\ImageOptimizer\\Optimizers\\Jpegoptim' => 
-      array (
-        0 => '--strip-all',
-        1 => '--all-progressive',
-      ),
-      'Spatie\\ImageOptimizer\\Optimizers\\Pngquant' => 
-      array (
-        0 => '--force',
-      ),
-      'Spatie\\ImageOptimizer\\Optimizers\\Optipng' => 
-      array (
-        0 => '-i0',
-        1 => '-o2',
-        2 => '-quiet',
-      ),
-      'Spatie\\ImageOptimizer\\Optimizers\\Svgo' => 
-      array (
-        0 => '--disable=cleanupIDs',
-      ),
-      'Spatie\\ImageOptimizer\\Optimizers\\Gifsicle' => 
-      array (
-        0 => '-b',
-        1 => '-O3',
-      ),
-    ),
-    'image_generators' => 
-    array (
-      0 => 'Spatie\\MediaLibrary\\ImageGenerators\\FileTypes\\Image',
-      1 => 'Spatie\\MediaLibrary\\ImageGenerators\\FileTypes\\Webp',
-      2 => 'Spatie\\MediaLibrary\\ImageGenerators\\FileTypes\\Pdf',
-      3 => 'Spatie\\MediaLibrary\\ImageGenerators\\FileTypes\\Svg',
-      4 => 'Spatie\\MediaLibrary\\ImageGenerators\\FileTypes\\Video',
-    ),
-    'image_driver' => 'gd',
-    'ffmpeg_path' => '/usr/bin/ffmpeg',
-    'ffprobe_path' => '/usr/bin/ffprobe',
-    'temporary_directory_path' => NULL,
-    'jobs' => 
-    array (
-      'perform_conversions' => 'Spatie\\MediaLibrary\\Jobs\\PerformConversions',
-      'generate_responsive_images' => 'Spatie\\MediaLibrary\\Jobs\\GenerateResponsiveImages',
-    ),
-  ),
   'volontario' => 
   array (
     'name' => 'Volontario',
@@ -1166,7 +1170,7 @@
     array (
       'view-volontario' => 'Vedi elenco volontari',
       'edit-volontario' => 'Modifica elenco volontari',
-      'view-edit-gruppi-volontario' => 'Vedi elenco volontari',
+      'view-edit-gruppi-volontario' => 'Vedi elenco gruppi volontari',
       'volontario-segreteria' => 'Gestisci i volontari come segreteria',
     ),
   ),

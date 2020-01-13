@@ -31,7 +31,9 @@
     "doctrine/dbal": "v2.4.2",
     "fzaninotto/faker": "~1.4",
     "ixudra/curl": "6.*",
-    "pbmedia/laravel-webdav": "^1.5"
+    "pbmedia/laravel-webdav": "^1.5",
+    "predis/predis": "^1.1",
+    "laravel/horizon": "^3.4"
   },
   "require-dev": {
     "mockery/mockery": "0.9.*",
