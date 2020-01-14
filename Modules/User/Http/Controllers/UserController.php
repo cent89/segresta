@@ -69,8 +69,9 @@ class UserController extends Controller
     $json = $input['check_user'];
     //se l'array è vuoto, seleziono tutti gli utenti
     if(count(json_decode($json)) == 0){
-      $users = User::leftJoin('user_oratorio', 'user_oratorio.id_user', 'users.id')->where('user_oratorio.id_oratorio', Session::get('session_oratorio'))->pluck('users.id')->toArray();
-      $json = json_encode($users);
+      // $users = User::leftJoin('user_oratorio', 'user_oratorio.id_user', 'users.id')->where('user_oratorio.id_oratorio', Session::get('session_oratorio'))->pluck('users.id')->toArray();
+      // $json = json_encode($users);
+      $json = json_encode([]);
     }
     //$json = json_encode($check_user);
     switch($input['action']){
