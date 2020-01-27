@@ -12,6 +12,7 @@ use Modules\Attributo\Entities\Attributo;
 use Modules\Attributo\Entities\AttributoUser;
 use App\Comune;
 use App\Provincia;
+use App\Nazione;
 ?>
 
 <html>
@@ -102,10 +103,15 @@ $subs = DB::table('subscriptions as sub')->select('sub.id as id_subs', 'users.*'
 					break;
 
 					case 'nato_a':
-					$comune = Comune::find($sub->id_comune_nascita);
-					if($comune == null) break;
-					$provincia = Provincia::find($comune->id_provincia);
-					echo $comune->nome." (".$provincia->sigla_automobilistica.")";
+					if($sub->id_nazione_nascita != 118){
+						echo Nazione::find($sub->id_nazione_nascita)->nome_stato;
+						break;
+					}else{
+						$comune = Comune::find($sub->id_comune_nascita);
+						if($comune == null) break;
+						$provincia = Provincia::find($comune->id_provincia);
+						echo $comune->nome." (".$provincia->sigla_automobilistica.")";
+					}
 					break;
 
 					default: echo $sub->$field_name;
@@ -182,7 +188,12 @@ $i=0;
 foreach($input['user_filter'] as $f){
 	if($f=='1'){
 		if($whereRaw!='') $whereRaw .= " AND ";
-		$whereRaw .= " users.".$input['user_filter_id'][$i]." LIKE '%".$input['user_filter_value'][$i]."%'";
+		if($input['user_filter_value'][$i] == ''){
+			$filter = '= ""';
+		}else{
+			$filter = "LIKE '%".$input['user_filter_value'][$i]."%''";
+		}
+		$whereRaw .= " users.".$input['user_filter_id'][$i].$filter;
 	}
 	$i++;
 }

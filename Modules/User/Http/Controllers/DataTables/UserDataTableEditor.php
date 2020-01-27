@@ -116,6 +116,9 @@ class UserDataTableEditor extends DataTablesEditor
       $componente->save();
     }
 
+    // Invio email di verifica email
+    $model->sendEmailVerificationNotification();
+
     return $model;
   }
 
