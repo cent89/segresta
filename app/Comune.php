@@ -20,4 +20,11 @@ class Comune extends Model
 
     return json_encode($comuniList, JSON_HEX_APOS|JSON_HEX_QUOT);
   }
+
+  // Relation
+  // Relation
+  public function provincia()
+  {
+      return $this->belongsTo('\App\Provincia', 'id_provincia', 'id');
+  }
 }

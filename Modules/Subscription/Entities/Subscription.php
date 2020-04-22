@@ -25,4 +25,10 @@ class Subscription extends Model implements  Auditable
 
     return $data;
   }
+
+  // Relation
+  public function evento()
+  {
+      return $this->belongsTo('\Modules\Event\Entities\Event', 'id_event', 'id');
+  }
 }

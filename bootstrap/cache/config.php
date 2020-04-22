@@ -6,7 +6,7 @@
     'name' => 'Segresta 2.0',
     'env' => 'local',
     'debug' => true,
-    'url' => 'http://localhost:8000',
+    'url' => 'http://192.168.5.147:8000',
     'nome_parrocchia' => 'NOME PARROCCHIA',
     'indirizzo_parrocchia' => 'INDIRIZZO PARROCCHIA',
     'email_parrocchia' => 'EMAIL PARROCCHIA',
@@ -635,7 +635,7 @@
         'driver' => 'local',
         'root' => '/home/roberto/Documenti/Clienti/Segresta/segresta/storage/app/public',
         'visibility' => 'public',
-        'url' => 'http://localhost:8000/storage',
+        'url' => 'http://192.168.5.147:8000/storage',
       ),
       'webdav' => 
       array (

@@ -706,7 +706,7 @@ class SubscriptionController extends Controller
 
 	}
 
-	public function print_subscription(Request $request, $id_subscription){
+	public static function print_subscription(Request $request, $id_subscription){
 		$input = $request->all();
 
 		$sub = Subscription::findOrFail($id_subscription);
@@ -988,16 +988,22 @@ class SubscriptionController extends Controller
 		$exec = "unoconv -f pdf ".$path;
 		shell_exec($exec);
 		//stampo 1/2 pagine per foglio in base alle impostazioni
-		$response_file = $output.$filename.".pdf";
+		$response_file = $filename.".pdf";
 		switch($event->pagine_foglio){
 			case 2:
 			$cmd = "pdfjam --nup 2x1 --landscape --a4paper --outfile ".$output."/".$filename."-2up.pdf ".$response_file;
 			shell_exec($cmd);
-			$response_file = $output.$filename."-2up.pdf";
+			$response_file = $filename."-2up.pdf";
 			break;
 		}
-		return response()->file($response_file);
+		if($request->has('type') && $input['type'] == 'url'){
+			// $url = Storage::disk('public')->url($response_file);
+			$url = Storage::disk('public')->url('/temp/subscription_21.pdf');
+			return $url;
+		}
+		return response()->file($output.$response_file);
 	}
+
 
 	public function show_eventspecvalues($id_sub){
 		$subscription = Subscription::find($id_sub);
