@@ -174,6 +174,7 @@ return [
     Telegram\Bot\Laravel\TelegramServiceProvider::class,
     Nwidart\Modules\LaravelModulesServiceProvider::class,
     Spatie\CookieConsent\CookieConsentServiceProvider::class,
+    App\Providers\DropboxServiceProvider::class,
 
 
     /*

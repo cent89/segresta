@@ -48,14 +48,15 @@
       26 => 'Telegram\\Bot\\Laravel\\TelegramServiceProvider',
       27 => 'Nwidart\\Modules\\LaravelModulesServiceProvider',
       28 => 'Spatie\\CookieConsent\\CookieConsentServiceProvider',
-      29 => 'Nayjest\\Grids\\ServiceProvider',
-      30 => 'Collective\\Html\\HtmlServiceProvider',
-      31 => 'Lavary\\Menu\\ServiceProvider',
-      32 => 'App\\Providers\\AppServiceProvider',
-      33 => 'App\\Providers\\AuthServiceProvider',
-      34 => 'App\\Providers\\EventServiceProvider',
-      35 => 'App\\Providers\\HorizonServiceProvider',
-      36 => 'App\\Providers\\RouteServiceProvider',
+      29 => 'App\\Providers\\DropboxServiceProvider',
+      30 => 'Nayjest\\Grids\\ServiceProvider',
+      31 => 'Collective\\Html\\HtmlServiceProvider',
+      32 => 'Lavary\\Menu\\ServiceProvider',
+      33 => 'App\\Providers\\AppServiceProvider',
+      34 => 'App\\Providers\\AuthServiceProvider',
+      35 => 'App\\Providers\\EventServiceProvider',
+      36 => 'App\\Providers\\HorizonServiceProvider',
+      37 => 'App\\Providers\\RouteServiceProvider',
     ),
     'aliases' => 
     array (
@@ -114,6 +115,7 @@
   ),
   'audit' => 
   array (
+    'enabled' => true,
     'implementation' => 'OwenIt\\Auditing\\Models\\Audit',
     'user' => 
     array (
@@ -187,6 +189,119 @@
         'provider' => 'users',
         'table' => 'password_resets',
         'expire' => 60,
+      ),
+    ),
+  ),
+  'backup' => 
+  array (
+    'backup' => 
+    array (
+      'name' => 'Segresta 2.0',
+      'source' => 
+      array (
+        'files' => 
+        array (
+          'include' => 
+          array (
+            0 => '/home/roberto/Documenti/Clienti/Segresta/segresta/storage',
+          ),
+          'exclude' => 
+          array (
+            0 => '/home/roberto/Documenti/Clienti/Segresta/segresta/vendor',
+            1 => '/home/roberto/Documenti/Clienti/Segresta/segresta/node_modules',
+          ),
+          'follow_links' => false,
+        ),
+        'databases' => 
+        array (
+          0 => 'mysql',
+        ),
+      ),
+      'database_dump_compressor' => NULL,
+      'destination' => 
+      array (
+        'filename_prefix' => '',
+        'disks' => 
+        array (
+          0 => 'dropbox',
+        ),
+      ),
+      'temporary_directory' => '/home/roberto/Documenti/Clienti/Segresta/segresta/storage/app/backup-temp',
+    ),
+    'notifications' => 
+    array (
+      'notifications' => 
+      array (
+        'Spatie\\Backup\\Notifications\\Notifications\\BackupHasFailed' => 
+        array (
+          0 => 'mail',
+        ),
+        'Spatie\\Backup\\Notifications\\Notifications\\UnhealthyBackupWasFound' => 
+        array (
+          0 => 'mail',
+        ),
+        'Spatie\\Backup\\Notifications\\Notifications\\CleanupHasFailed' => 
+        array (
+          0 => 'mail',
+        ),
+        'Spatie\\Backup\\Notifications\\Notifications\\BackupWasSuccessful' => 
+        array (
+          0 => 'mail',
+        ),
+        'Spatie\\Backup\\Notifications\\Notifications\\HealthyBackupWasFound' => 
+        array (
+          0 => 'mail',
+        ),
+        'Spatie\\Backup\\Notifications\\Notifications\\CleanupWasSuccessful' => 
+        array (
+          0 => 'mail',
+        ),
+      ),
+      'notifiable' => 'Spatie\\Backup\\Notifications\\Notifiable',
+      'mail' => 
+      array (
+        'to' => 'info@elephantech.it',
+        'from' => 
+        array (
+          'address' => 'hello@example.com',
+          'name' => 'Example',
+        ),
+      ),
+      'slack' => 
+      array (
+        'webhook_url' => '',
+        'channel' => NULL,
+        'username' => NULL,
+        'icon' => NULL,
+      ),
+    ),
+    'monitor_backups' => 
+    array (
+      0 => 
+      array (
+        'name' => 'Segresta 2.0',
+        'disks' => 
+        array (
+          0 => 'local',
+        ),
+        'health_checks' => 
+        array (
+          'Spatie\\Backup\\Tasks\\Monitor\\HealthChecks\\MaximumAgeInDays' => 1,
+          'Spatie\\Backup\\Tasks\\Monitor\\HealthChecks\\MaximumStorageInMegabytes' => 5000,
+        ),
+      ),
+    ),
+    'cleanup' => 
+    array (
+      'strategy' => 'Spatie\\Backup\\Tasks\\Cleanup\\Strategies\\DefaultStrategy',
+      'default_strategy' => 
+      array (
+        'keep_all_backups_for_days' => 7,
+        'keep_daily_backups_for_days' => 16,
+        'keep_weekly_backups_for_weeks' => 8,
+        'keep_monthly_backups_for_months' => 4,
+        'keep_yearly_backups_for_years' => 2,
+        'delete_oldest_backups_when_using_more_megabytes_than' => 5000,
       ),
     ),
   ),
@@ -645,6 +760,11 @@
         'password' => 'Oratorio2019!',
         'pathPrefix' => '',
       ),
+      'dropbox' => 
+      array (
+        'driver' => 'dropbox',
+        'authorization_token' => 'RjbCbfIqHnIAAAAAAAAn2JcRU5Y1gjs-H92_NUhBtDWdgn1te9l1diCBLUK9Us5v',
+      ),
     ),
   ),
   'generators' => 
@@ -769,7 +889,7 @@
       'name' => 'ElephanTech',
     ),
     'encryption' => 'ssl',
-    'username' => 'oratorio@segresta.it',
+    'username' => 'oratorio@segresta.it2',
     'password' => 'PPJF5aAzzFYrV63H',
     'markdown' => 
     array (
@@ -1162,6 +1282,11 @@
   'whatsapp' => 
   array (
     'name' => 'Whatsapp',
+  ),
+  'datatables-fractal' => 
+  array (
+    'includes' => 'include',
+    'serializer' => 'League\\Fractal\\Serializer\\DataArraySerializer',
   ),
   'volontario' => 
   array (

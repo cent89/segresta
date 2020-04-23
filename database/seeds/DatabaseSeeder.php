@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
   {
     $this->call([
       AddItalia::class,
+      ConfigSeeder::class
     ]);
 
     if(Oratorio::count() == 0){

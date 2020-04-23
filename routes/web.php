@@ -35,6 +35,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['verified']], function() {
 	Route::get('role/create', ['as' =>'role.create', 'uses' => 'RoleController@create']);
 	Route::post('role/store', ['as' =>'role.store', 'uses' => 'RoleController@store']);
 	Route::get('role/{id_role}/delete', ['as' =>'role.delete', 'uses' => 'RoleController@delete']);
+
+	Route::get('config', ['as' =>'config.index', 'uses' => 'ConfigController@index']);
+	Route::post('config/save', ['as' =>'config.save', 'uses' => 'ConfigController@save']);
 });
 
 

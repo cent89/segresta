@@ -62,6 +62,10 @@ return [
       'password'   => env('WEBDAV_PASSWORD'),
       'pathPrefix' => '', // optional
     ],
+    'dropbox' => [
+      'driver' => 'dropbox',
+      'authorization_token' => '',
+    ],
 
   ],
 

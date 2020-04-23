@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Menu;
 use Carbon\Carbon;
+use App\Config;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,10 +21,23 @@ class AppServiceProvider extends ServiceProvider
     //così ogni modulo, nel boot, pò aggiungere la sua voce.
 
     Schema::defaultStringLength(191);
-    Menu::make('SegrestaNavBar', function($menu){});
-      Carbon::setLocale('it');
-      setlocale(LC_TIME, 'it_IT');
+    Carbon::setLocale('it');
+    setlocale(LC_TIME, 'it_IT');
 
+    foreach(Config::all() as $c){
+      config()->set($c->config, $c->value);
+    }
+
+    // config([
+    //   'global' => Config::all(['key','value'])
+    //   ->keyBy('key') // key every setting by its name
+    //   ->transform(function ($setting) {
+    //     return $setting->value; // return only the value
+    //   })
+    //   ->toArray() // make it an array
+    // ]);
+
+    Menu::make('SegrestaNavBar', function($menu){});
 
     }
 
