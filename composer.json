@@ -33,7 +33,9 @@
     "laravel/horizon": "^3.4",
     "spatie/flysystem-dropbox": "^1.2",
     "owen-it/laravel-auditing": "^10.0",
-    "spatie/laravel-backup": "^6.9"
+    "spatie/laravel-backup": "^6.9",
+    "laravel-notification-channels/fcm": "^2.0",
+    "laravel/socialite": "^4.3"
   },
   "require-dev": {
     "mockery/mockery": "0.9.*",

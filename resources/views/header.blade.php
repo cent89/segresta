@@ -67,16 +67,21 @@ if(!Auth::guest()){
 					<?php
 					if(Session::get('session_oratorio')!=null){
 						$user = Auth::user();
-						if($user->photo==''){
-							if($user->sesso=="M"){
-								echo "<img src='".url("boy.png")."'>";
-							}else if($user->sesso=="F"){
-								echo "<img src='".url("girl.png")."'>";
-							}
-
+						if(substr($user->photo, 0, 4) == 'http'){
+							echo "<img src='".$user->photo."' width=48px>";
 						}else{
-							echo "<img src='".url(Storage::url('public/'.$user->photo))."' width=48px/>";
+							if($user->photo==''){
+								if($user->sesso=="M"){
+									echo "<img src='".url("boy.png")."'>";
+								}else if($user->sesso=="F"){
+									echo "<img src='".url("girl.png")."'>";
+								}
+
+							}else{
+								echo "<img src='".url(Storage::url('public/'.$user->photo))."' width=48px/>";
+							}
 						}
+
 					}
 
 					?>

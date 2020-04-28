@@ -26,7 +26,7 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
   */
   protected $fillable = ['name', 'email', 'password', 'cognome', 'nato_a', 'residente', 'sesso', 'via', 'nato_il',
   'photo', 'cell_number', 'id_nazione_nascita', 'id_comune_nascita', 'id_provincia_nascita', 'id_comune_residenza',
-  'id_provincia_residenza', 'tessera_sanitaria', 'cod_fiscale', 'patologie', 'allergie', 'note', 'consenso_affiliazione', 'fcmToken'];
+  'id_provincia_residenza', 'tessera_sanitaria', 'cod_fiscale', 'patologie', 'allergie', 'note', 'consenso_affiliazione', 'fcmToken', 'google_id', 'facebook_id'];
 
   protected $dates = ['nato_il'];
 
@@ -101,6 +101,11 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
 
     return $data;
   }
+
+  public function routeNotificationForFcm()
+    {
+        return $this->fcmToken;
+    }
 
 
   // Relation

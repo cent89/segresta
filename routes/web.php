@@ -25,6 +25,11 @@ Route::get('/informativa', function(){
 	return view('informativa');
 });
 
+Route::get('/auth/google/redirect', 'Auth\LoginController@redirectToProviderGoogle');
+Route::get('/auth/google/callback', 'Auth\LoginController@handleProviderCallbackGoogle');
+Route::get('/auth/facebook/redirect', 'Auth\LoginController@redirectToProviderFacebook');
+Route::get('/auth/facebook/callback', 'Auth\LoginController@handleProviderCallbackFacebook');
+
 ////////////////////////////////////////////////////////////
 //////////////////ADMIN/////////////////////////////////
 /////////////////////////////////////////////////////////

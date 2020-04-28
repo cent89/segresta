@@ -3,9 +3,18 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Login') }}</div>
+      <div class="col-md-5" style="margin-bottom: 30px;">
+        <div class="card">
+            <div class="card-body" style="text-align: center">
+              <h2>Accedi con:</h2>
+              <a href="{{ url('/auth/google/redirect') }}" class="btn btn-primary btn-lg" style="width: 50%; background-color: #e0472d; border-color: #e0472d"><i class="fab fa-google"></i> Google</a><br>
+              <a href="{{ url('/auth/facebook/redirect') }}" class="btn btn-primary btn-lg" style="width: 50%; background-color: #3b5998; border-color: #3b5998; margin-top: 10px;"><i class="fab fa-facebook-f"></i> Facebook</a>
+            </div>
+          </div>
+      </div>
+
+        <div class="col-md-5">
+            <div class="card">               
 
                 <div class="card-body">
                     <form method="POST" action="{{ route('login') }}">

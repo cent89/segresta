@@ -6,7 +6,7 @@
     'name' => 'Segresta 2.0',
     'env' => 'local',
     'debug' => true,
-    'url' => 'http://192.168.5.147:8000',
+    'url' => 'http://localhost:8000',
     'nome_parrocchia' => 'NOME PARROCCHIA',
     'indirizzo_parrocchia' => 'INDIRIZZO PARROCCHIA',
     'email_parrocchia' => 'EMAIL PARROCCHIA',
@@ -301,7 +301,7 @@
         'keep_weekly_backups_for_weeks' => 8,
         'keep_monthly_backups_for_months' => 4,
         'keep_yearly_backups_for_years' => 2,
-        'delete_oldest_backups_when_using_more_megabytes_than' => 5000,
+        'delete_oldest_backups_when_using_more_megabytes_than' => 2000,
       ),
     ),
   ),
@@ -438,6 +438,10 @@
         'prefix' => '',
         'strict' => true,
         'engine' => 'innodb',
+        'dump' => 
+        array (
+          'add_extra_option' => '-u segresta',
+        ),
       ),
       'pgsql' => 
       array (
@@ -750,7 +754,7 @@
         'driver' => 'local',
         'root' => '/home/roberto/Documenti/Clienti/Segresta/segresta/storage/app/public',
         'visibility' => 'public',
-        'url' => 'http://192.168.5.147:8000/storage',
+        'url' => 'http://localhost:8000/storage',
       ),
       'webdav' => 
       array (
@@ -766,6 +770,27 @@
         'authorization_token' => 'RjbCbfIqHnIAAAAAAAAn2JcRU5Y1gjs-H92_NUhBtDWdgn1te9l1diCBLUK9Us5v',
       ),
     ),
+  ),
+  'firebase' => 
+  array (
+    'credentials' => 
+    array (
+      'file' => '/home/roberto/Documenti/Clienti/Segresta/segresta-c2226-firebase-adminsdk-xe831-2e0df263f4.json',
+      'auto_discovery' => true,
+    ),
+    'database' => 
+    array (
+      'url' => NULL,
+    ),
+    'dynamic_links' => 
+    array (
+      'default_domain' => NULL,
+    ),
+    'storage' => 
+    array (
+      'default_bucket' => NULL,
+    ),
+    'cache_store' => 'file',
   ),
   'generators' => 
   array (
@@ -1211,6 +1236,18 @@
       'model' => 'Modules\\User\\Entities\\User',
       'key' => NULL,
       'secret' => NULL,
+    ),
+    'google' => 
+    array (
+      'client_id' => '222725687752-rdues2edc7rabretqhv605olg8rmre2v.apps.googleusercontent.com',
+      'client_secret' => 'X6JdT4TAWHhSM8sPUU49wLUr',
+      'redirect' => 'http://localhost:8000/auth/google/callback',
+    ),
+    'facebook' => 
+    array (
+      'client_id' => '573215073574741',
+      'client_secret' => '008679dea9d7b630780b53413aca90d3',
+      'redirect' => 'http://localhost:8000/auth/facebook/callback',
     ),
   ),
   'session' => 

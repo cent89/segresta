@@ -87,9 +87,12 @@ class UserController extends Controller
       case 'group':
       return route('groupusers.select', ['users' => $json]);
       break;
-      case 'whatsapp':
-      return route('whatsapp.create', ['users' => $json]);
+      case 'firebase':
+      return route('firebase.create', ['users' => $json]);
       break;
+      // case 'whatsapp':
+      // return route('whatsapp.create', ['users' => $json]);
+      // break;
     }
   }
 

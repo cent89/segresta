@@ -281,11 +281,18 @@ editor.on( 'initEdit', function ( e, node, data, items, type ) {
 } );
 
 var buttons = [
+  // {
+  //   text: '<i class="fab fa-telegram-plane"></i> Invia Telegram',
+  //   className: 'btn btn-sm btn-primary',
+  //   action: function ( e, dt, button, config ){
+  //     invia_utenti_selezionati('telegram');
+  //   }
+  // },
   {
-    text: '<i class="fab fa-telegram-plane"></i> Invia Telegram',
+    text: '<i class="fab fa-android"></i> Invia Notifica',
     className: 'btn btn-sm btn-primary',
     action: function ( e, dt, button, config ){
-      invia_utenti_selezionati('telegram');
+      invia_utenti_selezionati('firebase');
     }
   },
 ];

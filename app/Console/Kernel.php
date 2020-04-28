@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Storage;
 
 class Kernel extends ConsoleKernel
 {
@@ -24,8 +25,29 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+      $schedule->command('backup:clean')->daily()->at('00:00');
+      $schedule->command('backup:run')->daily()->at('00:30');
+
+      $schedule->call(function() {
+        // Cancella tutti file nella cartella temp
+        foreach(Storage::disk('public')->allDirectories('attachments') as $dir){
+          $files = Storage::disk('public')->allFiles($dir);
+          Storage::disk('public')->delete($files);
+        }
+
+        // Cancella tutti file nella cartella atachments
+        foreach(Storage::disk('public')->allDirectories('temp') as $dir){
+          $files = Storage::disk('public')->allFiles($dir);
+          Storage::disk('public')->delete($files);
+        }
+
+      })->dailyAt('23:00');
+
+      $schedule->call(function() {
+        // Cancello i vecchi audits
+        \App\Audit::where('created_at', '<', Carbon::now()->subDays(7)->toDateTimeString())->delete();
+
+      })->dailyAt('22:00');
     }
 
     /**
