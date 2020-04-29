@@ -775,7 +775,7 @@
   array (
     'credentials' => 
     array (
-      'file' => '/home/roberto/Documenti/Clienti/Segresta/segresta-c2226-firebase-adminsdk-xe831-2e0df263f4.json',
+      'file' => 'Modules/Firebase/segresta-c2226-firebase-adminsdk-xe831-2e0df263f4.json',
       'auto_discovery' => true,
     ),
     'database' => 
@@ -914,7 +914,7 @@
       'name' => 'ElephanTech',
     ),
     'encryption' => 'ssl',
-    'username' => 'oratorio@segresta.it2',
+    'username' => 'oratorio@segresta.it',
     'password' => 'PPJF5aAzzFYrV63H',
     'markdown' => 
     array (

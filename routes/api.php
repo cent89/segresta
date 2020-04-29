@@ -723,82 +723,86 @@ Route::post('profilo', function (Request $request){
 
 // Route per l'upload della foto profilo
 Route::post('foto', function (Request $request){
-  $user = User::find($request->id_user);
-  if($user == null){
-    return response()->json(['result' => 'error', 'title' => 'Errore']);
+  try{
+    $user = User::find($request->id_user);
+    if($user == null){
+      return response()->json(['result' => 'error', 'title' => 'Errore']);
+    }
+    $path = $request->photo->store('profile', 'public');
+    $user->photo = $path;
+    $user->save();
+
+    $url = url(Storage::url('public/'.$path));
+
+    return response()->json(['result' => 'ok', 'path' => $url]);
+  }catch(\Excepion $e){
+    return response()->json(['result' => 'error', 'msg' => 'Errore nel caricamento dell\'immagine']);
   }
-  $path = $request->photo->store('profile', 'public');
-  $user->photo = $path;
-  $user->save();
 
-  $url = url(Storage::url('public/'.$path));
-
-  return response()->json(['result' => 'ok', 'path' => $url]);
 });
 
 // Salva le informazioni sul profilo
 Route::post('salva_profilo', function (Request $request){
-  if($request->email == ''){
-    return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (1)']);
-  }
-
-
-  $user = User::where('email', $request->email)->first();
-  if($user == null){
-    return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (2)']);
-  }
-
-  // Prima faccio il check dell'email
-  if($user->email != $request->formData['email']){
-    // la mail è unica?
-    if(User::where('email', $request->formData['email'])->count() > 0){
-      return response()->json(['result' => 'error', 'title' => 'Attenzione', 'msg' => 'La nuova mail inserita esiste già!']);
+  try{
+    if($request->email == ''){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (1)']);
     }
-    $user->email = $request->formData['email'];
-  }
 
-  $user->name = $request->formData['name'];
-  $user->cognome = $request->formData['cognome'];
-  $user->nato_il = Carbon::parse($request->formData['nato_il'])->format('d/m/Y');
-  if($request->id_comune_nascita != null && $request->id_comune_nascita != ''){
-    $comune = Comune::find($request->id_comune_nascita);
-    $user->comuneNascita()->associate($comune);
-    $user->provinciaNascita()->associate($comune->provincia);
-  }
-  $user->id_nazione_nascita = $request->formData['id_nazione_nascita'];
-  $user->via = $request->formData['via'];
-  $user->cod_fiscale = $request->formData['cod_fiscale'];
-  $user->tessera_sanitaria = $request->formData['tessera_sanitaria'];
-  $user->cell_number = $request->formData['cell_number'];
-  $user->consenso_affiliazione = $request->formData['consenso_affiliazione'];
-  $user->patologie = $request->formData['patologie'];
-  $user->allergie = $request->formData['allergie'];
-  $user->note = $request->formData['note'];
-  $user->save();
 
-  //salvo gli attributi
-  foreach($request->formData as $key => $value){
-    $att = explode('_', $key);
-    if(count($att) == 2 && $att[0] == 'att'){
-      $au = AttributoUser::where('id', intval($att[1]))->first();
-      $au->valore = $value;
-      $au->save();
+    $user = User::where('email', $request->email)->first();
+    if($user == null){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (2)']);
     }
-  }
 
-  return response()->json(['result' => 'ok', 'title' => 'Successo', 'msg' => 'Profilo salvato correttamente!']);
+    $user->name = $request->formData['name'];
+    $user->cognome = $request->formData['cognome'];
+    $user->nato_il = Carbon::parse($request->formData['nato_il'])->format('d/m/Y');
+    if($request->id_comune_nascita != null && $request->id_comune_nascita != ''){
+      $comune = Comune::find($request->id_comune_nascita);
+      $user->comuneNascita()->associate($comune);
+      $user->provinciaNascita()->associate($comune->provincia);
+    }
+    $user->id_nazione_nascita = $request->formData['id_nazione_nascita'];
+    $user->via = $request->formData['via'];
+    $user->cod_fiscale = $request->formData['cod_fiscale'];
+    $user->tessera_sanitaria = $request->formData['tessera_sanitaria'];
+    $user->cell_number = $request->formData['cell_number'];
+    $user->consenso_affiliazione = $request->formData['consenso_affiliazione'];
+    $user->patologie = $request->formData['patologie'];
+    $user->allergie = $request->formData['allergie'];
+    $user->note = $request->formData['note'];
+    $user->save();
+
+    //salvo gli attributi
+    foreach($request->formData as $key => $value){
+      $att = explode('_', $key);
+      if(count($att) == 2 && $att[0] == 'att'){
+        $au = AttributoUser::where('id', intval($att[1]))->first();
+        $au->valore = $value;
+        $au->save();
+      }
+    }
+
+    return response()->json(['result' => 'ok', 'title' => 'Successo', 'msg' => 'Profilo salvato correttamente!']);
+  }catch(\Exception $e){
+    return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore nel salvataggio del profilo!']);
+  }
 });
 
 Route::post('sendEmail', function (Request $request){
-  if($request->email == ''){
-    return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (1)']);
+  try{
+    if($request->email == ''){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (1)']);
+    }
+
+    $oratorio = Oratorio::find($request->id_oratorio);
+
+    Notification::route('mail', $oratorio->email)->notify(new EmailMessage($request->oggetto, $request->messaggio));
+
+    return response()->json(['result' => 'ok', 'title' => 'Ok!', 'msg' => 'Messaggio inviato correttamente!']);
+  }catch(\Exception $e){
+    return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore nell\'invio del messaggio']);
   }
-
-  $oratorio = Oratorio::find($request->id_oratorio);
-
-  Notification::route('mail', $oratorio->email)->notify(new EmailMessage($request->oggetto, $request->messaggio));
-
-  return response()->json(['result' => 'ok', 'title' => 'Ok!', 'msg' => 'Messaggio inviato correttamente!']);
 });
 
 Route::post('form_registrazione', function (Request $request){
@@ -1058,69 +1062,72 @@ Route::post('form_registrazione', function (Request $request){
 
 // Salva le informazioni sul profilo
 Route::post('nuovo_utente', function (Request $request){
-
-  // Prima faccio il check della mail
-  if(User::where('email', $request->formData['email'])->count() > 0){
-    return response()->json(['result' => 'error', 'title' => 'Attenzione', 'msg' => 'La mail inserita esiste già!']);
-  }
-
-  // Check della password
-  if($request->formData['password'] != $request->formData['conferma_password']){
-    return response()->json(['result' => 'error', 'title' => 'Attenzione', 'msg' => 'La password non coincide con quella di conferma']);
-  }
-
-  $user = new User();
-  $user->email = $request->formData['email'];
-  $user->password = Hash::make($request->formData['password']);
-
-  $user->name = $request->formData['name'];
-  $user->cognome = $request->formData['cognome'];
-  $user->sesso = $request->formData['sesso'];
-  $user->nato_il = Carbon::parse($request->formData['nato_il'])->format('d/m/Y');
-  if($request->id_comune_nascita != null && $request->id_comune_nascita != ''){
-    $comune = Comune::find($request->id_comune_nascita);
-    $user->comuneNascita()->associate($comune);
-    $user->provinciaNascita()->associate($comune->provincia);
-  }
-  $user->id_nazione_nascita = $request->formData['id_nazione_nascita'];
-  $user->via = $request->formData['via'];
-  $user->cod_fiscale = $request->formData['cod_fiscale'];
-  $user->tessera_sanitaria = $request->formData['tessera_sanitaria'];
-  $user->cell_number = $request->formData['cell_number'];
-  $user->consenso_affiliazione = $request->formData['consenso_affiliazione'];
-  $user->patologie = $request->formData['patologie'];
-  $user->allergie = $request->formData['allergie'];
-  $user->note = $request->formData['note'];
-  $user->save();
-  $user->sendEmailVerificationNotification();
-
-  //salvo il link utente-oratorio
-  $orat = new UserOratorio;
-  $orat->id_user = $user->id;
-  $orat->id_oratorio = 1;
-  $orat->save();
-
-  //aggiungo il ruolo
-  $roles = Role::where([['name', 'user'], ['id_oratorio', 1]])->get();
-  if(count($roles)>0){
-    //creo il ruolo
-    $role = new RoleUser;
-    $role->user_id = $user->id;
-    $role->role_id = $roles[0]->id;
-    $role->save();
-  }
-
-  //salvo gli attributi
-  foreach($request->formData as $key => $value){
-    $att = explode('_', $key);
-    if(count($att) == 2 && $att[0] == 'att'){
-      $au = new AttributoUser();
-      $au->id_attributo = intval($att[1]);
-      $au->id_user = $user->id;
-      $au->valore = $value;
-      $au->save();
+  try{
+    // Prima faccio il check della mail
+    if(User::where('email', $request->formData['email'])->count() > 0){
+      return response()->json(['result' => 'error', 'title' => 'Attenzione', 'msg' => 'La mail inserita esiste già!']);
     }
-  }
 
-  return response()->json(['result' => 'ok', 'title' => 'Successo', 'msg' => 'Profilo salvato correttamente! Controlla la tua casella di posta per confermare il tuo indirizzo email']);
+    // Check della password
+    if($request->formData['password'] != $request->formData['conferma_password']){
+      return response()->json(['result' => 'error', 'title' => 'Attenzione', 'msg' => 'La password non coincide con quella di conferma']);
+    }
+
+    $user = new User();
+    $user->email = $request->formData['email'];
+    $user->password = Hash::make($request->formData['password']);
+
+    $user->name = $request->formData['name'];
+    $user->cognome = $request->formData['cognome'];
+    $user->sesso = $request->formData['sesso'];
+    $user->nato_il = Carbon::parse($request->formData['nato_il'])->format('d/m/Y');
+    if($request->id_comune_nascita != null && $request->id_comune_nascita != ''){
+      $comune = Comune::find($request->id_comune_nascita);
+      $user->comuneNascita()->associate($comune);
+      $user->provinciaNascita()->associate($comune->provincia);
+    }
+    $user->id_nazione_nascita = $request->formData['id_nazione_nascita'];
+    $user->via = $request->formData['via'];
+    $user->cod_fiscale = $request->formData['cod_fiscale'];
+    $user->tessera_sanitaria = $request->formData['tessera_sanitaria'];
+    $user->cell_number = $request->formData['cell_number'];
+    $user->consenso_affiliazione = $request->formData['consenso_affiliazione'];
+    $user->patologie = $request->formData['patologie'];
+    $user->allergie = $request->formData['allergie'];
+    $user->note = $request->formData['note'];
+    $user->save();
+    $user->sendEmailVerificationNotification();
+
+    //salvo il link utente-oratorio
+    $orat = new UserOratorio;
+    $orat->id_user = $user->id;
+    $orat->id_oratorio = 1;
+    $orat->save();
+
+    //aggiungo il ruolo
+    $roles = Role::where([['name', 'user'], ['id_oratorio', 1]])->get();
+    if(count($roles)>0){
+      //creo il ruolo
+      $role = new RoleUser;
+      $role->user_id = $user->id;
+      $role->role_id = $roles[0]->id;
+      $role->save();
+    }
+
+    //salvo gli attributi
+    foreach($request->formData as $key => $value){
+      $att = explode('_', $key);
+      if(count($att) == 2 && $att[0] == 'att'){
+        $au = new AttributoUser();
+        $au->id_attributo = intval($att[1]);
+        $au->id_user = $user->id;
+        $au->valore = $value;
+        $au->save();
+      }
+    }
+
+    return response()->json(['result' => 'ok', 'title' => 'Successo', 'msg' => 'Profilo salvato correttamente! Controlla la tua casella di posta per confermare il tuo indirizzo email']);
+  }catch(\Exception $e){
+    return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Non è stato possibile salvare un nuovo utente. Riprovare.']);
+  }
 });

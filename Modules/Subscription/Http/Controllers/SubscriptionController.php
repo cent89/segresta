@@ -998,7 +998,7 @@ class SubscriptionController extends Controller
 		}
 		if($request->has('type') && $input['type'] == 'url'){
 			// $url = Storage::disk('public')->url($response_file);
-			$url = Storage::disk('public')->url('/temp/subscription_21.pdf');
+			$url = Storage::disk('public')->url("/temp/".$response_file);
 			return $url;
 		}
 		return response()->file($output.$response_file);

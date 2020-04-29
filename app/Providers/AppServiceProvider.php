@@ -24,9 +24,15 @@ class AppServiceProvider extends ServiceProvider
     Carbon::setLocale('it');
     setlocale(LC_TIME, 'it_IT');
 
-    foreach(Config::all() as $c){
-      config()->set($c->config, $c->value);
+    try{
+      foreach(Config::all() as $c){
+        config()->set($c->config, $c->value);
+      }
+    }catch(\Exception $e){
+      
     }
+
+
 
     // config([
     //   'global' => Config::all(['key','value'])
