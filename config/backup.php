@@ -131,11 +131,11 @@ return [
     'notifiable' => \Spatie\Backup\Notifications\Notifiable::class,
 
     'mail' => [
-      'to' => env('MAIL_FROM_ADDRESS', 'info@elephantech.it'),
+      'to' => config('mail.from.address'),
 
       'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'Example'),
+        'address' => config('mail.from.address'),
+        'name' => env('mail.from.name'),
       ],
     ],
 

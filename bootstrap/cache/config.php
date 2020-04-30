@@ -260,11 +260,11 @@
       'notifiable' => 'Spatie\\Backup\\Notifications\\Notifiable',
       'mail' => 
       array (
-        'to' => 'info@elephantech.it',
+        'to' => NULL,
         'from' => 
         array (
-          'address' => 'hello@example.com',
-          'name' => 'Example',
+          'address' => NULL,
+          'name' => NULL,
         ),
       ),
       'slack' => 

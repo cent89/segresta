@@ -7,6 +7,10 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Socialite;
 use Carbon\Carbon;
 use Modules\User\Entities\User;
+use Session;
+use App\RoleUser;
+use App\Role;
+use Modules\Oratorio\Entities\UserOratorio;
 
 class LoginController extends Controller
 {
@@ -80,6 +84,23 @@ class LoginController extends Controller
       $newUser->photo          = $user->avatar;
       // $newUser->avatar_original = $user->avatar_original;
       $newUser->save();
+
+      //salvo il link utente-oratorio
+      $orat = new UserOratorio;
+      $orat->id_user = $newUser->id;
+      $orat->id_oratorio = Session::get('session_oratorio');
+      $orat->save();
+
+      //aggiungo il ruolo
+      $roles = Role::where([['name', 'user'], ['id_oratorio', Session::get('session_oratorio')]])->get();
+      if(count($roles)>0){
+        //creo il ruolo
+        $role = new RoleUser;
+        $role->user_id = $newUser->id;
+        $role->role_id = $roles[0]->id;
+        $role->save();
+      }
+
       auth()->login($newUser, true);
     }
     return redirect()->to('/home');
@@ -109,6 +130,24 @@ class LoginController extends Controller
       $newUser->email_verified_at = Carbon::now();
       $newUser->photo          = $user->avatar;
       $newUser->save();
+
+      //salvo il link utente-oratorio
+      $orat = new UserOratorio;
+      $orat->id_user = $newUser->id;
+      $orat->id_oratorio = Session::get('session_oratorio');
+      $orat->save();
+
+      //aggiungo il ruolo
+      $roles = Role::where([['name', 'user'], ['id_oratorio', Session::get('session_oratorio')]])->get();
+      if(count($roles)>0){
+        //creo il ruolo
+        $role = new RoleUser;
+        $role->user_id = $newUser->id;
+        $role->role_id = $roles[0]->id;
+        $role->save();
+      }
+
+
       auth()->login($newUser, true);
     }
     return redirect()->to('/home');

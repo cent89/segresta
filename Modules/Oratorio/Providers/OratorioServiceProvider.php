@@ -56,6 +56,11 @@ class OratorioServiceProvider extends ServiceProvider
     ->prepend("<i class='fas fa-stream'></i> ")
     ->data('permissions', ['edit-permission'])->data('order', 14);
 
+    $menuList->get('oratorio')
+    ->add('Configurazione', array('route'  => 'config.index'))
+    ->prepend("<i class='fas fa-cogs'></i> ")
+    ->data('permissions', ['edit-oratorio'])->data('order', 15);
+
   }
 
   /**
