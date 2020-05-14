@@ -152,7 +152,11 @@ class UserController extends Controller
           return "<img src='".url("girl.png")."'>";
         }
       }else{
-        return "<img src='".url(Storage::url('public/'.$entity->photo))."' width=48px/>";
+        if(substr($user->photo, 0, 4) == 'http'){
+          return  "<img src='".$user->photo."' width=48px>";
+        }else{
+          return "<img src='".url(Storage::url('public/'.$entity->photo))."' width=48px/>";
+        }
       }
     })
     ->addColumn('DT_RowId', function ($entity){
