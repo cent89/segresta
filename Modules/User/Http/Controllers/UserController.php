@@ -29,6 +29,9 @@ use Excel;
 use Yajra\DataTables\DataTables;
 use Modules\User\Http\Controllers\DataTables\UserDataTableEditor;
 use Modules\User\Http\Controllers\DataTables\UserDataTable;
+use App\Notifications\EmailMessage;
+use Notification;
+use PDF;
 
 class UserController extends Controller
 {
@@ -152,8 +155,8 @@ class UserController extends Controller
           return "<img src='".url("girl.png")."'>";
         }
       }else{
-        if(substr($user->photo, 0, 4) == 'http'){
-          return  "<img src='".$user->photo."' width=48px>";
+        if(substr($entity->photo, 0, 4) == 'http'){
+          return  "<img src='".$entity->photo."' width=48px>";
         }else{
           return "<img src='".url(Storage::url('public/'.$entity->photo))."' width=48px/>";
         }
@@ -180,6 +183,10 @@ class UserController extends Controller
       if($entity->id_comune_nascita != null){
         return Comune::find($entity->id_comune_nascita)->nome;
       }
+    })
+    ->filterColumn('nato_il', function($query, $keyword) {
+      $sql = "nato_il LIKE ? ";
+      $query->whereRaw($sql, ["{$keyword}"]);
     })
     ->rawColumns(['action', 'check', 'path_photo', 'email_label'])
     ->toJson();
@@ -363,6 +370,27 @@ class UserController extends Controller
     }
 
     return str_replace('\\', '/', json_encode(array('results' => $list), JSON_UNESCAPED_SLASHES));
+  }
+
+  public static function sendEmailCompleanni(){
+    if(User::where('nato_il', Carbon::now()->format('Y-m-d'))->count() > 0){
+      //genera pdf
+      $folder_name = Storage::disk('public')->getDriver()->getAdapter()->getPathPrefix()."/temp/";
+      if(!is_dir($folder_name)){
+        Storage::makeDirectory("public/temp/");
+      }
+      $pdf = PDF::loadView('user::compleanni');
+      $filename = $folder_name."compleanni_".Carbon::now()->format('d-m-Y').".pdf";
+      $pdf->save($filename);
+
+
+      //invia
+      $admins = User::withRole('admin')->get();
+      $oggetto = "Compleanni di oggi";
+      $messaggio = "Ciao, in allegato trovi l'elenco degli utenti che compiono gli anni oggi. Augura loro un buon compleanno!";
+      Notification::send($admins, new EmailMessage($oggetto, $messaggio, $filename));
+    }
+
   }
 
 

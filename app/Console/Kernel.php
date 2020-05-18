@@ -25,8 +25,17 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-      $schedule->command('backup:clean')->daily()->at('00:00');
-      $schedule->command('backup:run')->daily()->at('00:30');
+      // Backup
+      if(config('backup.enable')){
+        $schedule->command('backup:clean')->daily()->at('00:00');
+        $schedule->command('backup:run')->daily()->at('00:30');
+      }
+
+      //Email compleanni
+      $schedule->call(function() {
+        //invia report presenze alle 8.00 del giorno 3 di ogni mese
+        \Modules\User\Http\Controllers\UserController::sendEmailCompleanni();
+      })->dailyAt("01:00");
 
       $schedule->call(function() {
         // Cancella tutti file nella cartella temp

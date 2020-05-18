@@ -84,6 +84,7 @@
     'normal' => $fontDir . '/2ee5a7797d02fe4d560048b698835802',
   ),
   'encode sans condensed' => array(
-    'normal' => $fontDir . '/706596a1cccc6c8f4939f0e48052411f',
+    'normal' => $fontDir . '/encode-sans-condensed-normal_7d8bc72f9884a5a7731d4c87862a0487',
+    '800' => $fontDir . '/encode-sans-condensed-800_949a38c61cba4bdc9d9b817f599a5c7f',
   ),
 ) ?>

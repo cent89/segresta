@@ -342,6 +342,13 @@ class SubscriptionController extends Controller
 
 		if(!Session::has('id_subscription')){
 			$input = $request->all();
+			// Prima di procedere, verifico che i posti non siano esauriti
+			$event = Event::find($input['id_event']);
+			if($event->max_posti > 0 && $event->iscrizioni->count() > $event->max_posti){
+				// interrompo
+				Session::flash('flash_message', 'Non è possibile completare l\'iscrizione, i posti sono esauriti! ');
+				return redirect('home');
+			}
 			$sub = Subscription::create($input);
 			//salvo le specifiche
 			$specs = $input['specs'];

@@ -83,6 +83,333 @@ Route::post('login', function (Request $request){
 
 });
 
+Route::post('form_registrazione', function (Request $request){
+
+  // Form
+  $form = [
+    'schema' => ['title' => 'Registrazione', 'type' => 'object'],
+    'uiSchema' => []
+  ];
+
+  $properties = [];
+  $uiSchema = [];
+  $required = [];
+
+  $properties['generali'] = [
+    'type' => 'string',
+    'title' => 'Informazioni generali',
+    'displayLabel' => false
+  ];
+  $uiSchema['generali'] = ["ui:widget" => 'CustomHeading'];
+  $uiSchema['ui:order'][] = 'generali';
+
+
+  $properties['name'] = [
+    'type' => 'string',
+    'title' => 'Nome',
+    'default' => '',
+    'minLength' => 2
+  ];
+  $required[] = 'name';
+
+  $properties['cognome'] = [
+    'type' => 'string',
+    'title' => 'Cognome',
+    'default' => '',
+    'minLength' => 2
+  ];
+  $required[] = 'cognome';
+
+  $properties['email'] = [
+    'type' => 'string',
+    'title' => 'Email',
+    'format' => 'email',
+    'default' => '',
+    'minLength' => 5
+  ];
+  $required[] = 'email';
+
+  $properties['password'] = [
+    'type' => 'string',
+    'title' => 'Password',
+    'default' => '',
+    'minLength' => 8
+  ];
+  $required[] = 'password';
+  $uiSchema['password'] = ["ui:widget" => 'PasswordInput'];
+
+  $properties['conferma_password'] = [
+    'type' => 'string',
+    'title' => 'Conferma Password',
+    'default' => '',
+    'minLength' => 8
+  ];
+  $required[] = 'conferma_password';
+  $uiSchema['conferma_password'] = ["ui:widget" => 'PasswordInput'];
+
+  $properties['cell_number'] = [
+    'type' => 'string',
+    'title' => 'Cellulare',
+    'default' => '',
+    'minLength' => 2
+  ];
+  $required[] = 'cell_number';
+
+  $properties['cod_fiscale'] = [
+    'type' => 'string',
+    'title' => 'Codice Fiscale',
+    'default' => ''
+  ];
+
+  $properties['tessera_sanitaria'] = [
+    'type' => 'string',
+    'title' => 'Tessera Sanitaria',
+    'default' => ''
+  ];
+
+  $opzioni = array();
+  $opzioni[] = ['type' => 'string', 'title' => 'Maschio', 'enum' => ['M']];
+  $opzioni[] = ['type' => 'string', 'title' => 'Femmina', 'enum' => ['F']];
+  $properties['sesso'] = [
+    'type' => 'string',
+    'title' => 'Sesso',
+    'anyOf' => $opzioni,
+    'default' => 'M'
+  ];
+
+  $properties['consenso_affiliazione'] = [
+    'type' => 'boolean',
+    'title' => 'Consenso affiliazione e ricezione comunicazioni',
+    'default' => false
+  ];
+  $uiSchema['consenso_affiliazione'] = ["ui:widget" => 'radio'];
+
+  $properties['nascita'] = [
+    'type' => 'string',
+    'title' => 'Luogo e data di nascita',
+    'displayLabel' => false
+  ];
+  $uiSchema['nascita'] = ["ui:widget" => 'CustomHeading'];
+
+  $properties['nato_il'] = [
+    'type' => 'string',
+    'default' => Carbon::now()->toDateString(),
+    'title' => 'Data di nascita',
+  ];
+  $required[] = 'nato_il';
+  $uiSchema['nato_il'] = ["ui:widget" => 'CustomDatePicker'];
+
+  $opzioni = array();
+  foreach(Nazione::orderBy('nome_stato', 'ASC')->get() as $option){
+    $opzioni[] = ['type' => 'number', 'title' => $option->nome_stato, 'enum' => [$option->id]];
+  };
+  $properties['id_nazione_nascita'] = [
+    'type' => 'number',
+    'title' => 'Nazione di nascita',
+    'anyOf' => $opzioni,
+    'default' => 118
+  ];
+
+  $properties['residenza'] = [
+    'type' => 'string',
+    'title' => 'Residenza',
+    'displayLabel' => false
+  ];
+  $uiSchema['residenza'] = ["ui:widget" => 'CustomHeading'];
+
+  $opzioni = array();
+  foreach(Comune::orderBy('nome', 'ASC')->get() as $option){
+    $opzioni[] = [
+      'name' => $option->nome." (".$option->provincia->sigla_automobilistica.")",
+      'id' => $option->id,
+      'checked' => false
+    ];
+  };
+  $properties['id_comune_residenza'] = [
+    'type' => 'number',
+    'title' => 'Comune di residenza',
+    'anyOf' => $opzioni,
+    'default' => 0
+  ];
+  $uiSchema['id_comune_residenza'] = ["ui:widget" => 'SelectComune'];
+
+  $properties['via'] = [
+    'type' => 'string',
+    'title' => 'Indirizzo',
+    'default' => '',
+    'minLength' => 2
+  ];
+  $required[] = 'via';
+
+  $properties['dati_sanitari'] = [
+    'type' => 'string',
+    'title' => 'Dati sanitari',
+    'displayLabel' => false
+  ];
+  $uiSchema['dati_sanitari'] = ["ui:widget" => 'CustomHeading'];
+
+  $properties['patologie'] = [
+    'type' => 'string',
+    'title' => 'Patologie',
+    'default' => ''
+  ];
+  $properties['allergie'] = [
+    'type' => 'string',
+    'title' => 'Allergie',
+    'default' => ''
+  ];
+  $properties['note'] = [
+    'type' => 'string',
+    'title' => 'Note',
+    'default' => ''
+  ];
+
+  //Attributi
+  $attributi = Attributo::where([['hidden', 0], ['id_oratorio', 1]])->orderBy('ordine', 'ASC');
+  if($attributi->count() > 0){
+    $properties['attributi'] = [
+      'type' => 'string',
+      'title' => 'Informazioni aggiuntive',
+      'displayLabel' => false
+    ];
+    $uiSchema['attributi'] = ["ui:widget" => 'CustomHeading'];
+
+    foreach($attributi->get() as $attributo){
+      switch($attributo->id_type){
+        case Type::TEXT_TYPE:
+        $properties['att_'.$attributo->id] = [
+          'type' => 'string',
+          'title' => $attributo->nome,
+          'default' => ''
+        ];
+        $uiSchema['att_'.$attributo->id] = ["ui:placeholder" => ''];
+        break;
+
+        case Type::BOOL_TYPE:
+        $properties['att_'.$attributo->id] = [
+          'type' => 'boolean',
+          'title' => $attributo->nome,
+          'default' => ''
+        ];
+        $uiSchema['att_'.$attributo->id] = ["ui:widget" => 'radio'];
+        break;
+
+        case Type::NUMBER_TYPE:
+        $properties['att_'.$attributo->id] = [
+          'type' => 'number',
+          'title' => $attributo->nome,
+          'default' => ''
+        ];
+        $uiSchema['att_'.$attributo->id] = ['ui:widget' => 'updown'];
+        break;
+
+        case Type::DATE_TYPE:
+        $properties['att_'.$attributo->id] = [
+          'type' => 'date',
+          'title' => $attributo->nome,
+          'default' => ''
+        ];
+        $uiSchema['att_'.$attributo->id] = [];
+        break;
+
+        default:
+        $opzioni = array();
+        $opzioni_names = array();
+        foreach(TypeSelect::where('id_type', $attributo->id_type)->orderBy('ordine', 'ASC')->get() as $option){
+          $opzioni[] = ['type' => 'number', 'title' => $option->option, 'enum' => [$option->id]];
+        };
+        $properties['att_'.$attributo->id] = [
+          'type' => 'number',
+          'title' => $attributo->nome,
+          'anyOf' => $opzioni,
+          'default' => '',
+        ];
+      }
+    }
+  }
+
+
+  $form['schema']['properties'] = $properties;
+  $form['schema']['required'] = $required;
+  $uiSchema['ui:order'][] =  '*';
+  $form['uiSchema'] = $uiSchema;
+
+
+  return response()->json($form);
+});
+
+// Salva le informazioni sul profilo
+Route::post('nuovo_utente', function (Request $request){
+  try{
+    // Prima faccio il check della mail
+    if(User::where('email', $request->formData['email'])->count() > 0){
+      return response()->json(['result' => 'error', 'title' => 'Attenzione', 'msg' => 'La mail inserita esiste già!']);
+    }
+
+    // Check della password
+    if($request->formData['password'] != $request->formData['conferma_password']){
+      return response()->json(['result' => 'error', 'title' => 'Attenzione', 'msg' => 'La password non coincide con quella di conferma']);
+    }
+
+    $user = new User();
+    $user->email = $request->formData['email'];
+    $user->password = Hash::make($request->formData['password']);
+
+    $user->name = $request->formData['name'];
+    $user->cognome = $request->formData['cognome'];
+    $user->sesso = $request->formData['sesso'];
+    $user->nato_il = Carbon::parse($request->formData['nato_il'])->format('d/m/Y');
+    if($request->id_comune_nascita != null && $request->id_comune_nascita != ''){
+      $comune = Comune::find($request->id_comune_nascita);
+      $user->comuneNascita()->associate($comune);
+      $user->provinciaNascita()->associate($comune->provincia);
+    }
+    $user->id_nazione_nascita = $request->formData['id_nazione_nascita'];
+    $user->via = $request->formData['via'];
+    $user->cod_fiscale = $request->formData['cod_fiscale'];
+    $user->tessera_sanitaria = $request->formData['tessera_sanitaria'];
+    $user->cell_number = $request->formData['cell_number'];
+    $user->consenso_affiliazione = $request->formData['consenso_affiliazione'];
+    $user->patologie = $request->formData['patologie'];
+    $user->allergie = $request->formData['allergie'];
+    $user->note = $request->formData['note'];
+    $user->save();
+    $user->sendEmailVerificationNotification();
+
+    //salvo il link utente-oratorio
+    $orat = new UserOratorio;
+    $orat->id_user = $user->id;
+    $orat->id_oratorio = 1;
+    $orat->save();
+
+    //aggiungo il ruolo
+    $roles = Role::where([['name', 'user'], ['id_oratorio', 1]])->get();
+    if(count($roles)>0){
+      //creo il ruolo
+      $role = new RoleUser;
+      $role->user_id = $user->id;
+      $role->role_id = $roles[0]->id;
+      $role->save();
+    }
+
+    //salvo gli attributi
+    foreach($request->formData as $key => $value){
+      $att = explode('_', $key);
+      if(count($att) == 2 && $att[0] == 'att'){
+        $au = new AttributoUser();
+        $au->id_attributo = intval($att[1]);
+        $au->id_user = $user->id;
+        $au->valore = $value;
+        $au->save();
+      }
+    }
+
+    return response()->json(['result' => 'ok', 'title' => 'Successo', 'msg' => 'Profilo salvato correttamente! Controlla la tua casella di posta per confermare il tuo indirizzo email']);
+  }catch(\Exception $e){
+    return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Non è stato possibile salvare un nuovo utente. Riprovare.']);
+  }
+});
+
 // Route per l'upload della foto profilo
 Route::post('foto', function (Request $request){
   try{
@@ -806,330 +1133,5 @@ Route::middleware(['auth:api'])->group(function () {
     }
   });
 
-  Route::post('form_registrazione', function (Request $request){
 
-    // Form
-    $form = [
-      'schema' => ['title' => 'Registrazione', 'type' => 'object'],
-      'uiSchema' => []
-    ];
-
-    $properties = [];
-    $uiSchema = [];
-    $required = [];
-
-    $properties['generali'] = [
-      'type' => 'string',
-      'title' => 'Informazioni generali',
-      'displayLabel' => false
-    ];
-    $uiSchema['generali'] = ["ui:widget" => 'CustomHeading'];
-    $uiSchema['ui:order'][] = 'generali';
-
-
-    $properties['name'] = [
-      'type' => 'string',
-      'title' => 'Nome',
-      'default' => '',
-      'minLength' => 2
-    ];
-    $required[] = 'name';
-
-    $properties['cognome'] = [
-      'type' => 'string',
-      'title' => 'Cognome',
-      'default' => '',
-      'minLength' => 2
-    ];
-    $required[] = 'cognome';
-
-    $properties['email'] = [
-      'type' => 'string',
-      'title' => 'Email',
-      'format' => 'email',
-      'default' => '',
-      'minLength' => 5
-    ];
-    $required[] = 'email';
-
-    $properties['password'] = [
-      'type' => 'string',
-      'title' => 'Password',
-      'default' => '',
-      'minLength' => 8
-    ];
-    $required[] = 'password';
-    $uiSchema['password'] = ["ui:widget" => 'PasswordInput'];
-
-    $properties['conferma_password'] = [
-      'type' => 'string',
-      'title' => 'Conferma Password',
-      'default' => '',
-      'minLength' => 8
-    ];
-    $required[] = 'conferma_password';
-    $uiSchema['conferma_password'] = ["ui:widget" => 'PasswordInput'];
-
-    $properties['cell_number'] = [
-      'type' => 'string',
-      'title' => 'Cellulare',
-      'default' => '',
-      'minLength' => 2
-    ];
-    $required[] = 'cell_number';
-
-    $properties['cod_fiscale'] = [
-      'type' => 'string',
-      'title' => 'Codice Fiscale',
-      'default' => ''
-    ];
-
-    $properties['tessera_sanitaria'] = [
-      'type' => 'string',
-      'title' => 'Tessera Sanitaria',
-      'default' => ''
-    ];
-
-    $opzioni = array();
-    $opzioni[] = ['type' => 'string', 'title' => 'Maschio', 'enum' => ['M']];
-    $opzioni[] = ['type' => 'string', 'title' => 'Femmina', 'enum' => ['F']];
-    $properties['sesso'] = [
-      'type' => 'string',
-      'title' => 'Sesso',
-      'anyOf' => $opzioni,
-      'default' => 'M'
-    ];
-
-    $properties['consenso_affiliazione'] = [
-      'type' => 'boolean',
-      'title' => 'Consenso affiliazione e ricezione comunicazioni',
-      'default' => false
-    ];
-    $uiSchema['consenso_affiliazione'] = ["ui:widget" => 'radio'];
-
-    $properties['nascita'] = [
-      'type' => 'string',
-      'title' => 'Luogo e data di nascita',
-      'displayLabel' => false
-    ];
-    $uiSchema['nascita'] = ["ui:widget" => 'CustomHeading'];
-
-    $properties['nato_il'] = [
-      'type' => 'string',
-      'default' => Carbon::now()->toDateString(),
-      'title' => 'Data di nascita',
-    ];
-    $required[] = 'nato_il';
-    $uiSchema['nato_il'] = ["ui:widget" => 'CustomDatePicker'];
-
-    $opzioni = array();
-    foreach(Nazione::orderBy('nome_stato', 'ASC')->get() as $option){
-      $opzioni[] = ['type' => 'number', 'title' => $option->nome_stato, 'enum' => [$option->id]];
-    };
-    $properties['id_nazione_nascita'] = [
-      'type' => 'number',
-      'title' => 'Nazione di nascita',
-      'anyOf' => $opzioni,
-      'default' => 118
-    ];
-
-    $properties['residenza'] = [
-      'type' => 'string',
-      'title' => 'Residenza',
-      'displayLabel' => false
-    ];
-    $uiSchema['residenza'] = ["ui:widget" => 'CustomHeading'];
-
-    $opzioni = array();
-    foreach(Comune::orderBy('nome', 'ASC')->get() as $option){
-      $opzioni[] = [
-        'name' => $option->nome." (".$option->provincia->sigla_automobilistica.")",
-        'id' => $option->id,
-        'checked' => false
-      ];
-    };
-    $properties['id_comune_residenza'] = [
-      'type' => 'number',
-      'title' => 'Comune di residenza',
-      'anyOf' => $opzioni,
-      'default' => 0
-    ];
-    $uiSchema['id_comune_residenza'] = ["ui:widget" => 'SelectComune'];
-
-    $properties['via'] = [
-      'type' => 'string',
-      'title' => 'Indirizzo',
-      'default' => '',
-      'minLength' => 2
-    ];
-    $required[] = 'via';
-
-    $properties['dati_sanitari'] = [
-      'type' => 'string',
-      'title' => 'Dati sanitari',
-      'displayLabel' => false
-    ];
-    $uiSchema['dati_sanitari'] = ["ui:widget" => 'CustomHeading'];
-
-    $properties['patologie'] = [
-      'type' => 'string',
-      'title' => 'Patologie',
-      'default' => ''
-    ];
-    $properties['allergie'] = [
-      'type' => 'string',
-      'title' => 'Allergie',
-      'default' => ''
-    ];
-    $properties['note'] = [
-      'type' => 'string',
-      'title' => 'Note',
-      'default' => ''
-    ];
-
-    //Attributi
-    $attributi = Attributo::where([['hidden', 0], ['id_oratorio', $request->id_oratorio]])->orderBy('ordine', 'ASC');
-    if($attributi->count() > 0){
-      $properties['attributi'] = [
-        'type' => 'string',
-        'title' => 'Informazioni aggiuntive',
-        'displayLabel' => false
-      ];
-      $uiSchema['attributi'] = ["ui:widget" => 'CustomHeading'];
-
-      foreach($attributi->get() as $attributo){
-        switch($attributo->id_type){
-          case Type::TEXT_TYPE:
-          $properties['att_'.$attributo->id] = [
-            'type' => 'string',
-            'title' => $attributo->nome,
-            'default' => ''
-          ];
-          $uiSchema['att_'.$attributo->id] = ["ui:placeholder" => ''];
-          break;
-
-          case Type::BOOL_TYPE:
-          $properties['att_'.$attributo->id] = [
-            'type' => 'boolean',
-            'title' => $attributo->nome,
-            'default' => ''
-          ];
-          $uiSchema['att_'.$attributo->id] = ["ui:widget" => 'radio'];
-          break;
-
-          case Type::NUMBER_TYPE:
-          $properties['att_'.$attributo->id] = [
-            'type' => 'number',
-            'title' => $attributo->nome,
-            'default' => ''
-          ];
-          $uiSchema['att_'.$attributo->id] = ['ui:widget' => 'updown'];
-          break;
-
-          case Type::DATE_TYPE:
-          $properties['att_'.$attributo->id] = [
-            'type' => 'date',
-            'title' => $attributo->nome,
-            'default' => ''
-          ];
-          $uiSchema['att_'.$attributo->id] = [];
-          break;
-
-          default:
-          $opzioni = array();
-          $opzioni_names = array();
-          foreach(TypeSelect::where('id_type', $attributo->id_type)->orderBy('ordine', 'ASC')->get() as $option){
-            $opzioni[] = ['type' => 'number', 'title' => $option->option, 'enum' => [$option->id]];
-          };
-          $properties['att_'.$attributo->id] = [
-            'type' => 'number',
-            'title' => $attributo->nome,
-            'anyOf' => $opzioni,
-            'default' => '',
-          ];
-        }
-      }
-    }
-
-
-    $form['schema']['properties'] = $properties;
-    $form['schema']['required'] = $required;
-    $uiSchema['ui:order'][] =  '*';
-    $form['uiSchema'] = $uiSchema;
-
-
-    return response()->json($form);
-  });
-
-  // Salva le informazioni sul profilo
-  Route::post('nuovo_utente', function (Request $request){
-    try{
-      // Prima faccio il check della mail
-      if(User::where('email', $request->formData['email'])->count() > 0){
-        return response()->json(['result' => 'error', 'title' => 'Attenzione', 'msg' => 'La mail inserita esiste già!']);
-      }
-
-      // Check della password
-      if($request->formData['password'] != $request->formData['conferma_password']){
-        return response()->json(['result' => 'error', 'title' => 'Attenzione', 'msg' => 'La password non coincide con quella di conferma']);
-      }
-
-      $user = new User();
-      $user->email = $request->formData['email'];
-      $user->password = Hash::make($request->formData['password']);
-
-      $user->name = $request->formData['name'];
-      $user->cognome = $request->formData['cognome'];
-      $user->sesso = $request->formData['sesso'];
-      $user->nato_il = Carbon::parse($request->formData['nato_il'])->format('d/m/Y');
-      if($request->id_comune_nascita != null && $request->id_comune_nascita != ''){
-        $comune = Comune::find($request->id_comune_nascita);
-        $user->comuneNascita()->associate($comune);
-        $user->provinciaNascita()->associate($comune->provincia);
-      }
-      $user->id_nazione_nascita = $request->formData['id_nazione_nascita'];
-      $user->via = $request->formData['via'];
-      $user->cod_fiscale = $request->formData['cod_fiscale'];
-      $user->tessera_sanitaria = $request->formData['tessera_sanitaria'];
-      $user->cell_number = $request->formData['cell_number'];
-      $user->consenso_affiliazione = $request->formData['consenso_affiliazione'];
-      $user->patologie = $request->formData['patologie'];
-      $user->allergie = $request->formData['allergie'];
-      $user->note = $request->formData['note'];
-      $user->save();
-      $user->sendEmailVerificationNotification();
-
-      //salvo il link utente-oratorio
-      $orat = new UserOratorio;
-      $orat->id_user = $user->id;
-      $orat->id_oratorio = 1;
-      $orat->save();
-
-      //aggiungo il ruolo
-      $roles = Role::where([['name', 'user'], ['id_oratorio', 1]])->get();
-      if(count($roles)>0){
-        //creo il ruolo
-        $role = new RoleUser;
-        $role->user_id = $user->id;
-        $role->role_id = $roles[0]->id;
-        $role->save();
-      }
-
-      //salvo gli attributi
-      foreach($request->formData as $key => $value){
-        $att = explode('_', $key);
-        if(count($att) == 2 && $att[0] == 'att'){
-          $au = new AttributoUser();
-          $au->id_attributo = intval($att[1]);
-          $au->id_user = $user->id;
-          $au->valore = $value;
-          $au->save();
-        }
-      }
-
-      return response()->json(['result' => 'ok', 'title' => 'Successo', 'msg' => 'Profilo salvato correttamente! Controlla la tua casella di posta per confermare il tuo indirizzo email']);
-    }catch(\Exception $e){
-      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Non è stato possibile salvare un nuovo utente. Riprovare.']);
-    }
-  });
 });

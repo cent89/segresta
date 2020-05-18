@@ -9,6 +9,7 @@ use App\LicenseType;
 use Modules\Oratorio\Entities\UserOratorio;
 use Modules\Famiglia\Entities\ComponenteFamiglia;
 use Modules\Famiglia\Entities\Famiglia;
+use Carbon\Carbon;
 
 $user_oratorio = UserOratorio::where('id_user', Auth::user()->id)->get();
 
@@ -178,6 +179,7 @@ $modulo_volontario = (Module::find('volontario') != null && Module::find('volont
               </div>
               <div class="card-footer"><a href="https://www.segresta.it/documentazione" target="_blank" class="btn btn-sm btn-primary btn-block">Apri documentazione</a></div>
             </div>
+
           </div>
         </div>
       </div>
@@ -200,8 +202,9 @@ $modulo_volontario = (Module::find('volontario') != null && Module::find('volont
           @endif
 
           <?php
-          $events = (new Event)->where([['id_oratorio', $uo->id_oratorio],['active', true], ['is_diocesi', 0]])->get();
-          if(count($events)==0){
+          $now = Carbon::now()->toDateString();
+          $events = Event::where([['id_oratorio', $uo->id_oratorio], ['active', true], ['is_diocesi', 0], ['data_apertura', '<=', $now], ['data_chiusura', '>=', $now]]);
+          if($events->count()==0){
             echo "<i>Nessun evento creato!</i>";
           }
           $color = "#ADD8E6";
@@ -209,25 +212,26 @@ $modulo_volontario = (Module::find('volontario') != null && Module::find('volont
 
           <div class="card-deck">
 
-            @foreach($events as $event)
+            @foreach($events->get() as $event)
 
             <div class="card">
-              <div class="card-img-top" style="height: 300px; background-color: {{ ($event->color == '' || $event->color == null)?$color:$event->color }}">
-                @if($event->image == '' || $event->image == null)
-                <h2 class="card-title" style="text-align: center; padding-top: 30%">{{ $event->nome }}</h2>
-                @else
-                <img src="{!! url(Storage::url('public/'.$event->image)) !!}" style="height: 100%; width: 100%; object-fit: cover; " alt="">
-                @endif
+              @if($event->image == '' || $event->image == null)
+              <div class="card-header d-flex align-items-center" style="text-align: center; height: 300px; background-color: {{ ($event->color == '' || $event->color == null)?$color:$event->color }}">
+                <h2 class="mx-auto w-100" style="text-align: center; padding-top: 30px">{{ $event->nome }}</h2>
               </div>
-
-
-
+              @else
+              <div class="card-img-top" style="height: 300px;">
+                <img src="{!! url(Storage::url('public/'.$event->image)) !!}" style="height: 100%; width: 100%; object-fit: cover; " alt="">
+              </div>
+              @endif
 
               <div class="card-body">
+                @if($event->image != '' && $event->image != null)
                 <h5 class="card-title" style="text-align: center">{{ $event->nome }}</h5>
+                @endif
                 <p class="card-text">{!! (strlen(strip_tags($event->descrizione)) > 500) ? substr(strip_tags($event->descrizione), 0, 500) . '...' : strip_tags($event->descrizione) !!}</p>
               </div>
-              <div class="card-footer">
+              <div class="card-footer" style="text-align: center">
                 {!! Form::open(['method' => 'GET', 'route' => ['events.show', $event->id]]) !!}
                 {!! Form::submit('Apri evento', ['class' => 'btn btn-primary form-control']) !!}
                 {!! Form::close() !!}

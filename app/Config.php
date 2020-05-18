@@ -41,7 +41,8 @@ class Config extends Model
       ['key' => 'MAIL_PORT', 'config' => 'mail.port', 'value' => 465, 'display_name' => 'Porta Email', 'type' => 'text', 'group' => 'Email', 'order' => 6],
       ['key' => 'MAIL_USERNAME', 'config' => 'mail.username', 'value' => '', 'display_name' => 'Username', 'type' => 'text', 'group' => 'Email', 'order' => 7],
       ['key' => 'MAIL_PASSWORD', 'config' => 'mail.password', 'value' => '', 'display_name' => 'Password', 'type' => 'text', 'group' => 'Email', 'order' => 8],
-      ['key' => 'DROPBOX_AUTH_TOKEN', 'config' => 'filesystems.disks.dropbox.authorization_token', 'value' => '', 'display_name' => 'Dropbox Auth Token', 'type' => 'text', 'group' => 'Dropbox', 'order' => 9],
+      ['key' => 'ENABLE_BACKUP', 'config' => 'backup.enable', 'value' => 1, 'display_name' => 'Abilita backup su Dropbox', 'type' => 'boolean', 'group' => 'Backup', 'order' => 9],
+      ['key' => 'DROPBOX_AUTH_TOKEN', 'config' => 'filesystems.disks.dropbox.authorization_token', 'value' => '', 'display_name' => 'Dropbox Auth Token', 'type' => 'text', 'group' => 'Backup', 'order' => 10],
     ];
   }
 

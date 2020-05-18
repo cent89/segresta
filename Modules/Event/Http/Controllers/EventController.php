@@ -36,7 +36,7 @@ class EventController extends Controller
 	public $messages = [
 			'nome.required' => 'Inserisci un nome valido per l\'evento',
 			'descrizione.required'  => 'Inserisci una descrizione valida',
-			'anno.required'  => 'Inserisci un anno valido per l\'evento',
+			// 'anno.required'  => 'Inserisci un anno valido per l\'evento',
 			'id_modulo.required'  => 'Devi selezionare almeno un modulo da stampare',
 			'template_file.mimes'  => 'Il file template deve avere estensione .docx.',
 			'image.mimes' => 'Il logo oratorio deve avere una di queste estensioni: jpeg,jpg,gif,png.'
@@ -180,10 +180,11 @@ class EventController extends Controller
 		$this->validate($request, [
 			'nome' => 'required',
 			'descrizione' => 'required',
-			'anno' =>'required',
+			// 'anno' =>'required',
 			'template_file' => 'mimes:docx,zip',
 			'image' => 'mimes:jpeg,jpg,gif,png'
 		], $this->messages);
+
 		$input = $request->all();
 		$input['id_oratorio'] = Session::get('session_oratorio');
 		if(Input::hasFile('image')){
@@ -234,7 +235,7 @@ class EventController extends Controller
 		$this->validate($request, [
 			'nome' => 'required',
 			'descrizione' => 'required',
-			'anno' =>'required',
+			// 'anno' =>'required',
 			'template_file' => 'mimes:docx,zip',
 			'image' => 'mimes:jpeg,jpg,gif,png'
 		], $this->messages);

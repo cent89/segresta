@@ -12,12 +12,14 @@ use Session;
 use App\Notifications\VerificaEmail;
 use App\Notifications\ResetPassword;
 use OwenIt\Auditing\Contracts\Auditable;
+use App\Traits\MyEntrustUserTrait;
 
 class User extends Authenticatable implements MustVerifyEmail, Auditable
 {
   use Notifiable;
   use EntrustUserTrait;
   use \OwenIt\Auditing\Auditable;
+  use MyEntrustUserTrait;
 
   /**
   * The attributes that are mass assignable.

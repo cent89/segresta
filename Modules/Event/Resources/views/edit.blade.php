@@ -38,17 +38,32 @@ if($array_moduli == null) $array_moduli = array();
 					{!! Form::model($event, ['method' => 'PATCH','files' => true, 'route' => ['events.update', $event->id]]) !!}
 					<div class="form-row">
 						<div class="form-group col">
-							{!! Form::label('nome', 'Nome') !!}
+							{!! Form::label('nome', 'Nome Evento') !!}
 							{!! Form::text('nome', null, ['class' => 'form-control']) !!}
 						</div>
 
 						<div class="form-group col">
-							{!! Form::label('anno', 'Anno') !!}
-							{!! Form::number('anno', null, ['class' => 'form-control']) !!}
 						</div>
 					</div>
 
-					<div class="form-row">
+					<div class="form-row" style="margin-top: 20px;">
+						<div class="form-group col">
+							{!! Form::label('data_apertura', 'Data apertura iscrizioni') !!}
+							{!! Form::text('data_apertura', null, ['class' => 'form-control data']) !!}
+						</div>
+
+						<div class="form-group col">
+							{!! Form::label('data_chiusura', 'Data chiusura iscrizioni') !!}
+							{!! Form::text('data_chiusura', null, ['class' => 'form-control data']) !!}
+						</div>
+
+						<div class="form-group col">
+							{!! Form::label('max_posti', 'Max. posti disponibili (0 per disabilitare)') !!}
+							{!! Form::number('max_posti', null, ['class' => 'form-control', 'step' => 1, 'min' => 0]) !!}
+						</div>
+					</div>
+
+					<div class="form-row" style="margin-top: 20px;">
 						<div class="form-group col">
 							{!! Form::label('active', 'Attivo') !!}
 							{!! Form::hidden('active', 0) !!}
@@ -90,14 +105,14 @@ if($array_moduli == null) $array_moduli = array();
 
 
 
-					<div class="form-row">
+					<div class="form-row" style="margin-top: 20px;">
 						<div class="form-group col">
 							{!! Form::label('descrizione', 'Descrizione') !!}
 							{!! Form::textarea('descrizione', null, ['class' => 'form-control']) !!}
 						</div>
 					</div>
 
-					<div class="form-row" style="min-height: 150px">
+					<div class="form-row" style="min-height: 150px; margin-top: 20px">
 						<div class="form-group col">
 							{!! Form::label('stampa_anagrafica', 'Nel modulo di iscrizione, mostra anagrafica utente') !!}
 							<p>Se selezionato, nella pagina delle iscrizioni e nel modulo d'iscrizione all'evento viene mostrata l'anagrafica dell'utente che ha eseguito l'iscrizione.</p>

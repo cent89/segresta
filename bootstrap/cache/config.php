@@ -4,7 +4,7 @@
     'ip_address' => false,
     'password' => '12345',
     'name' => 'Segresta 2.0',
-    'env' => 'local',
+    'env' => 'production',
     'debug' => true,
     'url' => 'http://localhost:8000',
     'nome_parrocchia' => 'NOME PARROCCHIA',
@@ -197,6 +197,7 @@
     'backup' => 
     array (
       'name' => 'Segresta 2.0',
+      'enable' => true,
       'source' => 
       array (
         'files' => 
@@ -296,14 +297,15 @@
       'strategy' => 'Spatie\\Backup\\Tasks\\Cleanup\\Strategies\\DefaultStrategy',
       'default_strategy' => 
       array (
-        'keep_all_backups_for_days' => 7,
+        'keep_all_backups_for_days' => 3,
         'keep_daily_backups_for_days' => 16,
         'keep_weekly_backups_for_weeks' => 8,
         'keep_monthly_backups_for_months' => 4,
         'keep_yearly_backups_for_years' => 2,
-        'delete_oldest_backups_when_using_more_megabytes_than' => 2000,
+        'delete_oldest_backups_when_using_more_megabytes_than' => 1500,
       ),
     ),
+    'enable' => '0',
   ),
   'broadcasting' => 
   array (
@@ -854,8 +856,8 @@
             0 => 'default',
           ),
           'balance' => 'simple',
-          'processes' => 10,
-          'tries' => 1,
+          'processes' => 3,
+          'tries' => 3,
         ),
       ),
       'local' => 
@@ -1196,7 +1198,7 @@
         'driver' => 'redis',
         'connection' => 'default',
         'queue' => 'default',
-        'retry_after' => 90,
+        'retry_after' => 1200,
         'block_for' => 120,
       ),
     ),

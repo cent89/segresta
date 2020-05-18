@@ -12,6 +12,19 @@ $default_role = Role::where([['id_oratorio', Session::get('session_oratorio')], 
 @extends('layouts.app')
 
 @section('content')
+<style>
+thead input{
+  width: 100%;
+}
+
+/* #usersTable td:nth-child(1){
+   display:none;
+}
+#usersTable th:nth-child(1){
+   display:none;
+} */
+
+</style>
 <div class="container">
   <div class="row">
     <div class="col">
@@ -39,7 +52,7 @@ $default_role = Role::where([['id_oratorio', Session::get('session_oratorio')], 
           <table class="table table-bordered" id="usersTable" style="width: 100%">
             <thead>
               <tr>
-                <th>Id</th>
+                <!-- <th>Id</th> -->
                 <th>Foto</th>
                 <th>Cognome</th>
                 <th>Nome</th>
@@ -370,10 +383,13 @@ if("{{ Auth::user()->can('generate-report') }}"){
   );
 }
 
+
+
 table = $('#usersTable').DataTable({
   responsive: true,
   processing: true,
   serverSide: true,
+  orderCellsTop: true,
   language: { "url": "{{ asset('Italian.json') }}" },
   ajax: "{!! route('user.data') !!}",
   dom: 'Blfrtip',
@@ -388,29 +404,34 @@ table = $('#usersTable').DataTable({
   },
 
   columns: [
-    { data: 'id', name: 'id', visible: false},
-  {data: 'photo', className: "dt-body-center", render: function ( data, type, row ) {
-    if (type === 'display') {
-      return row['path_photo'];
+    // { data: 'id', name: 'id', visible: true},
+    { data: 'photo', className: "dt-body-center", render: function ( data, type, row ) {
+      if (type === 'display') {
+        return row['path_photo'];
+      }
+      return data;
     }
-    return data;
-  }
-},
-{ data: 'cognome', name: 'cognome' },
-{ data: 'name', name: 'name' },
-{ data: 'cell_number', name: 'cell_number' },
-{ data: 'email_label', editField: 'email', name: 'email'},
-{ data: 'nato_il', name: 'nato_il' },
-{ data: 'comune_nascita_label', name: 'comune_nascita_label', editField: 'id_comune_nascita'},
-{ data: 'cod_fiscale' },
-{ data: 'tessera_sanitaria' },
-{ data: 'action', orderable: false, searchable: false, responsivePriority: 1}
+  },
+  { data: 'cognome', name: 'cognome' },
+  { data: 'name', name: 'name' },
+  { data: 'cell_number', name: 'cell_number' },
+  { data: 'email_label', editField: 'email', name: 'email'},
+  { data: 'nato_il', name: 'nato_il' },
+  { data: 'comune_nascita_label', name: 'comune_nascita_label', editField: 'id_comune_nascita'},
+  { data: 'cod_fiscale' },
+  { data: 'tessera_sanitaria' },
+  { data: 'action', orderable: false, searchable: false, responsivePriority: 1}
 ],
 select: {
   style:    'os',
   selector: 'td:first-child'
 },
+initComplete: function(settings, json){
+  aggiungi_filtri_colonne();
+}
 });
+
+// aggiungi_filtri_colonne();
 
 
 // Editor degli attributi user
@@ -430,7 +451,7 @@ editor_attributi = new $.fn.dataTable.Editor({
 
 $(editor_attributi.field('id_attributo').input()).on('change', function (e, d) {
   if(editor_attributi.display() == 'inline')
-        return;
+  return;
   update_valore_field_type(editor_attributi.field('id_attributo').val());
 });
 
@@ -563,6 +584,65 @@ function update_valore_field_type(id_attributo){
     },
     error: function(XMLHttpRequest, textStatus, exception) { alert("Ajax failure\n" + XMLHttpRequest.responseText + "\n" + exception); },
   });
+}
+
+function aggiungi_filtri_colonne(){
+  //filtro sulle colonne
+  $('#usersTable thead tr').clone(true).appendTo( '#usersTable thead' );
+  $('#usersTable thead tr:eq(1) th:visible').each( function (i) {
+    switch(i){
+      case 1: // cognome
+      $(this).html("<input type='text'/>");
+      break;
+
+      case 2: // nome
+      $(this).html("<input type='text'/>");
+      break;
+
+      case 3: // cellulare
+      $(this).html("<input type='text'/>");
+      break;
+
+      case 4: // email
+      $(this).html("<input type='text'/>");
+      break;
+
+      case 5: // data di nascita
+      $(this).html("<input type='text' class='data' />");
+      break;
+
+      case 7: // cf
+      $(this).html("<input type='text'/>");
+      break;
+
+      default:
+      $(this).html( "" );
+      break;
+    }
+
+    // Faccio il parse del testo inserito dall'utente prima di filtrarlo
+
+    $( 'input, select', this ).on( 'keyup change', function () {
+      if(this.value == ""){
+        table.columns().search('').draw();
+      }else{
+        if (table.column(i).search() !== this.value){
+          valore_filtro = this.value;
+          switch(i){
+            case 5:
+            valore_filtro = moment(this.value, "DD/MM/YYYY").format("YYYY-MM-DD");
+            break;
+            default:
+            valore_filtro = this.value;
+            break;
+          }
+          table.column(i).search( valore_filtro ).draw();
+        }
+      }
+    } );
+  });
+
+  $(".data").datepicker();
 }
 
 </script>

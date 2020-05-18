@@ -2,6 +2,9 @@
 use Modules\Event\Entities\Event;
 use App\Role;
 use App\Permission;
+use Carbon\Carbon;
+
+$now = Carbon::now()->format('d/m/Y');
 ?>
 
 @extends('layouts.app')
@@ -37,7 +40,10 @@ use App\Permission;
 
           {!! $event->descrizione !!}
 
-          <div class="card-footer">
+          <div class="card-footer" style="text-align: center">
+            @if($event->data_apertura <= $now && $event->data_chiusura >= $now)
+            @if($event->max_posti == 0 || ($event->max_posti > 0 && $event->iscrizioni->count() <= $event->max_posti))
+
             @guest
             {!! Form::open(['method' => 'GET', 'route' => 'login']) !!}
             @else
@@ -48,6 +54,12 @@ use App\Permission;
 
             {!! Form::submit('Iscriviti', ['class' => 'btn btn-primary form-control']) !!}
             {!! Form::close() !!}
+            @else
+            Non è possibile iscriversi, posti esuriti! Contatta l'amministratore
+            @endif
+            @else
+            Non è possibile iscriversi, le iscrizioni non sono ancora aperte o già chiuse!
+            @endif
           </div>
 
 
