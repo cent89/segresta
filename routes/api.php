@@ -454,10 +454,13 @@ Route::middleware(['auth:api'])->group(function () {
     }
 
     $result = [];
-    foreach( Event::where([['id_oratorio', $request->id_oratorio], ['active', 1]])->orderBy('id', 'DESC')->get() as $event){
-      $r = ['nome' => $event->nome, 'id' => $event->id, 'color' => $event->color];
-      $r['image'] = url(Storage::url('public/'.$event->image));
-      array_push($result, $r);
+    $now = Carbon::now()->toDateString();
+    foreach( Event::where([['id_oratorio', $request->id_oratorio], ['active', 1], ['data_apertura', '<=', $now], ['data_chiusura', '>=', $now]])->orderBy('id', 'DESC')->get() as $event){
+      if($event->max_posti == 0 || ($event->max_posti > 0 && $event->iscrizioni->count() <= $event->max_posti)){
+        $r = ['nome' => $event->nome, 'id' => $event->id, 'color' => $event->color];
+        $r['image'] = url(Storage::url('public/'.$event->image));
+        array_push($result, $r);
+      }
     }
 
     return response()->json($result);
@@ -1047,7 +1050,7 @@ Route::middleware(['auth:api'])->group(function () {
           foreach(TypeSelect::where('id_type', $attributo->id_type)->orderBy('ordine', 'ASC')->get() as $option){
             $opzioni[] = ['type' => 'number', 'title' => $option->option, 'enum' => [$option->id]];
           };
-          $properties['att_'.$valore->id] = [
+          $properties['att_'.$attributo->id] = [
             'type' => 'number',
             'title' => $attributo->nome,
             'anyOf' => $opzioni,
@@ -1105,7 +1108,12 @@ Route::middleware(['auth:api'])->group(function () {
       foreach($request->formData as $key => $value){
         $att = explode('_', $key);
         if(count($att) == 2 && $att[0] == 'att'){
-          $au = AttributoUser::where('id', intval($att[1]))->first();
+          $au = AttributoUser::where([['id_user', $user->id], ['id_attributo', intval($att[1])]])->first();
+          if($au == null){
+            $au = new AttributoUser;
+            $au->id_attributo = intval($att[1]);
+            $au->id_user = $user->id;
+          }
           $au->valore = $value;
           $au->save();
         }
