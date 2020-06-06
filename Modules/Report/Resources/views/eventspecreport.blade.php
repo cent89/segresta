@@ -8,11 +8,13 @@ use Modules\Oratorio\Entities\Oratorio;
 use Modules\Event\Entities\EventSpecValue;
 use Modules\Event\Entities\EventSpec;
 use Modules\Oratorio\Entities\TypeSelect;
+use Modules\Oratorio\Entities\Type;
 use Modules\Attributo\Entities\Attributo;
 use Modules\Attributo\Entities\AttributoUser;
 use Modules\Famiglia\Entities\ComponenteFamiglia;
 use App\Comune;
 use App\Provincia;
+use Carbon\Carbon;
 ?>
 
 <html>
@@ -177,6 +179,10 @@ function stampa_tabella($input, $whereRaw, $format, $stampa_famiglia){
 						echo $comune->nome." (".$provincia->sigla_automobilistica.")";
 						break;
 
+						case 'nato_il':
+						echo Carbon::parse($sub->$field_name)->format('d/m/Y');
+						break;
+
 						default: echo $sub->$field_name;
 					}
 
@@ -253,10 +259,7 @@ function stampa_tabella($input, $whereRaw, $format, $stampa_famiglia){
 							}
 						}else{
 							switch($value->id_type){
-								case -1:
-								echo "<p>".$value->valore."</p>";
-								break;
-								case -2:
+								case Type::BOOL_TYPE:
 								if($value->valore==1){
 									if($format=='excel'){
 										echo "SI";
@@ -271,7 +274,8 @@ function stampa_tabella($input, $whereRaw, $format, $stampa_famiglia){
 									}
 								}
 								break;
-								case -3:
+
+								default:
 								echo "<p>".$value->valore."</p>";
 								break;
 

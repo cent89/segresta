@@ -8,6 +8,7 @@ use Modules\Oratorio\Entities\Oratorio;
 use Modules\Event\Entities\EventSpecValue;
 use Modules\Event\Entities\EventSpec;
 use Modules\Oratorio\Entities\TypeSelect;
+use Modules\Oratorio\Entities\Type;
 use Modules\Attributo\Entities\Attributo;
 use Modules\Attributo\Entities\AttributoUser;
 use App\Comune;

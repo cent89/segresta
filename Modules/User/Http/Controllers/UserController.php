@@ -373,7 +373,7 @@ class UserController extends Controller
   }
 
   public static function sendEmailCompleanni(){
-    if(User::where('nato_il', Carbon::now()->format('Y-m-d'))->count() > 0){
+    if(User::where('nato_il', 'like', '%-'.Carbon::now()->format('m-d'))->count() > 0){
       //genera pdf
       $folder_name = Storage::disk('public')->getDriver()->getAdapter()->getPathPrefix()."/temp/";
       if(!is_dir($folder_name)){
