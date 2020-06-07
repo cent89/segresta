@@ -11,7 +11,7 @@ use Modules\User\Entities\User;
 		font-family: 'Encode Sans Condensed' !important;
 		font-weight: 400;
 	}
-	
+
 	table, th, td {
 		border: 1px solid black;
 		padding: 5px;
@@ -42,7 +42,7 @@ use Modules\User\Entities\User;
 				<th>Cellulare</th>
 				<th>Email</th>
 			</tr>
-			@foreach(User::where('nato_il', Carbon::now()->format('Y-m-d'))->get() as $user)
+			@foreach(User::where('nato_il', 'like', '%-'.Carbon::now()->format('m-d'))->get() as $user)
 			<tr>
 				<td>{{ $user->full_name }}</td>
 				<td>{{ $user->cell_number }}</td>
