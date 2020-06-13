@@ -17,7 +17,7 @@ $specs = (new EventSpec)
 ->orderBy('event_specs.ordine', 'ASC')
 ->get();
 
-$weeks = Week::select('id', 'from_date', 'to_date')->where('id_event', $event->id)->orderBy('from_date', 'asc')->get();
+$weeks = Week::select('id', 'from_date', 'to_date', 'descrizione')->where('id_event', $event->id)->orderBy('from_date', 'asc')->get();
 $index = 0;
 $oratorio = Oratorio::find(Session::get('session_oratorio'));
 if($oratorio == null){
@@ -193,6 +193,9 @@ if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 
 							@if(count($specs)>0)
 							<h2>Settimana {{$loop->index+1}} - dal {{$w->from_date}} al {{$w->to_date}}</h2>
+							@if($w->descrizione != null && $w->descrizione != '')
+							<p style="font-size: 20px;"><b>{{ $w->descrizione }}</b></p>
+							@endif
 							@endif
 
 							@foreach($specs as $spec)
@@ -219,23 +222,32 @@ if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 									<p> {{$spec->descrizione}} </p>
 									@endif
 
-									@if($spec->id_type>0)
-									{!! Form::select('specs['.$index.']', TypeSelect::where('id_type', $spec->id_type)->orderBy('ordine', 'ASC')->pluck('option', 'id'), $spec->valore, ['class' => 'form-control', 'placeholder'=>'Seleziona un\'opzione', ($spec->obbligatoria==1)?'required':''])!!}
+
+									@if($spec->id_type > 0)
+									{!! Form::select('specs['.$index.']', TypeSelect::where('id_type', $spec->id_type)->orderBy('ordine', 'ASC')->pluck('option', 'id'), '', ['class' => 'form-control', 'placeholder'=>'Seleziona un\'opzione', ($spec->obbligatoria==1)?'required':''])!!}
 									@else
-									@if($spec->id_type==-1)
-									{!! Form::text('specs['.$index.']', $spec->valore, ['class' => 'form-control', ($spec->obbligatoria==1)?'required':'']) !!}
-									@elseif($spec->id_type==-2)
+									@if($spec->id_type == Type::TEXT_TYPE)
+									{!! Form::text('specs['.$index.']', '', ['class' => 'form-control', ($spec->obbligatoria==1)?'required':'']) !!}
+									@elseif($spec->id_type == Type::BOOL_TYPE)
 									{!! Form::hidden('specs['.$index.']', 0) !!}
-									{!! Form::checkbox('specs['.$index.']', 1, $spec->valore, ['class' => 'form-control']) !!}
-									@elseif($spec->id_type==-3)
-									{!! Form::number('specs['.$index.']', $spec->valore, ['class' => 'form-control', ($spec->obbligatoria==1)?'required':'']) !!}
+									{!! Form::checkbox('specs['.$index.']', 1, '', ['class' => 'form-control']) !!}
+									@elseif($spec->id_type == Type::NUMBER_TYPE)
+									{!! Form::number('specs['.$index.']', '', ['class' => 'form-control', ($spec->obbligatoria==1)?'required':'']) !!}
+									@elseif($spec->id_type == Type::DATE_TYPE)
+									{!! Form::text('specs['.$index.']', '', ['class' => 'form-control date', ($spec->obbligatoria==1)?'required':'']) !!}
 									@endif
 									@endif
+
+
 								</div>
 
 								<!--  COSTO -->
 								<div class="form-group col-2">
 									{!! Form::label('costo['.$index.']', "Costo") !!}
+									@if(strlen($spec->descrizione)>0)
+									<p>&nbsp;</p>
+									@endif
+
 									@if(Auth::user()->hasRole('user'))
 									{!! Form::hidden('costo['.$index.']', $price[$w->id]) !!}
 									{{ number_format(floatval($price[$w->id]), 2, ',', '') }}€
@@ -247,6 +259,9 @@ if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 								<!--  ACCONTO -->
 								<div class="form-group col-2">
 									{!! Form::label('acconto['.$index.']', "Acconto") !!}
+									@if(strlen($spec->descrizione)>0)
+									<p>&nbsp;</p>
+									@endif
 									@if(Auth::user()->hasRole('user'))
 									{!! Form::hidden('acconto['.$index.']', $acconto[$w->id]) !!}
 									{{ number_format(floatval($acconto[$w->id]), 2, ',', '') }}€
@@ -260,6 +275,9 @@ if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 								@else
 								<div class="form-group col-2">
 									{!! Form::label('pagato['.$index.']', "Pagato") !!}
+									@if(strlen($spec->descrizione)>0)
+									<p>&nbsp;</p>
+									@endif
 									{!! Form::hidden('pagato['.$index.']', 0) !!}
 									{!! Form::checkbox('pagato['.$index.']', 1, false, ['class' => 'form-control']) !!}
 								</div>

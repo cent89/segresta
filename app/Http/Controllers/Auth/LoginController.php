@@ -77,7 +77,7 @@ class LoginController extends Controller
     } else {
       // create a new user
       $newUser                  = new User;
-      $newUser->nome            = $user->name;
+      $newUser->name            = $user->name;
       $newUser->email           = $user->email;
       $newUser->google_id       = $user->id;
       $newUser->email_verified_at = Carbon::now();
@@ -88,11 +88,11 @@ class LoginController extends Controller
       //salvo il link utente-oratorio
       $orat = new UserOratorio;
       $orat->id_user = $newUser->id;
-      $orat->id_oratorio = Session::get('session_oratorio');
+      $orat->id_oratorio = 1;
       $orat->save();
 
       //aggiungo il ruolo
-      $roles = Role::where([['name', 'user'], ['id_oratorio', Session::get('session_oratorio')]])->get();
+      $roles = Role::where([['name', 'user'], ['id_oratorio', 1]])->get();
       if(count($roles)>0){
         //creo il ruolo
         $role = new RoleUser;
@@ -124,7 +124,7 @@ class LoginController extends Controller
     } else {
       // create a new user
       $newUser                  = new User;
-      $newUser->nome            = $user->name;
+      $newUser->name            = $user->name;
       $newUser->email           = $user->email;
       $newUser->facebook_id       = $user->id;
       $newUser->email_verified_at = Carbon::now();

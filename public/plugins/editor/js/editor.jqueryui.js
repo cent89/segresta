@@ -61,7 +61,7 @@ $.extend( true, $.fn.dataTable.Editor.classes, {
  */
 Editor.display.jqueryui = $.extend( true, {}, Editor.models.displayController, {
 	init: function ( dte ) {
-		dte.__dialouge = $('<div class="DTED"/>')
+		dte.__dialouge = $('<div class="DTED"></div>')
 			.css('display', 'none')
 			.appendTo('body')
 			.dialog( $.extend( true, Editor.display.jqueryui.modalOptions, {
@@ -98,7 +98,7 @@ Editor.display.jqueryui = $.extend( true, {}, Editor.models.displayController, {
 			.children()
 			.addClass( 'ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only' )
 			.each( function () {
-				$(this).wrapInner( '<span class="ui-button-text" />' );
+				$(this).wrapInner( '<span class="ui-button-text"></span>' );
 			} );
 
 		// Move the buttons into the jQuery UI button set

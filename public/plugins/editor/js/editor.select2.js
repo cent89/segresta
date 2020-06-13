@@ -33,7 +33,8 @@
  *     `-tag select` element before Select2 is initialised
  * @opt `-type string` - **`separator`** when the `multiple` and `tags` options are used for Select2 (`opts` parameter) this can be used to use a string value to represent the multiple values that are selected. The character given for this parameter is the separator character that will be used.
  * @opt `-type string` - **`onFocus`**: Action to take when the Select2 field is focused. This can be `open` or `undefined`. If `open` the dropdown list will automatically show when the field is focused.
- *
+ * @pot `-type string` - **`urlDataType`**: Format in which to send the data for an Ajax initial request (if required). Can be `json` (default) or `param` to have the value encoded with `jQuery.param()`.
+ * 
  * @method **`inst`**: Execute a Select2 method, using the arguments given. The
  *     return value is that returned by the Select2 method. For example you could
  *     use `editor.field('priority').inst('val')` to get the value from Select2
@@ -91,7 +92,7 @@
 (function( factory ){
 	if ( typeof define === 'function' && define.amd ) {
 		// AMD
-		define( ['jquery', 'datatables', 'datatables-editor'], factory );
+		define( ['jquery', 'datatables.net', 'datatables.net-editor'], factory );
 	}
 	else if ( typeof exports === 'object' ) {
 		// Node / CommonJS
@@ -211,8 +212,9 @@ _fieldTypes.select2 = {
                 beforeSend: function ( jqXhr, settings ) {
                     // Add an initial data request to the server, but don't
                     // override `data` since the dev might be using that
-                    var initData = 'initialValue=true&value='+
-                        JSON.stringify(val);
+                    var initData = conf.urlDataType === undefined || conf.urlDataType === 'json'
+                    ? 'initialValue=true&value='+JSON.stringify(val)
+                    : $.param({initialValue: true, value: val});
 
                     if ( typeof conf.opts.ajax.url === 'function' ) {
                         settings.url = conf.opts.ajax.url();
@@ -306,7 +308,11 @@ _fieldTypes.select2 = {
             return true;
         }
         return false;
-    }
+    },
+
+	canReturnSubmit: function() {
+		return false;
+	}
 };
 
 

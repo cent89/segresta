@@ -36,7 +36,7 @@ class EventController extends Controller
 	public $messages = [
 			'nome.required' => 'Inserisci un nome valido per l\'evento',
 			'descrizione.required'  => 'Inserisci una descrizione valida',
-			// 'anno.required'  => 'Inserisci un anno valido per l\'evento',
+			'max_posti.required'  => 'Devi indicare i posti massimi disponibili per questo evento. Inserisci 0 per posti illimitati',
 			'id_modulo.required'  => 'Devi selezionare almeno un modulo da stampare',
 			'template_file.mimes'  => 'Il file template deve avere estensione .docx.',
 			'image.mimes' => 'Il logo oratorio deve avere una di queste estensioni: jpeg,jpg,gif,png.'
@@ -235,7 +235,7 @@ class EventController extends Controller
 		$this->validate($request, [
 			'nome' => 'required',
 			'descrizione' => 'required',
-			// 'anno' =>'required',
+			'max_posti' =>'required',
 			'template_file' => 'mimes:docx,zip',
 			'image' => 'mimes:jpeg,jpg,gif,png'
 		], $this->messages);

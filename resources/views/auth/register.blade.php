@@ -355,18 +355,21 @@ $('#id_provincia_nascita').on('change', function(){
   if($('#id_nazione_nascita').val() != 118) null;
   update_comune('id_provincia_nascita', 'id_comune_nascita');
 });
+
 $('#id_provincia_residenza').on('change', function(){
   update_comune('id_provincia_residenza', 'id_comune_residenza');
 });
+
 $('#id_nazione_nascita').on('change', function(){
   var nazione = $('#id_nazione_nascita').val();
   if(nazione == 118){
     $('#div_provincia_nascita').show();
     $('#div_comune_nascita').show();
+    update_comune('id_provincia_nascita', 'id_comune_nascita');
   }else{
     $('#div_provincia_nascita').hide();
     $('#div_comune_nascita').hide();
-    $('#id_provincia_nascita').empty();
+    // $('#id_provincia_nascita').empty();
     $('#id_comune_nascita').empty();
   }
 });

@@ -37,6 +37,7 @@ use App\Permission;
 								<th>Id</th>
 								<th>Data di inizio</th>
 								<th>Data di fine</th>
+								<th>Descrizione</th>
 								<th>Operazioni</th>
 							</tr>
 						</thead>
@@ -69,6 +70,7 @@ $(document).ready(function(){
 			{label: "ID Evento", name: 'id_event', type: 'hidden', default: "{{ Session::get('work_event') }}" },
 			{label: "Data di inizio", name: "from_date", type:"datetime", format:"DD/MM/YYYY"},
 			{label: "Data di fine", name: "to_date", type:"datetime", format:"DD/MM/YYYY"},
+			{label: "Descrizione", name: "descrizione"},
 		]
 	});
 
@@ -110,6 +112,7 @@ $(document).ready(function(){
 			{ data: 'id', name: 'id', visible: false},
 			{ data: 'from_date', name: 'week.from_date' },
 			{ data: 'to_date', name: 'week.to_date' },
+			{ data: 'descrizione', name: 'week.descrizione' },
 			{ data: 'action', orderable: false, searchable: false}
 		],
 		buttons: {

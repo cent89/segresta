@@ -588,7 +588,25 @@ div.editor-datetime div.editor-datetime-label select {
   opacity: 0;
   -ms-filter: "alpha(opacity=0)";
 }
+div.editor-datetime.horizontal {
+  width: 550px;
+}
+div.editor-datetime.horizontal div.editor-datetime-date,
+div.editor-datetime.horizontal div.editor-datetime-time {
+  width: 48%;
+}
+div.editor-datetime.horizontal div.editor-datetime-time {
+  margin-left: 4%;
+}
+div.editor-datetime div.editor-datetime-date {
+  position: relative;
+  float: left;
+  width: 100%;
+}
 div.editor-datetime div.editor-datetime-time {
+  position: relative;
+  float: left;
+  width: 100%;
   text-align: center;
 }
 div.editor-datetime div.editor-datetime-time > span {
@@ -655,6 +673,7 @@ div.editor-datetime div.editor-datetime-iconDown {
 }
 
 div.editor-datetime-error {
+  clear: both;
   padding: 0 1em;
   max-width: 240px;
   font-size: 11px;

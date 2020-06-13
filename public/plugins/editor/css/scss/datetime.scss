@@ -137,7 +137,31 @@ div.editor-datetime {
 		}
 	}
 
+	// JS will only apply this when both date and time are visible
+	&.horizontal {
+		width: 550px;
+
+		div.editor-datetime-date,
+		div.editor-datetime-time {
+			width: 48%;
+		}
+
+		div.editor-datetime-time {
+			margin-left: 4%;
+		}
+	}
+
+	div.editor-datetime-date {
+		position: relative;
+		float: left;
+		width: 100%;
+	}
+
 	div.editor-datetime-time {
+		position: relative;
+		float: left;
+		width: 100%;
+
 		text-align: center;
 
 		> span {
@@ -210,6 +234,7 @@ div.editor-datetime {
 }
 
 div.editor-datetime-error {
+	clear: both;
 	padding: 0 1em;
 	max-width: 240px;
 	font-size: 11px;

@@ -62,6 +62,19 @@ return [
       'password'   => env('WEBDAV_PASSWORD'),
       'pathPrefix' => '', // optional
     ],
+    'modelli_certificazioni' => [
+        'driver' => 'local',
+        'root' => storage_path('app/public/modelli_certificazioni'),
+        'url' => env('APP_URL').'/storage/modelli_certificazioni',
+        'visibility' => 'public',
+    ],
+    'certificazioni' => [
+        'driver' => 'local',
+        'root' => storage_path('app/public/certificazioni'),
+        'url' => env('APP_URL').'/storage/certificazioni',
+        'visibility' => 'public',
+    ],
+
     'dropbox' => [
       'driver' => 'dropbox',
       'authorization_token' => '',

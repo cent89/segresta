@@ -1,13 +1,13 @@
-/*! DataTables Editor v1.9.0
+/*! DataTables Editor v1.9.4
  *
- * ©2012-2019 SpryMedia Ltd, all rights reserved.
+ * ©2012-2020 SpryMedia Ltd, all rights reserved.
  * License: editor.datatables.net/license
  */
 
 /**
  * @summary     DataTables Editor
  * @description Table editing library for DataTables
- * @version     1.9.0
+ * @version     1.9.4
  * @file        dataTables.editor.js
  * @author      SpryMedia Ltd
  * @contact     www.datatables.net/contact
@@ -49,7 +49,7 @@ var DataTable = $.fn.dataTable;
 
 
 if ( ! DataTable || ! DataTable.versionCheck || ! DataTable.versionCheck('1.10.7') ) {
-	throw 'Editor requires DataTables 1.10.7 or newer';
+	throw new Error('Editor requires DataTables 1.10.7 or newer');
 }
 
 /**
@@ -261,7 +261,7 @@ Editor.Field = function ( opts, classes, host ) {
 			'</label>'+
 			'<div data-dte-e="input" class="'+classes.input+'">'+
 				// Field specific HTML is added here if there is any
-				'<div data-dte-e="input-control" class="'+classes.inputControl+'"/>'+
+				'<div data-dte-e="input-control" class="'+classes.inputControl+'"></div>'+
 				'<div data-dte-e="multi-value" class="'+classes.multiValue+'">'+
 					multiI18n.title+
 					'<span data-dte-e="multi-info" class="'+classes.multiInfo+'">'+
@@ -275,7 +275,7 @@ Editor.Field = function ( opts, classes, host ) {
 				'<div data-dte-e="msg-message" class="'+classes['msg-message']+'">'+opts.message+'</div>'+
 				'<div data-dte-e="msg-info" class="'+classes['msg-info']+'">'+opts.fieldInfo+'</div>'+
 			'</div>'+
-			'<div data-dte-e="field-processing" class="'+classes.processing+'"><span/></div>'+
+			'<div data-dte-e="field-processing" class="'+classes.processing+'"><span></span></div>'+
 		'</div>');
 
 	var input = this._typeFn( 'create', opts );
@@ -582,6 +582,7 @@ Editor.Field.prototype = {
 					.replace(/&lt;/g, '<')
 					.replace(/&amp;/g, '&')
 					.replace(/&quot;/g, '"')
+					.replace(/&#163;/g, '£')
 					.replace(/&#39;/g, '\'')
 					.replace(/&#10;/g, '\n');
 		};
@@ -1510,16 +1511,20 @@ Editor.display.lightbox = $.extend( true, {}, Editor.models.displayController, {
 
 		// Event handlers - assign on show (and unbind on hide) rather than init
 		// since we might need to refer to different editor instances - 12563
-		dom.close.bind( 'click.DTED_Lightbox', function (e) {
-			self._dte.close();
-		} );
+		dom.close
+			.attr('title', self._dte.i18n.close)
+			.bind( 'click.DTED_Lightbox', function (e) {
+				self._dte.close();
+			} );
 
 		dom.background.bind( 'click.DTED_Lightbox', function (e) {
+			e.stopImmediatePropagation();
 			self._dte.background();
 		} );
 
 		$('div.DTED_Lightbox_Content_Wrapper', dom.wrapper).bind( 'click.DTED_Lightbox', function (e) {
 			if ( $(e.target).hasClass('DTED_Lightbox_Content_Wrapper') ) {
+				e.stopImmediatePropagation();
 				self._dte.background();
 			}
 		} );
@@ -1535,7 +1540,7 @@ Editor.display.lightbox = $.extend( true, {}, Editor.models.displayController, {
 		// the virtual keyboard is shown
 		if ( window.orientation !== undefined ) {
 			var kids = $('body').children().not( dom.background ).not( dom.wrapper );
-			$('body').append( '<div class="DTED_Lightbox_Shown"/>' );
+			$('body').append( '<div class="DTED_Lightbox_Shown"></div>' );
 			$('div.DTED_Lightbox_Shown').append( kids );
 		}
 	},
@@ -1621,7 +1626,7 @@ Editor.display.lightbox = $.extend( true, {}, Editor.models.displayController, {
 		),
 
 		"background": $(
-			'<div class="DTED_Lightbox_Background"><div/></div>'
+			'<div class="DTED_Lightbox_Background"><div></div></div>'
 		),
 
 		"close": $(
@@ -1690,9 +1695,6 @@ Editor.display.envelope = $.extend( true, {}, Editor.models.displayController, {
 
 		self._dom.content = $('div.DTED_Envelope_Container', self._dom.wrapper)[0];
 
-		document.body.appendChild( self._dom.background );
-		document.body.appendChild( self._dom.wrapper );
-
 		// For IE6-8 we need to make it a block element to read the opacity...
 		self._dom.background.style.visbility = 'hidden';
 		self._dom.background.style.display = 'block';
@@ -1709,6 +1711,9 @@ Editor.display.envelope = $.extend( true, {}, Editor.models.displayController, {
 		if ( !callback ) {
 			callback = function () {};
 		}
+
+		document.body.appendChild( self._dom.background );
+		document.body.appendChild( self._dom.wrapper );
 
 		// Adjust size for the content
 		self._dom.content.style.height = 'auto';
@@ -1760,9 +1765,11 @@ Editor.display.envelope = $.extend( true, {}, Editor.models.displayController, {
 		}
 
 		// Event handlers
-		$(self._dom.close).bind( 'click.DTED_Envelope', function (e) {
-			self._dte.close();
-		} );
+		$(self._dom.close)
+			.attr('title', self._dte.i18n.close)
+			.bind( 'click.DTED_Envelope', function (e) {
+				self._dte.close();
+			} );
 
 		$(self._dom.background).bind( 'click.DTED_Envelope', function (e) {
 			self._dte.background();
@@ -1806,7 +1813,10 @@ Editor.display.envelope = $.extend( true, {}, Editor.models.displayController, {
 		$(self._dom.content).animate( {
 			"top": -(self._dom.content.offsetHeight+50)
 		}, 600, function () {
-			$([self._dom.wrapper, self._dom.background]).fadeOut( 'normal', callback );
+			$([self._dom.wrapper, self._dom.background]).fadeOut( 'normal', function () {
+				$(this).remove();
+				callback();
+			} );
 		} );
 
 		// Event handlers
@@ -1850,7 +1860,7 @@ Editor.display.envelope = $.extend( true, {}, Editor.models.displayController, {
 		)[0],
 
 		"background": $(
-			'<div class="DTED_Envelope_Background"><div/></div>'
+			'<div class="DTED_Envelope_Background"><div></div></div>'
 		)[0],
 
 		"close": $(
@@ -2084,16 +2094,16 @@ Editor.prototype.bubble = function ( cells, fieldNames, show, opts )
 	
 		// Create container display
 		var classes = that.classes.bubble;
-		var background = $( '<div class="'+classes.bg+'"><div/></div>' );
+		var background = $( '<div class="'+classes.bg+'"><div></div></div>' );
 		var container = $(
 				'<div class="'+classes.wrapper+'">'+
 					'<div class="'+classes.liner+'">'+
 						'<div class="'+classes.table+'">'+
-							'<div class="'+classes.close+'" />'+
+							'<div class="'+classes.close+'" title="'+that.i18n.close+'"></div>'+
 							'<div class="DTE_Processing_Indicator"><span></div>'+
 						'</div>'+
 					'</div>'+
-					'<div class="'+classes.pointer+'" />'+
+					'<div class="'+classes.pointer+'"></div>'+
 				'</div>'
 			);
 	
@@ -2126,12 +2136,16 @@ Editor.prototype.bubble = function ( cells, fieldNames, show, opts )
 				pair,
 				{ opacity: 0 },
 				function () {
-					pair.detach();
-	
-					$(window).off( 'resize.'+namespace );
-	
-					// Clear error messages "offline"
-					that._clearDynamicInfo();
+					if (this === container[0]) {
+						pair.detach();
+
+						$(window).off( 'resize.'+namespace );
+
+						// Clear error messages "offline"
+						that._clearDynamicInfo();
+
+						that._event( 'closed', ['bubble'] );
+					}
 				}
 			);
 		} );
@@ -2149,7 +2163,7 @@ Editor.prototype.bubble = function ( cells, fieldNames, show, opts )
 	
 		that._animate( pair, { opacity: 1 } );
 		that._focus( that.s.includeFields, opts.focus );
-		that._postopen( 'bubble' );
+		that._postopen( 'bubble', true );
 	} );
 
 	return this;
@@ -2282,7 +2296,7 @@ Editor.prototype.buttons = function ( buttons )
 		var text = btn.text || btn.label;
 		var action = btn.action || btn.fn;
 
-		$( '<button/>', {
+		$( '<button></button>', {
 				'class': that.classes.form.button+(btn.className ? ' '+btn.className : '')
 			} )
 			.html( typeof text === 'function' ?
@@ -2307,7 +2321,7 @@ Editor.prototype.buttons = function ( buttons )
 				e.preventDefault();
 
 				if ( action ) {
-					action.call( that );
+					action.call( that, e );
 				}
 			} )
 			.appendTo( that.dom.buttons );
@@ -2599,7 +2613,7 @@ Editor.prototype.dependent = function ( parent, url, opts ) {
 		}
 
 		if ( typeof url === 'function' ) {
-			var o = url( field.val(), data, update );
+			var o = url.call( that, field.val(), data, update );
 
 			if ( o ) {
 				if ( typeof o === 'object' && typeof o.then === 'function' ) {
@@ -2868,9 +2882,13 @@ Editor.prototype.enable = function ( name )
  */
 Editor.prototype.error = function ( name, msg )
 {
+	var wrapper = $(this.dom.wrapper);
+
 	if ( msg === undefined ) {
 		// Global error
-		this._message( this.dom.formError, name );
+		this._message( this.dom.formError, name, true, function () {
+			wrapper.toggleClass('inFormError', name !== undefined && name !== '');
+		} );
 
 		// Store the error message so `inError` can check if there is an
 		// error or not without considering animation
@@ -3173,12 +3191,16 @@ Editor.prototype.inline = function ( cell, fieldName, opts )
 
 		// Note the wdith setting shouldn't be required, but Edge increases the column's
 		// width if a % width is used (even 1%). This is the workaround
+		var style = navigator.userAgent.indexOf('Edge/') !== -1 ?
+			'style="width:'+node.width()+'px"' :
+			'';
+
 		node.append( $(
 			'<div class="'+classes.wrapper+'">'+
-				'<div class="'+classes.liner+'" style="width:'+node.width()+'px">'+
-					'<div class="DTE_Processing_Indicator"><span/></div>'+
+				'<div class="'+classes.liner+'" '+ style +'>'+
+					'<div class="DTE_Processing_Indicator"><span></span></div>'+
 				'</div>'+
-				'<div class="'+classes.buttons+'"/>'+
+				'<div class="'+classes.buttons+'"></div>'+
 			'</div>'
 		) );
 
@@ -3208,6 +3230,8 @@ Editor.prototype.inline = function ( cell, fieldName, opts )
 
 			// Clear error messages "offline"
 			that._clearDynamicInfo();
+
+			return 'inline'; // trigger `closed`
 		} );
 
 		// Submit and blur actions
@@ -3235,7 +3259,7 @@ Editor.prototype.inline = function ( cell, fieldName, opts )
 		}, 0 );
 
 		that._focus( [ field ], opts.focus );
-		that._postopen( 'inline' );
+		that._postopen( 'inline', true );
 	} );
 
 	return this;
@@ -3495,9 +3519,10 @@ Editor.prototype.open = function ()
 	this._displayReorder();
 
 	// Define how to do a close
-	this._closeReg( function ( submitComplete ) {
+	this._closeReg( function () {
 		that.s.displayController.close( that, function () {
 			that._clearDynamicInfo();
+			that._event('closed', ['main']);
 		} );
 	} );
 
@@ -3514,8 +3539,9 @@ Editor.prototype.open = function ()
 			} ),
 			that.s.editOpts.focus
 		);
+		that._event( 'opened', ['main', that.s.action] );
 	} );
-	this._postopen( 'main' );
+	this._postopen( 'main', false );
 
 	return this;
 };
@@ -4224,7 +4250,7 @@ Editor.upload = function ( editor, conf, files, progressCallback, completeCallba
 		data.append( 'upload', files[ counter ] );
 
 		if ( conf.ajaxData ) {
-			conf.ajaxData( data );
+			conf.ajaxData( data, files[ counter ], counter );
 		}
 
 		if ( conf.ajax ) {
@@ -4240,7 +4266,7 @@ Editor.upload = function ( editor, conf, files, progressCallback, completeCallba
 		}
 
 		if ( ! ajax ) {
-			throw 'No Ajax option specified for upload plug-in';
+			throw new Error('No Ajax option specified for upload plug-in');
 		}
 
 		if ( typeof ajax === 'string' ) {
@@ -4260,6 +4286,9 @@ Editor.upload = function ( editor, conf, files, progressCallback, completeCallba
 			$.each( d, function ( key, value ) {
 				data.append( key, value );
 			} );
+		}
+		else if ( $.isPlainObject(ajax.data) ) {
+			throw new Error('Upload feature cannot use `ajax.data` with an object. Please use it as a function instead.');
 		}
 
 		// Dev cancellable event
@@ -4347,7 +4376,7 @@ Editor.upload = function ( editor, conf, files, progressCallback, completeCallba
 					}
 					else {
 						completeCallback.call( editor, ids );
-						
+
 						if ( submit ) {
 							editor.submit();
 						}
@@ -4357,8 +4386,8 @@ Editor.upload = function ( editor, conf, files, progressCallback, completeCallba
 				progressCallback( conf );
 			},
 			error: function ( xhr ) {
-				editor._event( 'uploadXhrError', [ conf.name, xhr ] );
 				editor.error( conf.name, generalError );
+				editor._event( 'uploadXhrError', [ conf.name, xhr ] );
 
 				progressCallback( conf );
 			}
@@ -4386,6 +4415,7 @@ Editor.upload = function ( editor, conf, files, progressCallback, completeCallba
 Editor.prototype._constructor = function(init) {
     init = $.extend(true, {}, Editor.defaults, init);
     this.s = $.extend(true, {}, Editor.models.settings, {
+        actionName: init.actionName,
         table: init.domTable || init.table,
         dbTable: init.dbTable || null, // legacy
         ajaxUrl: init.ajaxUrl,
@@ -4410,24 +4440,24 @@ Editor.prototype._constructor = function(init) {
     this.dom = {
         "wrapper": $(
             '<div class="' + classes.wrapper + '">' +
-            '<div data-dte-e="processing" class="' + classes.processing.indicator + '"><span/></div>' +
+            '<div data-dte-e="processing" class="' + classes.processing.indicator + '"><span></span></div>' +
             '<div data-dte-e="body" class="' + classes.body.wrapper + '">' +
-            '<div data-dte-e="body_content" class="' + classes.body.content + '"/>' +
+            '<div data-dte-e="body_content" class="' + classes.body.content + '"></div>' +
             '</div>' +
             '<div data-dte-e="foot" class="' + classes.footer.wrapper + '">' +
-            '<div class="' + classes.footer.content + '"/>' +
+            '<div class="' + classes.footer.content + '"></div>' +
             '</div>' +
             '</div>'
         )[0],
         "form": $(
             '<form data-dte-e="form" class="' + classes.form.tag + '">' +
-            '<div data-dte-e="form_content" class="' + classes.form.content + '"/>' +
+            '<div data-dte-e="form_content" class="' + classes.form.content + '"></div>' +
             '</form>'
         )[0],
-        "formError": $('<div data-dte-e="form_error" class="' + classes.form.error + '"/>')[0],
-        "formInfo": $('<div data-dte-e="form_info" class="' + classes.form.info + '"/>')[0],
-        "header": $('<div data-dte-e="head" class="' + classes.header.wrapper + '"><div class="' + classes.header.content + '"/></div>')[0],
-        "buttons": $('<div data-dte-e="form_buttons" class="' + classes.form.buttons + '"/>')[0]
+        "formError": $('<div data-dte-e="form_error" class="' + classes.form.error + '"></div>')[0],
+        "formInfo": $('<div data-dte-e="form_info" class="' + classes.form.info + '"></div>')[0],
+        "header": $('<div data-dte-e="head" class="' + classes.header.wrapper + '"><div class="' + classes.header.content + '"></div></div>')[0],
+        "buttons": $('<div data-dte-e="form_buttons" class="' + classes.form.buttons + '"></div>')[0]
     };
 
     // Customise the TableTools buttons with the i18n settings - worth noting that
@@ -4497,6 +4527,7 @@ Editor.prototype._constructor = function(init) {
     }
 
     this._event('initComplete', []);
+    $(document).trigger('initEditor', [this]);
 };
 /*global __inlineCounter*/
 
@@ -4809,13 +4840,15 @@ Editor.prototype._clearDynamicInfo = function ()
  */
 Editor.prototype._close = function ( submitComplete, mode )
 {
+	var closed;
+
 	// Allow preClose event to cancel the opening of the display
 	if ( this._event( 'preClose' ) === false ) {
 		return;
 	}
 
 	if ( this.s.closeCb ) {
-		this.s.closeCb( submitComplete, mode );
+		closed = this.s.closeCb( submitComplete, mode );
 		this.s.closeCb = null;
 	}
 
@@ -4829,6 +4862,11 @@ Editor.prototype._close = function ( submitComplete, mode )
 
 	this.s.displayed = false;
 	this._event( 'close' );
+
+	if ( closed ) {
+		// Note that `bubble` will call this itself due to the animation
+		this._event( 'closed', [closed] );
+	}
 };
 
 
@@ -5140,7 +5178,7 @@ Editor.prototype._event = function ( trigger, args, promiseComplete )
 			}
 			else {
 				// If there wasn't a promise returned, then execute immediately
-				promiseComplete();
+				promiseComplete( e.result );
 			}
 		}
 
@@ -5250,6 +5288,9 @@ Editor.prototype._focus = function ( fieldsIn, focus )
 		else {
 			field = this.s.fields[ focus ];
 		}
+	}
+	else {
+		document.activeElement.blur();
 	}
 
 	this.s.setFocus = field;
@@ -5467,10 +5508,18 @@ Editor.prototype._optionsUpdate = function ( json )
  * @param {string|function} msg The message to show
  * @private
  */
-Editor.prototype._message = function ( el, msg )
+Editor.prototype._message = function ( el, msg, title, fn )
 {
 	// Allow for jQuery slim
 	var canAnimate = $.fn.animate ? true : false;
+	
+	if ( title === undefined ) {
+		title = false;
+	}
+
+	if ( ! fn ) {
+		fn = function () {};
+	}
 
 	if ( typeof msg === 'function' ) {
 		msg = msg( this, new DataTable.Api(this.s.table) );
@@ -5488,6 +5537,7 @@ Editor.prototype._message = function ( el, msg )
 			el
 				.fadeOut( function () {
 					el.html( '' );
+					fn();
 				} );
 		}
 		else {
@@ -5495,9 +5545,17 @@ Editor.prototype._message = function ( el, msg )
 			el
 				.html( '' )
 				.css('display', 'none');
+
+			fn();
+		}
+
+		if (title) {
+			el.removeAttr('title');
 		}
 	}
 	else {
+		fn();
+
 		if ( this.s.displayed && canAnimate ) {
 			// Show the message with visual effect
 			el
@@ -5509,6 +5567,10 @@ Editor.prototype._message = function ( el, msg )
 			el
 				.html( msg )
 				.css('display', 'block');
+		}
+
+		if (title) {
+			el.attr('title', msg);
 		}
 	}
 };
@@ -5557,11 +5619,13 @@ Editor.prototype._multiInfo = function ()
  * form has been configured and displayed. This is to ensure all fire the same
  * events.
  *
- * @param  {string} Editing type
+ * @param  {string} type Editing type
+ * @param  {boolean} immediate indicate if the open is immediate (in which case
+ *   `opened` is also triggered).
  * @return {boolean} `true`
  * @private
  */
-Editor.prototype._postopen = function ( type )
+Editor.prototype._postopen = function ( type, immediate )
 {
 	var that = this;
 	var focusCapture = this.s.displayController.captureFocus;
@@ -5594,6 +5658,10 @@ Editor.prototype._postopen = function ( type )
 	this._multiInfo();
 
 	this._event( 'open', [type, this.s.action] );
+
+	if ( immediate ) {
+		this._event( 'opened', [type, this.s.action] );
+	}
 
 	return true;
 };
@@ -5692,9 +5760,10 @@ Editor.prototype._submit = function ( successCallback, errorCallback, formatdata
 	// After initSubmit to allow `mode()` to be used as a setter
 	var action = this.s.action;
 	var submitParams = {
-		"action": action,
 		"data": {}
 	};
+
+	submitParams[this.s.actionName] = action;
 
 	// For backwards compatibility
 	if ( this.s.dbTable ) {
@@ -6440,6 +6509,13 @@ Editor.defaults = {
 	 */
 	"i18n": {
 		/**
+		 * Close button title text
+		 *  @type string
+		 *  @default Close
+		 */
+		"close": "Close",
+
+		/**
 		 * Strings used when working with the Editor 'create' action (creating new
 		 * records).
 		 *  @namespace
@@ -6661,7 +6737,13 @@ Editor.defaults = {
 	 *
 	 * @type Boolean
 	 */
-	legacyAjax: false
+	legacyAjax: false,
+
+	/**
+	 * Parameter name to use to submit data to the server.
+	 * @type string
+	 */
+	actionName: 'action'
 };
 
 
@@ -6789,7 +6871,9 @@ var __dtCellSelector = function ( out, dt, identifier, allFields, idFn, forceFie
 		out[ idSrc ].attach = prevAttach || [];
 		out[ idSrc ].attach.push( isNode ?
 			$(identifier).get(0) :
-			cell.node()
+			cell.fixedNode ? // If its under a fixed column, get the floating node
+				cell.fixedNode() :
+				cell.node()
 		);
 
 		out[ idSrc ].displayFields = prevDisplayFields || {};
@@ -7666,7 +7750,6 @@ $.extend( _buttons, {
 		action: function( e, dt, node, config ) {
 			var that = this;
 			var editor = config.editor;
-			var buttons = config.formButtons;
 
 			this.processing(true);
 			editor
@@ -7675,7 +7758,7 @@ $.extend( _buttons, {
 				})
 				.create( {
 					buttons: config.formButtons,
-					message: config.formMessage,
+					message: config.formMessage || editor.i18n.create.message,
 					title:   config.formTitle || editor.i18n.create.title
 				} );
 		}
@@ -7719,8 +7802,8 @@ $.extend( _buttons, {
 					that.processing(false);
 				})
 				.edit( items, {
-					message: config.formMessage,
 					buttons: config.formButtons,
+					message: config.formMessage || editor.i18n.edit.message,
 					title:   config.formTitle || editor.i18n.edit.title
 				} );
 		}
@@ -7840,22 +7923,22 @@ Editor.DateTime = function ( input, opts ) {
 						'<button>'+i18n.next+'</button>'+
 					'</div>'+
 					'<div class="'+classPrefix+'-label">'+
-						'<span/>'+
-						'<select class="'+classPrefix+'-month"/>'+
+						'<span></span>'+
+						'<select class="'+classPrefix+'-month"></select>'+
 					'</div>'+
 					'<div class="'+classPrefix+'-label">'+
-						'<span/>'+
-						'<select class="'+classPrefix+'-year"/>'+
+						'<span></span>'+
+						'<select class="'+classPrefix+'-year"></select>'+
 					'</div>'+
 				'</div>'+
-				'<div class="'+classPrefix+'-calendar"/>'+
+				'<div class="'+classPrefix+'-calendar"></div>'+
 			'</div>'+
 			'<div class="'+classPrefix+'-time">'+
-				'<div class="'+classPrefix+'-hours"/>'+
-				'<div class="'+classPrefix+'-minutes"/>'+
-				'<div class="'+classPrefix+'-seconds"/>'+
+				'<div class="'+classPrefix+'-hours"></div>'+
+				'<div class="'+classPrefix+'-minutes"></div>'+
+				'<div class="'+classPrefix+'-seconds"></div>'+
 			'</div>'+
-			'<div class="'+classPrefix+'-error"/>'+
+			'<div class="'+classPrefix+'-error"></div>'+
 		'</div>'
 	);
 
@@ -7977,6 +8060,9 @@ $.extend( Editor.DateTime.prototype, {
 		else if ( set === null || set === '' ) {
 			this.s.d = null;
 		}
+		else if ( set === '--now' ) {
+			this.s.d = new Date();
+		}
 		else if ( typeof set === 'string' ) {
 			if ( window.moment ) {
 				// Use moment if possible (even for ISO8601 strings, since it
@@ -8050,6 +8136,7 @@ $.extend( Editor.DateTime.prototype, {
 			this.dom.time.children('div.'+classPrefix+'-seconds').remove();
 			this.dom.time.children('span').eq(1).remove();
 		}
+
 		// Render the options
 		this._optionsTitle();
 
@@ -8369,6 +8456,7 @@ $.extend( Editor.DateTime.prototype, {
 
 		$(window).off( '.'+namespace );
 		$(document).off( 'keydown.'+namespace );
+		$('div.dataTables_scrollBody').off( 'scroll.'+namespace );
 		$('div.DTE_Body_Content').off( 'scroll.'+namespace );
 		$('body').off( 'click.'+namespace );
 	},
@@ -8812,6 +8900,13 @@ $.extend( Editor.DateTime.prototype, {
 		var container = this.dom.container;
 		var inputHeight = this.dom.input.outerHeight();
 
+		if ( this.s.parts.date && this.s.parts.time && $(window).width() > 550 ) {
+			container.addClass('horizontal');
+		}
+		else {
+			container.removeClass('horizontal');
+		}
+
 		container
 			.css( {
 				top: offset.top + inputHeight,
@@ -8922,11 +9017,15 @@ $.extend( Editor.DateTime.prototype, {
 
 		// Need to reposition on scroll
 		$(window).on( 'scroll.'+namespace+' resize.'+namespace, function () {
-			that._position();
+			that._hide();
 		} );
 
 		$('div.DTE_Body_Content').on( 'scroll.'+namespace, function () {
-			that._position();
+			that._hide();
+		} );
+
+		$('div.dataTables_scrollBody').on( 'scroll.'+namespace, function () {
+			that._hide();
 		} );
 
 		// On tab focus will move to a different field (no keyboard navigation
@@ -8971,10 +9070,12 @@ $.extend( Editor.DateTime.prototype, {
 		var out = window.moment ?
 			window.moment.utc( date, undefined, this.c.momentLocale, this.c.momentStrict ).format( this.c.format ) :
 			date.getUTCFullYear() +'-'+
-	            this._pad(date.getUTCMonth() + 1) +'-'+
-	            this._pad(date.getUTCDate());
+				this._pad(date.getUTCMonth() + 1) +'-'+
+				this._pad(date.getUTCDate());
 		
-		this.dom.input.val( out );
+		this.dom.input
+			.val( out )
+			.trigger('change', {write: date});
 
 		if ( focus ) {
 			this.dom.input.focus();
@@ -9035,7 +9136,7 @@ Editor.DateTime.defaults = {
 	showWeekNumber: false,
 
 	// overruled by max / min date
-	yearRange: 10
+	yearRange: 25
 };
 
 
@@ -9061,19 +9162,19 @@ function _commonUpload ( editor, conf, dropCallback, multiple )
 			'<div class="eu_table">'+
 				'<div class="row">'+
 					'<div class="cell upload limitHide">'+
-						'<button class="'+btnClass+'" />'+
-						'<input type="file" '+(multiple ? 'multiple' : '')+'/>'+
+						'<button class="'+btnClass+'"></button>'+
+						'<input type="file" '+(multiple ? 'multiple' : '')+'></input>'+
 					'</div>'+
 					'<div class="cell clearValue">'+
-						'<button class="'+btnClass+'" />'+
+						'<button class="'+btnClass+'"></button>'+
 					'</div>'+
 				'</div>'+
 				'<div class="row second">'+
 					'<div class="cell limitHide">'+
-						'<div class="drop"><span/></div>'+
+						'<div class="drop"><span></span></div>'+
 					'</div>'+
 					'<div class="cell">'+
-						'<div class="rendered"/>'+
+						'<div class="rendered"></div>'+
 					'</div>'+
 				'</div>'+
 			'</div>'+
@@ -9082,6 +9183,14 @@ function _commonUpload ( editor, conf, dropCallback, multiple )
 
 	conf._input = container;
 	conf._enabled = true;
+
+	if ( conf.id ) {
+		container.find('input[type=file]').attr('id', Editor.safeId( conf.id ));
+	}
+
+	if ( conf.attr ) {
+		container.find('input[type=file]').attr(conf.attr);
+	}
 
 	_buttonText( conf );
 
@@ -9131,17 +9240,19 @@ function _commonUpload ( editor, conf, dropCallback, multiple )
 		container.append( container.find('div.rendered') );
 	}
 
-	container.find('div.clearValue button').on( 'click', function () {
-		Editor.fieldTypes.upload.set.call( editor, conf, '' );
+	container.find('div.clearValue button').on( 'click', function (e) {
+		e.preventDefault();
+
+		if ( conf._enabled ) {
+			Editor.fieldTypes.upload.set.call( editor, conf, '' );
+		}
 	} );
 
-	container.find('input[type=file]').on('change', function () {
+	container.find('input[type=file]').on('input', function () {
 		Editor.upload( editor, conf, this.files, _buttonText, function (ids) {
 			dropCallback.call( editor, ids );
 
-			// Clear the value so change will happen on the next file select,
-			// even if it is the same file
-			container.find('input[type=file]').val('');
+			container.find('input[type=file]')[0].value = null;
 		} );
 	} );
 
@@ -9244,7 +9355,7 @@ fieldTypes.password = $.extend( true, {}, baseFieldType, {
 
 fieldTypes.textarea = $.extend( true, {}, baseFieldType, {
 	create: function ( conf ) {
-		conf._input = $('<textarea/>').attr( $.extend( {
+		conf._input = $('<textarea></textarea>').attr( $.extend( {
 			id: Editor.safeId( conf.id )
 		}, conf.attr || {} ) );
 		return conf._input[0];
@@ -9301,7 +9412,7 @@ fieldTypes.select = $.extend( true, {}, baseFieldType, {
 	},
 
 	create: function ( conf ) {
-		conf._input = $('<select/>')
+		conf._input = $('<select></select>')
 			.attr( $.extend( {
 				id: Editor.safeId( conf.id ),
 				multiple: conf.multiple === true
@@ -9435,7 +9546,7 @@ fieldTypes.checkbox = $.extend( true, {}, baseFieldType, {
 
 
 	create: function ( conf ) {
-		conf._input = $('<div />');
+		conf._input = $('<div></div>');
 		fieldTypes.checkbox._addOptions( conf, conf.options || conf.ipOpts );
 
 		return conf._input[0];
@@ -9693,11 +9804,8 @@ fieldTypes.datetime = $.extend( true, {}, baseFieldType, {
 		}, conf.attr ) );
 
 		conf._picker = new Editor.DateTime( conf._input, $.extend( {
-			format: conf.format, // can be undefined
+			format: conf.displayFormat || conf.format, // can be undefined
 			i18n: this.i18n.datetime,
-			onChange: function () {
-				_triggerChange( conf._input );
-			}
 		}, conf.opts ) );
 
 		conf._closeFn = function () {
@@ -9715,13 +9823,29 @@ fieldTypes.datetime = $.extend( true, {}, baseFieldType, {
 		return conf._input[0];
 	},
 
-	// default get, disable and enable options are okay
+	get: function ( conf ) {
+		let val = conf._input.val();
+		let inst = conf._picker.c;
+
+		// If a wire format is specified, convert the display format to the wire
+		return val && conf.wireFormat && moment ?
+			moment(val, inst.format, inst.momentLocale, inst.momentStrict).format(conf.wireFormat) :
+			val;
+	},
 
 	set: function ( conf, val ) {
-		conf._picker.val( val );
+		let inst = conf._picker.c;
+
+		// If there is a wire format, convert it to the display format
+		conf._picker.val( val && conf.wireFormat && moment ?
+			moment(val, conf.wireFormat, inst.momentLocale, inst.momentStrict).format(inst.format) :
+			val
+		);
 
 		_triggerChange( conf._input );
 	},
+
+	// default disable and enable options are okay
 
 	owns: function ( conf, node ) {
 		return conf._picker.owns( node );
@@ -9839,10 +9963,12 @@ fieldTypes.uploadMany = $.extend( true, {}, baseFieldType, {
 			.on( 'click', 'button.remove', function (e) {
 				e.stopPropagation();
 
-				var idx = $(this).data('idx');
+				if ( conf._enabled ) {
+					var idx = $(this).data('idx');
 
-				conf._val.splice( idx, 1 );
-				Editor.fieldTypes.uploadMany.set.call( editor, conf, conf._val );
+					conf._val.splice( idx, 1 );
+					Editor.fieldTypes.uploadMany.set.call( editor, conf, conf._val );
+				}
 			} );
 
 		conf._container = container;
@@ -9872,7 +9998,7 @@ fieldTypes.uploadMany = $.extend( true, {}, baseFieldType, {
 			var rendered = container.find('div.rendered').empty();
 			
 			if ( val.length ) {
-				var list = $('<ul/>').appendTo( rendered );
+				var list = $('<ul></ul>').appendTo( rendered );
 
 				$.each( val, function ( i, file ) {
 					list.append(
@@ -9943,7 +10069,7 @@ Editor.prototype.CLASS = "Editor";
  *  @default   See code
  *  @static
  */
-Editor.version = "1.9.0";
+Editor.version = "1.9.4";
 
 
 // Event documentation for JSDoc

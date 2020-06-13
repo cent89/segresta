@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
     $oratorio->nome = "Il tuo nuovo Oratorio";
     $oratorio->email = "info@oratorio.it";
     $oratorio->reg_token = md5($oratorio->nome);
+    $oratorio->logo = null;
     $oratorio->save();
     $this->command->info("Nuovo oratorio creato. Email: info@oratorio.it");
   }
@@ -56,9 +57,9 @@ class DatabaseSeeder extends Seeder
     //aggiungo utente Amministratore
     $admin = [
       'name' => 'Amministratore',
-      'cognome' => '',
+      'cognome' => 'Segresta',
       'email' => 'admin@email.it',
-      'password' => Hash::make('admin'),
+      'password' => Hash::make(config('app.admin_password')),
       'nato_il' => '01/01/2018',
       'id_nazione_nascita' => 118,
       'id_provincia_nascita' => 16,

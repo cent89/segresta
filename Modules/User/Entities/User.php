@@ -32,6 +32,13 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
 
   protected $dates = ['nato_il'];
 
+  protected $attributes = [
+    'cognome' => '',
+    'sesso' => 'M',
+    'nato_il' => '2020-01-01',
+    'via' => ''
+  ];
+
   /**
   * The attributes that should be hidden for arrays.
   *
@@ -105,20 +112,30 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
   }
 
   public function routeNotificationForFcm()
-    {
-        return $this->fcmToken;
-    }
+  {
+    return $this->fcmToken;
+  }
 
 
   // Relation
   public function comuneNascita()
   {
-      return $this->belongsTo('\App\Comune', 'id_comune_nascita', 'id');
+    return $this->belongsTo('\App\Comune', 'id_comune_nascita', 'id');
   }
 
   public function provinciaNascita()
   {
-      return $this->belongsTo('\App\Provincia', 'id_provincia_nascita', 'id');
+    return $this->belongsTo('\App\Provincia', 'id_provincia_nascita', 'id');
   }
+
+  public function iscrizioni()
+  {
+    return $this->hasMany('\Modules\User\Entities\User', 'id_user', 'id');
+  }
+
+  // public function certificazioni()
+  // {
+  //   return $this->hasMany('\Modules\Certificazione\Entities\CertificazioneUtente', 'id_user', 'id');
+  // }
 
 }

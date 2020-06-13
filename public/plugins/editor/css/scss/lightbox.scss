@@ -59,6 +59,21 @@ div.DTED_Lightbox_Wrapper {
 	}
 }
 
+div.DTED_Lightbox_Wrapper {
+	div.DTE_Footer {
+		display: flex;
+		justify-content: end;
+	}
+
+	div.DTE_Footer_Content {
+		display: none;
+	}
+
+	div.DTE.inFormError div.DTE_Footer {
+		justify-content: space-between;
+	}
+}
+
 
 div.DTED_Lightbox_Background {
 	@include overlay-background();

@@ -76,6 +76,10 @@ thead select{
             <div class="form-group col">
               {!! Form::submit('Salva', ['class' => 'btn btn-primary form-control']) !!}
             </div>
+
+            <div class="form-group col">
+              {!! Form::submit('Test invio email', ['name' => 'test_email', 'class' => 'btn btn-primary form-control']) !!}
+            </div>
           </div>
 
           {!! Form::close() !!}

@@ -767,7 +767,7 @@ class SubscriptionController extends Controller
 		$template->setValue('nome_diocesi', $oratorio->nome_diocesi);
 		$template->setValue('luogo_data_modulo', $oratorio->luogo_firma_moduli.", ".$sub->created_at);
 		$template->setValue('nome_evento', $event->nome);
-		$template->setValue('id_subscription', $sub->id);
+		$template->setValue('id_subscription', $sub->numero);
 		$template->setValue('padre', $padre!=null?$padre->full_name:'');
 		$template->setValue('madre', $madre!=null?$madre->full_name:'');
 		$template->setValue('figlio', $user->full_name);

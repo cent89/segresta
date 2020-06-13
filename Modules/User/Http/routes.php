@@ -4,10 +4,6 @@ Route::group(['middleware' => ['web', 'verified'], 'prefix' => 'admin', 'namespa
 {
   Route::resource('user', 'UserController', ['only' => ['store', 'index']]);
   Route::get('user/users_list', ['as' =>'user.users_list', 'uses' => 'UserController@users_list']);
-  //Route::get('user/destroy', ['as' => 'user.destroy', 'uses' => 'UserController@destroy']);
-  //Route::get('user/edit', ['as' => 'user.edit', 'uses' => 'UserController@edit']);
-  //Route::get('user/print', ['as' => 'user.printprofile', 'uses' => 'UserController@print_userprofile']);
-  //Route::get('user/sistema_permessi', ['as' => 'user.permessi', 'uses' => 'UserController@sistema_permessi']);
   Route::get('user/getData', ['as' =>'user.data', 'uses' => 'UserController@data']);
   Route::post('user/action', ['as' =>'user.action', 'uses' => 'UserController@action']);
 });

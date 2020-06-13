@@ -359,14 +359,15 @@ class UserController extends Controller
       return str_replace('\\', '/', json_encode(array('id' => $user->id, 'text' => $user->full_name), JSON_UNESCAPED_SLASHES));
 
     }else{
-      $users = User::leftJoin('user_oratorio', 'user_oratorio.id_user', 'users.id')
+      $users = User::select('users.*')->leftJoin('user_oratorio', 'user_oratorio.id_user', 'users.id')
       ->where('cognome', 'LIKE', ($request->has('term')?$input['term']:'').'%')
       ->where('user_oratorio.id_oratorio', Session::get('session_oratorio'))
       ->orderBy('cognome', 'ASC');
     }
 
     foreach ($users->get() as $user) {
-      array_push($list, array('id' => $user->id, 'text' => $user->full_name));
+      $user_name = $user->full_name." (".$user->nato_il.")";
+      array_push($list, array('id' => $user->id, 'text' => $user_name));
     }
 
     return str_replace('\\', '/', json_encode(array('results' => $list), JSON_UNESCAPED_SLASHES));

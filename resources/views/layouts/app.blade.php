@@ -16,81 +16,99 @@ use Modules\Oratorio\Entities\Oratorio;
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
   <title>{{ config('app.name', 'Laravel') }}</title>
-  <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" >
 
   <!-- Scripts -->
-  <!-- jQuery -->
-  <script src="{{ asset('js/app.js') }}"></script>
-  <!-- <script src="//code.jquery.com/jquery-3.3.1.min.js"></script> -->
-  <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
-  <script src="{{ asset('js/jquery-ui.js') }}"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/bootstrap.datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+  <!-- <script src="{{ asset('js/app.js') }}" defer></script> -->
+  <!-- <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
 
-  <!-- <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.min.css"/> -->
+  <script src="{{ asset('js/jquery-3.4.1.min.js') }}"></script>
+  <script src="{{ asset('js/tinymce.min.js') }}"></script>
+  <script src="{{ asset('js/jquery-ui.js') }}"></script>
+  <script src="{{ asset('js/moment-with-locals.min.js') }}"></script>
+  <!-- <script src="{{ asset('js/bootstrap-datetimepicker.min.js') }}"></script> -->
+
+  <!-- jQuery CDN - Slim version (=without AJAX) -->
+  <!-- Popper.JS -->
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script> -->
+  <!-- Bootstrap JS -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+
 
   <!-- Fonts -->
-  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" type="text/css">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="dns-prefetch" href="//fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" >
+
+
 
   <!-- Styles -->
   <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  <link rel="stylesheet" href="//cdn.datatables.net/1.10.7/css/jquery.dataTables.min.css">
-  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css">
-  <link rel="stylesheet" href="https://cdn.datatables.net/rowreorder/1.2.5/css/rowReorder.dataTables.min.css">
+  <link rel="stylesheet" href="{{ asset('css/bootstrap/bootstrap.min.css') }}" >
+  <link rel="stylesheet" href="https://cdn.datatables.net/rowgroup/1.1.2/css/rowGroup.dataTables.min.css">
+  <link rel="stylesheet" href="{{ asset('plugins/datatables/css/jquery.dataTables.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('plugins/datatables/css/buttons.dataTables.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('plugins/datatables/css/rowReorder.dataTables.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('plugins/datatables/css/fixedHeader.dataTables.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('plugins/datatables/css/responsive.dataTables.min.css') }}">
+  <!-- <link rel="stylesheet" href="{{ asset('plugins/datatables/css/bootstrap-datetimepicker.min.css') }}"> -->
+  <link rel="stylesheet" href="{{ asset('plugins/datatables/css/scroller.dataTables.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('plugins/datatables/css/fixedColumns.dataTables.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('plugins/datatables/css/select.bootstrap.min.css') }}">
+
+  <!-- <link rel="stylesheet" href="{{ asset('css/bootstrap-glyphicons.css') }}"> -->
+  <link rel="stylesheet" href="{{ asset('css/select2.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/quill.snow.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/jquery-ui.css') }}">
+
+  <link rel="stylesheet" href="{{ asset('plugins/editor/css/editor.dataTables.css') }}">
+  <link rel="stylesheet" href="{{ asset('plugins/editor/css/editor.bootstrap.css') }}">
+  <!-- <link rel="stylesheet" href="{{ asset('plugins/editor/css/editor.quill.css') }}"> -->
+  <!-- <link rel="stylesheet" href="{{ asset('plugins/editor/css/editor.title.css') }}" > -->
+  <!-- <link rel="stylesheet" href="{{ asset('css/font-awesome-animation.min.css')}}"> -->
+  <!-- Custom styles for this template-->
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css">
-  <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css">
-
-  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css">
-  <link rel="stylesheet" href="https://cdn.datatables.net/select/1.2.4/css/select.bootstrap.min.css">
-  <link rel="stylesheet" href="{{asset('plugins/editor/css/editor.dataTables.css') }}">
-  <link rel="stylesheet" href="{{asset('plugins/editor/css/editor.bootstrap.css') }}">
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css">
-
-
-  <link rel="stylesheet" type="text/css" href="{{asset('plugins/datatables/datatables.min.css')}}"/>
-  <script type="text/javascript" src="{{ asset('plugins/datatables/datatables.min.js')}}"></script>
-
-
-  <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-  <script src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
-  <script src="https://cdn.datatables.net/select/1.3.0/js/dataTables.select.min.js"></script>
-  <script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
-  <script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.flash.min.js"></script>
-  <script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
-  <script src="https://cdn.datatables.net/rowreorder/1.2.5/js/dataTables.rowReorder.min.js"></script>
-  <script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js"></script>
-  <script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.full.min.js"></script>
-
-  <script src="{{asset('plugins/editor/js/dataTables.editor.js')}}"></script>
-  <script src="{{asset('plugins/editor/js/editor.title.js')}}"></script>
-  <script src="{{asset('plugins/editor/js/editor.select2.js')}}"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper-utils.min.js"></script>
-  <script src="{{asset('/js/bootstrap-confirmation.js')}}"></script>
-  <script src="{{asset('/js/jquery.redirect.js')}}"></script>
-
-
-  <!--  -->
   <link href="{{ asset('css/app.css') }}" rel="stylesheet">
   <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
-  <link href="{{ asset('css/jquery-ui.css') }}" rel="stylesheet">
-  <link href="{{ asset('css/scheduler.min.css') }}" rel="stylesheet">
-  <link href="{{ asset('css/font-awesome-animation.css') }}" rel="stylesheet">
-  <link href="{{ asset('plugins/editor/css/editor.title.css') }}" rel="stylesheet">
-  <link href="https://cdn.datatables.net/select/1.3.0/css/select.dataTables.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ asset('plugins/fontawesome/css/all.css') }}">
 
-  <!-- FullCalendar -->
 
-  <!-- <script src="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.min.js"></script>
-  <script src="{{ asset('/js/fullcalendar/scheduler.min.js') }}"></script>
-  <script src="{{ asset('/js/fullcalendar/locale/it.js') }}"></script> -->
+
+
+  <script src="{{ asset('plugins/datatables/js/jquery.dataTables.min.js') }}"></script>
+  <script src="{{ asset('plugins/datatables/js/dataTables.buttons.min.js') }}"></script>
+  <script src="{{ asset('plugins/datatables/js/dataTables.select.min.js') }}"></script>
+  <script src="{{ asset('plugins/datatables/js/buttons.print.min.js') }}"></script>
+  <script src="{{ asset('plugins/datatables/js/buttons.flash.min.js') }}"></script>
+  <script src="{{ asset('plugins/datatables/js/buttons.html5.min.js') }}"></script>
+  <script src="{{ asset('plugins/datatables/js/jszip.min.js') }}"></script>
+  <script src="{{ asset('plugins/datatables/js/pdfmake.min.js') }}"></script>
+  <script src="{{ asset('plugins/datatables/js/vfs_fonts.js') }}"></script>
+  <script src="{{ asset('plugins/datatables/js/dataTables.rowReorder.min.js') }}"></script>
+  <script src="{{ asset('plugins/datatables/js/dataTables.fixedHeader.min.js') }}"></script>
+  <script src="{{ asset('plugins/datatables/js/dataTables.responsive.min.js') }}"></script>
+  <script src="{{ asset('plugins/datatables/js/dataTables.keyTable.min.js') }}"></script>
+  <script src="{{ asset('plugins/datatables/js/dataTables.scroller.min.js') }}"></script>
+  <script src="{{ asset('plugins/datatables/js/dataTables.fixedColumns.min.js') }}"></script>
+  <script src="https://cdn.datatables.net/rowgroup/1.1.2/js/dataTables.rowGroup.min.js"></script>
+
+  <script src="{{ asset('js/select2.full.min.js') }}"></script>
+  <!-- <script src="{{ asset('js/quill.min.js') }}"></script> -->
+  <script src="{{ asset('js/datetime.js') }}"></script>
+  <script src="{{ asset('js/popper.min.js') }}"></script>
+  <script src="{{ asset('js/popper-utils.min.js') }}"></script>
+
+  <script src="{{ asset('plugins/editor/js/dataTables.editor.js')}}"></script>
+  <!-- <script src="{{ asset('plugins/editor/js/editor.autoComplete.js')}}"></script> -->
+  <!-- <script src="{{ asset('plugins/editor/js/editor.quill.js')}}"></script> -->
+  <script src="{{ asset('plugins/editor/js/editor.select2.js')}}"></script>
+  <script src="{{ asset('plugins/editor/js/editor.title.js')}}"></script>
+  <!-- <script src="{{ asset('/js/bootstrap-confirmation.js')}}"></script> -->
+  <script src="{{ asset('/js/bootbox.all.min.js')}}"></script>
+  <script src="{{ asset('/js/signature_pad.min.js')}}"></script>
+  <script src="https://cdn.jsdelivr.net/bootstrap.datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
 
   <script>
   //select2
@@ -319,6 +337,10 @@ use Modules\Oratorio\Entities\Oratorio;
   }));
   //END SELECT 2
 
+  // Datepicker options
+  $.datepicker.setDefaults({dateFormat: 'dd/mm/yyyy'});
+  // End options
+
   function getUrlParameter(sParam) {
     var sPageURL = window.location.search.substring(1),
     sURLVariables = sPageURL.split('&'),
@@ -345,6 +367,7 @@ use Modules\Oratorio\Entities\Oratorio;
   @include('header_event')
 
   <main class="py-4" role="main">
+    @include('modals')
     @yield('content')
   </main>
 

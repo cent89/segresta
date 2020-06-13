@@ -23,7 +23,7 @@ if(!Auth::guest()){
 			<?php
 			if(Session::get('session_oratorio') != null){
 				$oratorio = Oratorio::where('id', Session::get('session_oratorio'))->first();
-				if($oratorio->logo != ''){
+				if($oratorio->logo != '' && $oratorio->logo != null){
 					echo "<img src='".url(Storage::url('public/'.$oratorio->logo))."' height='60px' ><br>";
 				}else{
 					echo "<img src='".asset('/assets/logo_new_orizzontale_b.png')."' height='60px'><br>";

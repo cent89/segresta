@@ -20,7 +20,7 @@
     "irazasyed/telegram-bot-sdk": "^2.0",
     "nwidart/laravel-modules": "^5.0",
     "spatie/laravel-cookie-consent": "^2.2.1",
-    "phpoffice/phpword": "v0.13.*",
+    "phpoffice/phpword": "v0.17.*",
     "swiftmailer/swiftmailer": "^6.0",
     "mpdf/mpdf": "^7.0",
     "yajra/laravel-datatables": "^1.5",

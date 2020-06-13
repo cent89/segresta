@@ -19,6 +19,11 @@ class Event extends Model implements Auditable
     'more_subscriptions', 'stampa_anagrafica', 'spec_iscrizione', 'grazie', 'template_file', 'pagine_foglio', 'select_famiglia', 'id_moduli', 'is_diocesi',
      'data_apertura', 'data_chiusura', 'max_posti'];
 
+     protected $attributes = [
+       'max_posti' => 0,
+     ];
+
+
     public static $pagine_per_foglio = array('1' => "Una pagina per foglio", '2' => "Due pagine per foglio");
 
     public static function getPaginePerFoglio(){

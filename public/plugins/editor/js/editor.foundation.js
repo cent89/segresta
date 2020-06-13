@@ -78,9 +78,10 @@ DataTable.Editor.display.foundation = $.extend( true, {}, DataTable.Editor.model
 	 */
 	"init": function ( dte ) {
 		self._dom.content = $(
-			'<div class="reveal reveal-modal DTED" data-reveal />'
+			'<div class="reveal reveal-modal DTED" data-reveal></div>'
 		);
-		self._dom.close = $('<button class="close close-button">&times;</div>');
+		self._dom.close = $('<button class="close close-button">&times;</div>')
+			.attr('title', dte.i18n.close);
 
 		self._dom.close.click( function () {
 			self._dte.close('icon');

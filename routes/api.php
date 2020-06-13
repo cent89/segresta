@@ -16,6 +16,9 @@ use Modules\Modulo\Entities\Modulo;
 use Modules\Event\Entities\Week;
 use Modules\Attributo\Entities\Attributo;
 use Modules\Attributo\Entities\AttributoUser;
+use Modules\Certificazione\Entities\Certificazione;
+use Modules\Certificazione\Entities\CertificazioneUtente;
+use Modules\Certificazione\Http\Controllers\CertificazioneUtenteController;
 use App\RoleUser;
 use App\Role;
 use Carbon\Carbon;
@@ -588,7 +591,8 @@ Route::middleware(['auth:api'])->group(function () {
           case Type::DATE_TYPE:
           $properties['spec_0_'.$spec->id] = [
             'type' => 'date',
-            'title' => $spec->label
+            'title' => $spec->label,
+            'default' => Carbon::now()->toDateString(),
           ];
           $uiSchema['spec_0_'.$spec->id] = [];
           break;
@@ -609,14 +613,18 @@ Route::middleware(['auth:api'])->group(function () {
 
     // Specifiche settimanali
 
-    $weeks = Week::select('id', 'from_date', 'to_date')->where('id_event', $request->id_evento)->orderBy('from_date', 'asc');
+    $weeks = Week::select('id', 'from_date', 'to_date', 'descrizione')->where('id_event', $request->id_evento)->orderBy('from_date', 'asc');
     if($weeks->count() > 0){
 
       foreach($weeks->get() as $week){
         // Titolo della sezione
+        $titolo = 'Settimana dal '.$week->from_date.' al '.$week->to_date;
+        if($week->descrizione != null && $week->descrizione != ''){
+          $titolo .= ' - '.$week->descrizione;
+        }
         $properties['settimana_'.$week->id] = [
           'type' => 'string',
-          'title' => 'Settimana dal '.$week->from_date.' al '.$week->to_date,
+          'title' => $titolo,
           'displayLabel' => false
         ];
         $uiSchema['settimana_'.$week->id] = ["ui:widget" => 'CustomHeading'];
@@ -671,10 +679,10 @@ Route::middleware(['auth:api'])->group(function () {
 
               case Type::DATE_TYPE:
               $properties['spec_'.$week->id.'_'.$spec->id] = [
-                'type' => 'date',
+                'type' => 'string',
                 'title' => $spec->label
               ];
-              $uiSchema['spec_'.$week->id.'_'.$spec->id] = [];
+              $uiSchema['spec_'.$week->id.'_'.$spec->id] = ["ui:widget" => 'CustomDatePicker'];
               break;
 
               default:
@@ -1139,6 +1147,102 @@ Route::middleware(['auth:api'])->group(function () {
     }catch(\Exception $e){
       return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore nell\'invio del messaggio']);
     }
+  });
+
+  Route::post('certificazioni', function (Request $request){
+    if($request->email == '' || !$request->has('id_oratorio')){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (1)']);
+    }
+
+    // $user = User::where('email', $request->email)->first();
+    // if($user == null){
+    //   return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (2)']);
+    // }
+
+    $result = [];
+    foreach(Certificazione::where([['id_oratorio', $request->id_oratorio], ['is_attiva', 1]])->orderBy('created_at', 'DESC')->get() as $certificazione){
+			if(Storage::disk('modelli_certificazioni')->exists($certificazione->path_pdf)){
+				$pdf_url = url(Storage::disk('modelli_certificazioni')->url($certificazione->path_pdf));
+			}else{
+				$pdf_url = null;
+			}
+      $c = ['id' => $certificazione->id, 'titolo' => $certificazione->titolo, 'pdf_url' => $pdf_url];
+      array_push($result, $c);
+    }
+
+    return response()->json($result);
+  });
+
+  Route::post('certificazioni_utente', function (Request $request){
+    if($request->email == ''){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (1)']);
+    }
+
+    $user = User::where('email', $request->email)->first();
+    if($user == null){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (2)']);
+    }
+
+    $result = [];
+    $componente = ComponenteFamiglia::where('id_user', $user->id)->first();
+    if($componente == null){
+      $componenti = [$user->id];
+    }else{
+      $componenti = ComponenteFamiglia::where('id_famiglia', $componente->id_famiglia)->pluck('id_user');
+    }
+
+
+    foreach(CertificazioneUtente::whereIn('id_user', $componenti)->orderBy('created_at', 'DESC')->get() as $certificazione_utente){
+			if(Storage::disk('certificazioni')->exists($certificazione_utente->path_modulo)){
+				$pdf_url = url(Storage::disk('certificazioni')->url($certificazione_utente->path_modulo));
+			}else{
+				$pdf_url = null;
+			}
+      $titolo = $certificazione_utente->certificazione->titolo." (".$certificazione_utente->created_at.")\n".$certificazione_utente->user->full_name;
+      $c = ['id' => $certificazione_utente->id, 'titolo' => $titolo, 'pdf_url' => $pdf_url];
+      array_push($result, $c);
+    }
+
+    return response()->json($result);
+  });
+
+  Route::post('salva_certificazione', function (Request $request){
+    if($request->email == ''){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (1)']);
+    }
+
+    $user = User::where('email', $request->email)->first();
+    if($user == null){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (2)']);
+    }
+
+    $pdf = CertificazioneUtenteController::genera_certificazione_pdf($user->id, $request->certificazione_id, $request->signature, $request->familiare_id);
+    $pdf_url = url(Storage::disk('certificazioni')->url($pdf));
+    return response()->json(['result' => 'ok', 'title' => 'Certificazione salvata', 'msg' => 'La tua certificazione è stata ricevuta e salvata correttamente', 'pdf_url' => $pdf_url]);
+  });
+
+  Route::post('famigliari', function (Request $request){
+    if($request->email == ''){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (1)']);
+    }
+
+    $user = User::where('email', $request->email)->first();
+    if($user == null){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (2)']);
+    }
+
+    $result = [];
+    $componente = ComponenteFamiglia::where('id_user', $user->id)->first();
+    if($componente == null) return response()->json(['famigliari' => []]);
+
+    $componenti = ComponenteFamiglia::where('id_famiglia', $componente->id_famiglia)->pluck('id_user');
+
+    foreach(User::whereIn('id', $componenti)->orderBy('name')->get() as $user){
+      $c = ['id' => $user->id, 'name' => $user->full_name];
+      array_push($result, $c);
+    }
+
+    return response()->json(['famigliari' => $result]);
   });
 
 

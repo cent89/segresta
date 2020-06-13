@@ -10,13 +10,13 @@ use Session;
 class Week extends Model implements Auditable
 {
   use \OwenIt\Auditing\Auditable;
-  
+
   /**
   * The attributes that are mass assignable.
   *
   * @var array
   */
-  protected $fillable = ['id_event','from_date', 'to_date'];
+  protected $fillable = ['id_event','from_date', 'to_date', 'descrizione'];
 
   protected $dates = ['from_date', 'to_date'];
 

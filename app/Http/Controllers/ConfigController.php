@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Config;
+use Notification;
+use App\Notifications\EmailMessage;
 use Session;
 
 class ConfigController extends Controller
@@ -55,7 +57,20 @@ class ConfigController extends Controller
       $config->save();
     }
 
-    Session::flash('flash_message', 'Configurazione aggiornata');
+    if($request->has('test_email')){
+      // Test invio email
+      try{
+        Notification::route('mail', config('mail.from.address'))->notify(new EmailMessage('Test Email Segresta', 'Questo è un messaggio di prova da Segresta!', null));
+        Session::flash('flash_message', 'Email inviata con successo!');
+      }catch(\Exception $e){
+        Session::flash('flash_message', 'Errore test email! '.$e->getMessage());
+      }
+
+    }else{
+      Session::flash('flash_message', 'Configurazione aggiornata');
+    }
+
+
     return redirect()->route('config.index');
   }
 

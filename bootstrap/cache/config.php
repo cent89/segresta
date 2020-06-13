@@ -6,7 +6,7 @@
     'name' => 'Segresta 2.0',
     'env' => 'production',
     'debug' => true,
-    'url' => 'http://localhost:8000',
+    'url' => 'http://192.168.7.102:8000',
     'nome_parrocchia' => 'NOME PARROCCHIA',
     'indirizzo_parrocchia' => 'INDIRIZZO PARROCCHIA',
     'email_parrocchia' => 'EMAIL PARROCCHIA',
@@ -391,6 +391,15 @@
     ),
     'prefix' => 'laravel',
   ),
+  'certificazione' => 
+  array (
+    'name' => 'Certificazione',
+    'permissions' => 
+    array (
+      'view-certificazione' => 'Visualizza la finestra certificazione',
+      'edit-certificazione' => 'Modifica le informazioni certificazione',
+    ),
+  ),
   'compile' => 
   array (
     'files' => 
@@ -756,7 +765,7 @@
         'driver' => 'local',
         'root' => '/home/roberto/Documenti/Clienti/Segresta/segresta/storage/app/public',
         'visibility' => 'public',
-        'url' => 'http://localhost:8000/storage',
+        'url' => 'http://192.168.7.102:8000/storage',
       ),
       'webdav' => 
       array (
@@ -765,6 +774,20 @@
         'userName' => 'oratorio',
         'password' => 'Oratorio2019!',
         'pathPrefix' => '',
+      ),
+      'modelli_certificazioni' => 
+      array (
+        'driver' => 'local',
+        'root' => '/home/roberto/Documenti/Clienti/Segresta/segresta/storage/app/public/modelli_certificazioni',
+        'url' => 'http://192.168.7.102:8000/storage/modelli_certificazioni',
+        'visibility' => 'public',
+      ),
+      'certificazioni' => 
+      array (
+        'driver' => 'local',
+        'root' => '/home/roberto/Documenti/Clienti/Segresta/segresta/storage/app/public/certificazioni',
+        'url' => 'http://192.168.7.102:8000/storage/certificazioni',
+        'visibility' => 'public',
       ),
       'dropbox' => 
       array (
@@ -871,7 +894,7 @@
           ),
           'balance' => 'simple',
           'processes' => 3,
-          'tries' => 1,
+          'tries' => 3,
         ),
       ),
     ),
@@ -1243,13 +1266,13 @@
     array (
       'client_id' => '222725687752-rdues2edc7rabretqhv605olg8rmre2v.apps.googleusercontent.com',
       'client_secret' => 'X6JdT4TAWHhSM8sPUU49wLUr',
-      'redirect' => 'http://localhost:8000/auth/google/callback',
+      'redirect' => 'http://192.168.7.102:8000/auth/google/callback',
     ),
     'facebook' => 
     array (
       'client_id' => '573215073574741',
       'client_secret' => '008679dea9d7b630780b53413aca90d3',
-      'redirect' => 'http://localhost:8000/auth/facebook/callback',
+      'redirect' => 'http://192.168.7.102:8000/auth/facebook/callback',
     ),
   ),
   'session' => 

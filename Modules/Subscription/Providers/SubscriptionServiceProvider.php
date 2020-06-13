@@ -39,6 +39,8 @@ class SubscriptionServiceProvider extends ServiceProvider
     ->add('Iscrizioni', array('route'  => 'subscription.index'))
     ->prepend("<i class='fas fa-flag' aria-hidden='true'></i> ")
     ->data('permissions', ['edit-admin-iscrizioni'])->data('order', 31);
+
+    \Modules\Subscription\Entities\Subscription::observe(\Modules\Subscription\Observers\SubscriptionObserver::class);
   }
 
   /**

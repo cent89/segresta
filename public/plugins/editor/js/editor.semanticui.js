@@ -121,6 +121,7 @@ DataTable.Editor.display.semanticui = $.extend( true, {}, DataTable.Editor.model
 			self._dom.modal = $('<div class="ui modal DTED"></div>');
 
 			self._dom.close = $('<i class="close icon"/>')
+				.attr('title', dte.i18n.close)
 				.click( function (e) {
 					self._dte.close('icon');
 					return false;
@@ -166,6 +167,7 @@ DataTable.Editor.display.semanticui = $.extend( true, {}, DataTable.Editor.model
 
 		$(self._dom.modal)
 			.modal( 'setting', {
+				autofocus: false,
 				dimmerSettings: {
 					closable: false
 				},

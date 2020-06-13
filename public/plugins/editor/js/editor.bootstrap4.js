@@ -115,37 +115,41 @@ $.extend( true, DataTable.ext.buttons, {
  * modal control.
  */
 
-var self;
-
 DataTable.Editor.display.bootstrap = $.extend( true, {}, DataTable.Editor.models.displayController, {
 	/*
 	 * API methods
 	 */
 	"init": function ( dte ) {
-		// init can be called multiple times (one for each Editor instance), but
-		// we only support a single construct here (shared between all Editor
-		// instances)
-		if ( ! self._dom.content ) {
-			self._dom.content = $(
+		var conf = {
+			// Note that `modal-dialog-scrollable` is BS4.3+ only. It has no effect on 4.0-4.2
+			content: $(
 				'<div class="modal fade DTED">'+
-					'<div class="modal-dialog">'+
-						'<div class="modal-content"/>'+
-					'</div>'+
+					'<div class="modal-dialog modal-dialog-scrollable"></div>'+
 				'</div>'
-			);
-
-			self._dom.close = $('<button class="close">&times;</div>');
-
-			self._dom.close.click( function () {
-				self._dte.close('icon');
-			} );
-
-			$(document).on('click', 'div.modal', function (e) {
-				if ( $(e.target).hasClass('modal') && self._shown ) {
-					self._dte.background();
-				}
-			} );
+			),
+			close: $('<button class="close">&times;</div>')
+				.attr('title', dte.i18n.close)
+				.on('click', function () {
+					dte.close('icon');
+				}),
+			shown: false,
+			fullyShow: false
 		}
+
+		// This is a bit horrible, but if you mousedown and then drag out of the modal container, we don't
+		// want to trigger a background action.
+		var allowBackgroundClick = false;
+		$(document).on('mousedown', 'div.modal', function (e) {
+			allowBackgroundClick = $(e.target).hasClass('modal') && conf.shown
+				? true
+				: false;
+		} );
+
+		$(document).on('click', 'div.modal', function (e) {
+			if ( $(e.target).hasClass('modal') && allowBackgroundClick ) {
+				dte.background();
+			}
+		} );
 
 		// Add `form-control` to required elements
 		dte.on( 'displayOrder.dtebs', function ( e, display, action, form ) {
@@ -155,42 +159,52 @@ DataTable.Editor.display.bootstrap = $.extend( true, {}, DataTable.Editor.models
 			} );
 		} );
 
-		return self;
+		dte._bootstrapDisplay = conf;
+
+		return DataTable.Editor.display.bootstrap;
 	},
 
 	"open": function ( dte, append, callback ) {
-		if ( self._shown ) {
+		var conf = dte._bootstrapDisplay;
+
+		$(append).addClass('modal-content');
+
+		if ( conf._shown ) {
+			// Modal already up, so just draw in the new content
+			var content = conf.content.find('div.modal-dialog');
+			content.children().detach();
+			content.append( append );
+
 			if ( callback ) {
 				callback();
 			}
 			return;
 		}
 
-		self._dte = dte;
-		self._shown = true;
-		self._fullyDisplayed = false;
+		conf.shown = true;
+		conf.fullyDisplayed = false;
 
-		var content = self._dom.content.find('div.modal-content');
+		var content = conf.content.find('div.modal-dialog');
 		content.children().detach();
 		content.append( append );
 
-		$('div.modal-header', append).append( self._dom.close );
+		$('div.modal-header', append).append( conf.close );
 
-		$(self._dom.content)
+		$(conf.content)
 			.one('shown.bs.modal', function () {
 				// Can only give elements focus when shown
-				if ( self._dte.s.setFocus ) {
-					self._dte.s.setFocus.focus();
+				if ( dte.s.setFocus ) {
+					dte.s.setFocus.focus();
 				}
 
-				self._fullyDisplayed = true;
+				conf.fullyDisplayed = true;
 
 				if ( callback ) {
 					callback();
 				}
 			})
 			.one('hidden', function () {
-				self._shown = false;
+				conf.shown = false;
 			})
 			.appendTo( 'body' )
 			.modal( {
@@ -200,7 +214,9 @@ DataTable.Editor.display.bootstrap = $.extend( true, {}, DataTable.Editor.models
 	},
 
 	"close": function ( dte, callback ) {
-		if ( !self._shown ) {
+		var conf = dte._bootstrapDisplay;
+
+		if ( !conf.shown ) {
 			if ( callback ) {
 				callback();
 			}
@@ -209,24 +225,23 @@ DataTable.Editor.display.bootstrap = $.extend( true, {}, DataTable.Editor.models
 
 		// Check if actually displayed or not before hiding. BS4 doesn't like `hide`
 		// before it has been fully displayed
-		if ( ! self._fullyDisplayed ) {
-			$(self._dom.content)
+		if ( ! conf.fullyDisplayed ) {
+			$(conf.content)
 				.one('shown.bs.modal', function () {
-					self.close( dte, callback );
+					conf.close( dte, callback );
 				} );
 
 			return;
 		}
 
-		$(self._dom.content)
+		$(conf.content)
 			.one( 'hidden.bs.modal', function () {
 				$(this).detach();
 			} )
 			.modal('hide');
 
-		self._dte = dte;
-		self._shown = false;
-		self._fullyDisplayed = false;
+		conf.shown = false;
+		conf.fullyDisplayed = false;
 
 		if ( callback ) {
 			callback();
@@ -234,19 +249,9 @@ DataTable.Editor.display.bootstrap = $.extend( true, {}, DataTable.Editor.models
 	},
 
 	node: function ( dte ) {
-		return self._dom.content[0];
-	},
-
-
-	/*
-	 * Private properties
-	 */
-	 "_shown": false,
-	"_dte": null,
-	"_dom": {}
+		return dte._bootstrapDisplay.content[0];
+	}
 } );
-
-self = DataTable.Editor.display.bootstrap;
 
 
 return DataTable.Editor;

@@ -102,14 +102,16 @@ class GroupUserController extends Controller
 		$users = json_decode($input['check_user']);
 		foreach($users as $user){
 			//cerco se lo stesso utente è già assegnato allo stesso gruppo. Altrimenti inserisco nuovo record
-			$g = (new GroupUser)->where([['id_user', '=', $user], ['id_group', '=', $id_group]])->first();
-			if(count($g)==0){
-				$groupUser = new GroupUser;
-			$groupUser->id_group=$id_group;
-			$groupUser->id_user = $user;
-			$groupUser->save();
-			}
+			GroupUser::firstOrCreate(['id_user' => $user, 'id_group' => $id_group]);
+			// $g = (new GroupUser)->where([['id_user', '=', $user], ['id_group', '=', $id_group]])->first();
+			// if(count($g)==0){
+			// 	$groupUser = new GroupUser;
+			// $groupUser->id_group=$id_group;
+			// $groupUser->id_user = $user;
+			// $groupUser->save();
+
 		}
+		Session::flash("flash_message", "Utenti aggiunti al gruppo!");
 		return redirect()->route('group.index');
 	}
 

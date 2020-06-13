@@ -3,6 +3,7 @@
 return [
   'ip_address' => getenv('SERVER_ADDR'),
   'password' => env('APP_PASSWORD', 'non_valida'),
+  'admin_password' => env('ADMIN_PASSWORD', 'admin2020'),
 
   /*
   |--------------------------------------------------------------------------
