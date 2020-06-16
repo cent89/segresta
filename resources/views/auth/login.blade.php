@@ -14,7 +14,7 @@
       </div>
 
         <div class="col-md-5">
-            <div class="card">               
+            <div class="card">
 
                 <div class="card-body">
                     <form method="POST" action="{{ route('login') }}">
@@ -75,7 +75,7 @@
                         </div>
 
                         <div  style="text-align: center; margin-top: 20px;">
-                          <h3 >Non hai ancora un account? <a href="{{ route('register') }}">Registrati!</a> </h3>
+                          <h3><i class="fas fa-angle-double-right"></i> Non hai ancora un account? <a href="{{ route('register') }}">Registrati!</a> </h3>
                           </div>
 
 

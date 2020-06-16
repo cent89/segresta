@@ -7,6 +7,8 @@ use App\Config;
 use Notification;
 use App\Notifications\EmailMessage;
 use Session;
+use Mail;
+use Artisan;
 
 class ConfigController extends Controller
 {
@@ -57,10 +59,18 @@ class ConfigController extends Controller
       $config->save();
     }
 
+    Artisan::call('config:cache');
+
     if($request->has('test_email')){
       // Test invio email
       try{
-        Notification::route('mail', config('mail.from.address'))->notify(new EmailMessage('Test Email Segresta', 'Questo è un messaggio di prova da Segresta!', null));
+        Mail::send('test_email',
+        ['html' => 'test_email'],
+        function ($message){
+          $message->subject("Test Email Segresta");
+          $message->to(config('mail.from.address'), config('mail.from.name'));
+        });
+        // Notification::route('mail', config('mail.from.address'))->notify(new EmailMessage('Test Email Segresta', 'Questo è un messaggio di prova da Segresta!', null));
         Session::flash('flash_message', 'Email inviata con successo!');
       }catch(\Exception $e){
         Session::flash('flash_message', 'Errore test email! '.$e->getMessage());

@@ -133,9 +133,14 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
     return $this->hasMany('\Modules\User\Entities\User', 'id_user', 'id');
   }
 
-  // public function certificazioni()
-  // {
-  //   return $this->hasMany('\Modules\Certificazione\Entities\CertificazioneUtente', 'id_user', 'id');
-  // }
+  public function certificazioni()
+  {
+    return $this->hasMany('\Modules\Certificazione\Entities\CertificazioneUtente', 'id_user', 'id');
+  }
+
+  public function presenze()
+  {
+    return $this->hasMany('\Modules\RegistroPresenze\Entities\RegistroPresenzeUtente', 'id_user', 'id');
+  }
 
 }

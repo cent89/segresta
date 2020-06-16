@@ -1,6 +1,6 @@
 <?php
 
-Route::group(['middleware' => ['web', 'role:admin|owner', 'license:elenco'], 'prefix' => 'admin', 'namespace' => 'Modules\Elenco\Http\Controllers'], function()
+Route::group(['middleware' => ['web', 'role:admin|owner'], 'prefix' => 'admin', 'namespace' => 'Modules\Elenco\Http\Controllers'], function()
 {
 	Route::resource('elenco', 'ElencoController', ['only' => ['index', 'update', 'create', 'store']]);
 	Route::get('elenco/edit', ['as' => 'elenco.edit', 'uses' => 'ElencoController@edit']);
@@ -13,4 +13,3 @@ Route::group(['middleware' => ['web', 'role:admin|owner', 'license:elenco'], 'pr
 	Route::post('elenco/save_values',['as' => 'elenco.save_values', 'uses' => 'ElencoController@save_values']);
 	Route::post('elenco/destroy_value', ['as' => 'elenco.destroy_value', 'uses' => 'ElencoController@destroy_value']);
 });
-

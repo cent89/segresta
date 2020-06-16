@@ -3,6 +3,7 @@
   array (
     'ip_address' => false,
     'password' => '12345',
+    'admin_password' => 'admin2019',
     'name' => 'Segresta 2.0',
     'env' => 'production',
     'debug' => true,
@@ -416,6 +417,8 @@
     array (
       'edit-contabilita-opzioni' => 'Modifica le opzioni contabilità',
       'edit-contabilita' => 'Modifica la contabilità',
+      'view-modello-ricevuta' => 'Vedi i modelli ricevute',
+      'edit-modello-ricevuta' => 'Modifica modelli ricevute',
     ),
   ),
   'cookie-consent' => 
@@ -447,7 +450,7 @@
         'charset' => 'utf8',
         'collation' => 'utf8_unicode_ci',
         'prefix' => '',
-        'strict' => true,
+        'strict' => false,
         'engine' => 'innodb',
         'dump' => 
         array (
@@ -782,11 +785,25 @@
         'url' => 'http://192.168.7.102:8000/storage/modelli_certificazioni',
         'visibility' => 'public',
       ),
+      'modelli_ricevute' => 
+      array (
+        'driver' => 'local',
+        'root' => '/home/roberto/Documenti/Clienti/Segresta/segresta/storage/app/public/modelli_ricevute',
+        'url' => 'http://192.168.7.102:8000/storage/modelli_ricevute',
+        'visibility' => 'public',
+      ),
       'certificazioni' => 
       array (
         'driver' => 'local',
         'root' => '/home/roberto/Documenti/Clienti/Segresta/segresta/storage/app/public/certificazioni',
         'url' => 'http://192.168.7.102:8000/storage/certificazioni',
+        'visibility' => 'public',
+      ),
+      'ricevute' => 
+      array (
+        'driver' => 'local',
+        'root' => '/home/roberto/Documenti/Clienti/Segresta/segresta/storage/app/public/ricevute',
+        'url' => 'http://192.168.7.102:8000/storage/ricevute',
         'visibility' => 'public',
       ),
       'dropbox' => 
@@ -935,12 +952,12 @@
     'port' => '465',
     'from' => 
     array (
-      'address' => 'oratorio@segresta.it',
+      'address' => 'info@elephantech.it',
       'name' => 'ElephanTech',
     ),
     'encryption' => 'ssl',
-    'username' => 'oratorio@segresta.it',
-    'password' => 'PPJF5aAzzFYrV63H',
+    'username' => 'info@elephantech.it',
+    'password' => 'cQVz3~B~hyvuwjtr',
     'markdown' => 
     array (
       'theme' => 'default',
@@ -1229,6 +1246,15 @@
     array (
       'database' => 'mysql',
       'table' => 'failed_jobs',
+    ),
+  ),
+  'registropresenze' => 
+  array (
+    'name' => 'Registro Presenze',
+    'permissions' => 
+    array (
+      'view-registro_presenze' => 'Visualizza i registri presenze',
+      'edit-registro_presenze' => 'Modifica i registri presenze',
     ),
   ),
   'report' => 

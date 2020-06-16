@@ -19,6 +19,8 @@ use Modules\Attributo\Entities\AttributoUser;
 use Modules\Certificazione\Entities\Certificazione;
 use Modules\Certificazione\Entities\CertificazioneUtente;
 use Modules\Certificazione\Http\Controllers\CertificazioneUtenteController;
+use Modules\RegistroPresenze\Entities\RegistroPresenze;
+use Modules\RegistroPresenze\Entities\RegistroPresenzeUtente;
 use App\RoleUser;
 use App\Role;
 use Carbon\Carbon;
@@ -79,7 +81,14 @@ Route::post('login', function (Request $request){
       $result['logo_oratorio'] = asset('/assets/logo_new_orizzontale_b.png');
       $result['hasLogo'] = false;
     }
-    return response()->json(['result' => 'ok', 'user' => $result]);
+
+    // Voci di menu
+    $menu_items = [];
+    if($user->can('edit-registro_presenze')){
+      $menu_items[] = ['text' => 'Registro Presenze', 'navigation' => 'RegistroPresenze'];
+    }
+
+    return response()->json(['result' => 'ok', 'user' => $result, 'menu_items' => $menu_items]);
   }else{
     return response()->json(['result' => 'error', 'message' => 'Email o password errati!']);
   }
@@ -1161,11 +1170,11 @@ Route::middleware(['auth:api'])->group(function () {
 
     $result = [];
     foreach(Certificazione::where([['id_oratorio', $request->id_oratorio], ['is_attiva', 1]])->orderBy('created_at', 'DESC')->get() as $certificazione){
-			if(Storage::disk('modelli_certificazioni')->exists($certificazione->path_pdf)){
-				$pdf_url = url(Storage::disk('modelli_certificazioni')->url($certificazione->path_pdf));
-			}else{
-				$pdf_url = null;
-			}
+      if(Storage::disk('modelli_certificazioni')->exists($certificazione->path_pdf)){
+        $pdf_url = url(Storage::disk('modelli_certificazioni')->url($certificazione->path_pdf));
+      }else{
+        $pdf_url = null;
+      }
       $c = ['id' => $certificazione->id, 'titolo' => $certificazione->titolo, 'pdf_url' => $pdf_url];
       array_push($result, $c);
     }
@@ -1193,11 +1202,11 @@ Route::middleware(['auth:api'])->group(function () {
 
 
     foreach(CertificazioneUtente::whereIn('id_user', $componenti)->orderBy('created_at', 'DESC')->get() as $certificazione_utente){
-			if(Storage::disk('certificazioni')->exists($certificazione_utente->path_modulo)){
-				$pdf_url = url(Storage::disk('certificazioni')->url($certificazione_utente->path_modulo));
-			}else{
-				$pdf_url = null;
-			}
+      if(Storage::disk('certificazioni')->exists($certificazione_utente->path_modulo)){
+        $pdf_url = url(Storage::disk('certificazioni')->url($certificazione_utente->path_modulo));
+      }else{
+        $pdf_url = null;
+      }
       $titolo = $certificazione_utente->certificazione->titolo." (".$certificazione_utente->created_at.")\n".$certificazione_utente->user->full_name;
       $c = ['id' => $certificazione_utente->id, 'titolo' => $titolo, 'pdf_url' => $pdf_url];
       array_push($result, $c);
@@ -1243,6 +1252,173 @@ Route::middleware(['auth:api'])->group(function () {
     }
 
     return response()->json(['famigliari' => $result]);
+  });
+
+  Route::post('registro_presenze/lista', function (Request $request){
+    if($request->email == '' || !$request->has('id_oratorio')){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (1)']);
+    }
+
+    $user = User::where('email', $request->email)->first();
+    if($user == null){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (2)']);
+    }
+
+    $result = [];
+    foreach(RegistroPresenze::where([['id_oratorio', $request->id_oratorio], ['aperto', 1]])->orderBy('data', 'DESC')->get() as $registro){
+      $c = ['id' => $registro->id, 'titolo' => $registro->titolo, 'data' => $registro->data, 'evento' => $registro->evento->nome];
+      array_push($result, $c);
+    }
+
+    return response()->json($result);
+  });
+
+  Route::post('registro_presenze/utenti', function (Request $request){
+    if($request->email == '' || !$request->has('registro_id')){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (1)']);
+    }
+
+    $user = User::where('email', $request->email)->first();
+    if($user == null){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (2)']);
+    }
+
+    $result = [];
+    $presenze = RegistroPresenzeUtente::select('registro_presenze_utente.*')
+    ->leftJoin('users', 'users.id', 'registro_presenze_utente.id_user')
+    ->where('id_registro', $request->registro_id)
+    ->orderBy('users.cognome', 'ASC')
+    ->orderBy('users.name', 'ASC')
+    ->get();
+
+    foreach($presenze as $presenza){
+      $c = ['id' => $presenza->id, 'utente' => $presenza->user->full_name, 'presente' => $presenza->presente];
+      array_push($result, $c);
+    }
+
+    return response()->json(['utenti_registro' => $result]);
+  });
+
+  Route::post('registro_presenze/salva', function (Request $request){
+    if($request->email == '' || !$request->has('id_oratorio')){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (1)']);
+    }
+
+    try{
+      RegistroPresenze::create(['id_oratorio' => $request->id_oratorio, 'id_event' => $request->event_id, 'titolo' => $request->titolo, 'data' => $request->data, 'aperto' => 1]);
+      return response()->json(['result' => 'ok', 'title' => 'Ok', 'msg' => 'Registro creato']);
+    }catch(\Exception $e){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore']);
+    }
+
+    return response()->json($result);
+  });
+
+  Route::post('registro_presenze/aggiungi_utente', function (Request $request){
+    if($request->email == ''){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (1)']);
+    }
+
+    try{
+      RegistroPresenzeUtente::firstOrCreate(['id_registro' => $request->registro_id, 'id_user' => $request->user_id, 'presente' => 1]);
+
+      $result = [];
+      $presenze = RegistroPresenzeUtente::select('registro_presenze_utente.*')
+      ->leftJoin('users', 'users.id', 'registro_presenze_utente.id_user')
+      ->where('id_registro', $request->registro_id)
+      ->orderBy('users.cognome', 'ASC')
+      ->orderBy('users.name', 'ASC')
+      ->get();
+
+      foreach($presenze as $presenza){
+        $c = ['id' => $presenza->id, 'utente' => $presenza->user->full_name, 'presente' => $presenza->presente];
+        array_push($result, $c);
+      }
+
+
+      return response()->json(['result' => 'ok', 'title' => 'Ok', 'msg' => 'Presenza registrata', 'utenti_registro' => $result]);
+    }catch(\Exception $e){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore, presenza non registrata']);
+    }
+
+    return response()->json($result);
+  });
+
+  Route::post('registro_presenze/rimuovi_presenza', function (Request $request){
+    if($request->email == ''){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (1)']);
+    }
+
+    try{
+      $presenza = RegistroPresenzeUtente::find($request->presenza_id);
+      $presenza->delete();
+      return response()->json(['result' => 'ok', 'title' => 'Ok', 'msg' => 'Presenza cancellata']);
+    }catch(\Exception $e){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore, presenza non cancellata']);
+    }
+
+    return response()->json($result);
+  });
+
+  Route::post('registro_presenze/segna_presente', function (Request $request){
+    if($request->email == ''){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (1)']);
+    }
+
+    try{
+      $presenza = RegistroPresenzeUtente::find($request->presenza_id);
+      $presenza->presente = boolval($request->presente);
+      $presenza->save();
+      return response()->json(['result' => 'ok', 'title' => 'Ok', 'msg' => 'Presenza aggiornata']);
+    }catch(\Exception $e){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore, presenza non cancellata']);
+    }
+
+    return response()->json($result);
+  });
+
+
+  Route::post('events_lists', function (Request $request){
+    if($request->email == '' || !$request->has('id_oratorio')){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (1)']);
+    }
+
+    $user = User::where('email', $request->email)->first();
+    if($user == null){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (2)']);
+    }
+
+    $result = [];
+    foreach(Event::where([['id_oratorio', $request->id_oratorio], ['active', 1]])->orderBy('nome', 'ASC')->get() as $evento){
+      $c = ['id' => $evento->id, 'name' => $evento->nome];
+      array_push($result, $c);
+    }
+
+    return response()->json($result);
+  });
+
+  Route::post('utenti', function (Request $request){
+    if($request->email == ''){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (1)']);
+    }
+
+    $user = User::where('email', $request->email)->first();
+    if($user == null){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (2)']);
+    }
+
+    $result = [];
+
+    $users = User::select('users.*')->leftJoin('user_oratorio', 'user_oratorio.id_user', 'users.id')
+    ->where('user_oratorio.id_oratorio', $request->id_oratorio)
+    ->orderBy('cognome', 'ASC');
+
+    foreach($users->get() as $user){
+      $c = ['id' => $user->id, 'name' => $user->full_name." (".$user->nato_il.")" ];
+      array_push($result, $c);
+    }
+
+    return response()->json(['utenti_list' => $result]);
   });
 
 

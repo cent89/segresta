@@ -2,9 +2,12 @@
 use Modules\Oratorio\Entities\Oratorio;
 if(!Auth::guest()){
 	$seg = Menu::get('SegrestaNavBar');
+	$seg->add("Home", route('home'))
+	->prepend("<i class='fas fa-home'></i> ")
+	->data('order', 0);
 	$seg->add("Help", "https://doc.segresta.it")
-	->prepend("<i class='fa fa-life-ring' aria-hidden='true'></i> ")
-	->data('permissions', ['usermodule', 'all'])->data('order', 70);
+	->prepend("<i class='fa fa-life-ring'></i> ")
+	->data('order', 1000);
 
 	//filtro il menu popolato dai vari moduli in base al ruolo
 	$seg = Menu::get('SegrestaNavBar');

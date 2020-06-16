@@ -678,8 +678,14 @@ class SubscriptionController extends Controller
 				$user = User::findOrFail($sub->id_user);
 				$event = Event::findOrFail($sub->id_event);
 				$user->notify(new IscrizioneApprovata($sub->id, $event->nome));
+				// Mando la mail anche a padre e padre
+				$componenti = ComponenteFamiglia::getComponenti($user->id);
+				foreach($componenti as $componente){
+					if($componente->id == $user->id) continue;
+					$componente->notify(new IscrizioneApprovata($sub->id, $event->nome));
+				}
 			}
-
+			
 			Session::flash("flash_message", "Hai approvato ".count(json_decode($check_user))." iscrizioni!");
 			//return redirect()->route('subscription.index');
 		}else{
@@ -878,97 +884,106 @@ class SubscriptionController extends Controller
 		$importo_totale = 0;
 		$acconto_totale = 0;
 		$da_pagare = 0;
-		$specs = (new EventSpecValue)->select('event_spec_values.id_eventspec', 'event_specs.label', 'event_spec_values.valore', 'event_spec_values.id', 'event_specs.id_type', 'event_spec_values.costo', 'event_spec_values.acconto', 'event_spec_values.pagato')
-		->leftJoin('event_specs', 'event_specs.id', '=', 'event_spec_values.id_eventspec')
-		->where([['event_spec_values.id_subscription', $sub->id], ['event_specs.general', 1]])
-		->orderBy('event_specs.ordine', 'asc')->get();
-		if(count($specs)>0){
-			$template->cloneRow('specifica_g', count($specs));
-			$i = 1;
-			foreach($specs as $spec){
-				$template->setValue('specifica_g#'.$i, $spec->label);
-				$template->setValue('valore_g#'.$i, EventSpec::getPrintableValue($spec->id_type, $spec->valore));
-				if(($spec->id_type==-2 && $spec->valore == 1) || $spec->id_type!=-2){
-					$template->setValue('costo_g#'.$i, $spec->costo);
-					$template->setValue('acconto_g#'.$i, $spec->acconto);
-					$importo_totale += $spec->costo;
-					$acconto_totale += $spec->acconto;
-					if($spec->costo == 0){
-						$template->setValue('pagato_g#'.$i, '');
-					}else{
-						if($spec->pagato == 1){
-							$template->setValue('pagato_g#'.$i, 'SI');
+		try{
+			$specs = (new EventSpecValue)->select('event_spec_values.id_eventspec', 'event_specs.label', 'event_spec_values.valore', 'event_spec_values.id', 'event_specs.id_type', 'event_spec_values.costo', 'event_spec_values.acconto', 'event_spec_values.pagato')
+			->leftJoin('event_specs', 'event_specs.id', '=', 'event_spec_values.id_eventspec')
+			->where([['event_spec_values.id_subscription', $sub->id], ['event_specs.general', 1]])
+			->orderBy('event_specs.ordine', 'asc')->get();
+			if(count($specs)>0){
+				$template->cloneRow('specifica_g', count($specs));
+				$i = 1;
+				foreach($specs as $spec){
+					$template->setValue('specifica_g#'.$i, $spec->label);
+					$template->setValue('valore_g#'.$i, EventSpec::getPrintableValue($spec->id_type, $spec->valore));
+					if(($spec->id_type==-2 && $spec->valore == 1) || $spec->id_type!=-2){
+						$template->setValue('costo_g#'.$i, $spec->costo);
+						$template->setValue('acconto_g#'.$i, $spec->acconto);
+						$importo_totale += $spec->costo;
+						$acconto_totale += $spec->acconto;
+						if($spec->costo == 0){
+							$template->setValue('pagato_g#'.$i, '');
 						}else{
-							$template->setValue('pagato_g#'.$i, 'NO');
+							if($spec->pagato == 1){
+								$template->setValue('pagato_g#'.$i, 'SI');
+							}else{
+								$template->setValue('pagato_g#'.$i, 'NO');
+							}
+
 						}
+						if($spec->pagato == false){
+							$da_pagare += $spec->costo-$spec->acconto;
+						}
+					}else{
+						$template->setValue('costo_g#'.$i, '');
+						$template->setValue('acconto_g#'.$i, '');
+						$template->setValue('pagato_g#'.$i, '');
+					}
 
-					}
-					if($spec->pagato == false){
-						$da_pagare += $spec->costo-$spec->acconto;
-					}
-				}else{
-					$template->setValue('costo_g#'.$i, '');
-					$template->setValue('acconto_g#'.$i, '');
-					$template->setValue('pagato_g#'.$i, '');
+
+
+
+
+					$i++;
 				}
-
-
-
-
-
-				$i++;
 			}
+		}catch(\Exception $e){
+			// Non ci sono specifiche generali
 		}
 
+
 		//specifiche Settimanali
-		$weeks = (new Week)->select('id', 'from_date', 'to_date')->where('id_event', $sub->id_event)->orderBy('from_date', 'asc')->get();
-		if(count($weeks)>0){
-			$template->cloneBlock('settimana', count($weeks));
-			$w = 1;
-			foreach($weeks as $week){
-				$i = 1;
-				$template->setValue('nome_settimana#'.$w, "Settimana $w - dal ".$week->from_date." al ".$week->to_date);
-				$specs = (new EventSpecValue)->select('event_spec_values.id_eventspec', 'event_specs.label', 'event_spec_values.valore', 'event_spec_values.id', 'event_specs.id_type', 'event_spec_values.costo', 'event_spec_values.acconto', 'event_spec_values.pagato', 'event_specs.valid_for')
-				->leftJoin('event_specs', 'event_specs.id', '=', 'event_spec_values.id_eventspec')
-				->where([['event_spec_values.id_subscription', $sub->id], ['event_specs.general', 0], ['event_spec_values.id_week', $week->id]])
-				->orderBy('event_specs.ordine', 'asc')->get();
-				if(count($specs)>0){
-					$template->cloneRow('specifica_w#'.$w, count($specs));
-					foreach($specs as $spec){
-						$template->setValue('specifica_w#'.$w.'#'.$i, $spec->label);
-						$template->setValue('valore_w#'.$w.'#'.$i, EventSpec::getPrintableValue($spec->id_type, $spec->valore));
-						if(($spec->id_type==-2 && $spec->valore == 1) || $spec->id_type!=-2){
-							$template->setValue('costo_w#'.$w.'#'.$i, $spec->costo);
-							$template->setValue('acconto_w#'.$w.'#'.$i, $spec->acconto);
-							$importo_totale += $spec->costo;
-							$acconto_totale += $spec->acconto;
-							if($spec->costo == 0){
-								$template->setValue('pagato_w#'.$w.'#'.$i, '');
-							}else{
-								if($spec->pagato == 1){
-									$template->setValue('pagato_w#'.$w.'#'.$i, 'SI');
+		try{
+			$weeks = (new Week)->select('id', 'from_date', 'to_date')->where('id_event', $sub->id_event)->orderBy('from_date', 'asc')->get();
+			if(count($weeks)>0){
+				$template->cloneBlock('settimana', count($weeks));
+				$w = 1;
+				foreach($weeks as $week){
+					$i = 1;
+					$template->setValue('nome_settimana#'.$w, "Settimana $w - dal ".$week->from_date." al ".$week->to_date);
+					$specs = (new EventSpecValue)->select('event_spec_values.id_eventspec', 'event_specs.label', 'event_spec_values.valore', 'event_spec_values.id', 'event_specs.id_type', 'event_spec_values.costo', 'event_spec_values.acconto', 'event_spec_values.pagato', 'event_specs.valid_for')
+					->leftJoin('event_specs', 'event_specs.id', '=', 'event_spec_values.id_eventspec')
+					->where([['event_spec_values.id_subscription', $sub->id], ['event_specs.general', 0], ['event_spec_values.id_week', $week->id]])
+					->orderBy('event_specs.ordine', 'asc')->get();
+					if(count($specs)>0){
+						$template->cloneRow('specifica_w#'.$w, count($specs));
+						foreach($specs as $spec){
+							$template->setValue('specifica_w#'.$w.'#'.$i, $spec->label);
+							$template->setValue('valore_w#'.$w.'#'.$i, EventSpec::getPrintableValue($spec->id_type, $spec->valore));
+							if(($spec->id_type==-2 && $spec->valore == 1) || $spec->id_type!=-2){
+								$template->setValue('costo_w#'.$w.'#'.$i, $spec->costo);
+								$template->setValue('acconto_w#'.$w.'#'.$i, $spec->acconto);
+								$importo_totale += $spec->costo;
+								$acconto_totale += $spec->acconto;
+								if($spec->costo == 0){
+									$template->setValue('pagato_w#'.$w.'#'.$i, '');
 								}else{
-									$template->setValue('pagato_w#'.$w.'#'.$i, 'NO');
+									if($spec->pagato == 1){
+										$template->setValue('pagato_w#'.$w.'#'.$i, 'SI');
+									}else{
+										$template->setValue('pagato_w#'.$w.'#'.$i, 'NO');
+									}
 								}
+
+								if($spec->pagato == false){
+									$da_pagare += ($spec->costo-$spec->acconto);
+								}
+							}else{
+								$template->setValue('pagato_w#'.$w.'#'.$i, '');
+								$template->setValue('costo_w#'.$w.'#'.$i, '');
+								$template->setValue('acconto_w#'.$w.'#'.$i, '');
 							}
 
-							if($spec->pagato == false){
-								$da_pagare += ($spec->costo-$spec->acconto);
-							}
-						}else{
-							$template->setValue('pagato_w#'.$w.'#'.$i, '');
-							$template->setValue('costo_w#'.$w.'#'.$i, '');
-							$template->setValue('acconto_w#'.$w.'#'.$i, '');
+
+							$i++;
 						}
-
-
-						$i++;
 					}
+					$w++;
 				}
-				$w++;
+			}else{
+				$template->deleteBlock('settimana');
 			}
-		}else{
-			$template->deleteBlock('settimana');
+		}catch(\Exception $e){
+			// Non ci sono specifiche settimanali
 		}
 
 		$template->setValue('importo_totale', number_format($importo_totale,2));

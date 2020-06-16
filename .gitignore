@@ -8,6 +8,7 @@ Modules/Diocesi
 Modules/Volontario
 Modules/Firebase
 Modules/Certificazione
+Modules/RegistroPresenze
 resources/views/piwik.blade.php
 
 /node_modules
