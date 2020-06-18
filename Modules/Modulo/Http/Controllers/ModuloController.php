@@ -12,6 +12,7 @@ use Modules\Event\Entities\Event;
 use Yajra\DataTables\DataTables;
 use Modules\Event\Entities\EventSpec;
 use Modules\Oratorio\Entities\Oratorio;
+use Modules\Subscription\Entities\Subscription;
 use Modules\Event\Entities\Week;
 use Form;
 use Storage;
@@ -217,5 +218,9 @@ class ModuloController extends Controller
 		}
 		return response()->file($response_file);
 
+  }
+
+  public function seleziona_modulo(Request $request){
+    return view('modulo::seleziona_modulo')->withSubscription(Subscription::find($request->id_subscription));
   }
 }

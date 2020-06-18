@@ -645,5 +645,10 @@ function aggiungi_filtri_colonne(){
   $(".data").datepicker();
 }
 
+
+function seleziona_evento(id_user){
+  $("#modal_dettaglio").load("{!! url('admin/events/seleziona_evento?id_user="+id_user+"') !!}");
+  $("#modal_entity").modal('show');
+}
 </script>
 @endpush

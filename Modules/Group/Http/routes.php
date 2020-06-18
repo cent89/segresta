@@ -10,6 +10,7 @@ Route::group(['middleware' => ['web', 'verified'], 'prefix' => 'admin', 'namespa
 	Route::get('group/edit', ['as' => 'group.edit', 'uses' => 'GroupController@edit']);
 	Route::post('group/report_generator',['as' => 'group.report_generator', 'uses' => 'GroupController@report_generator']);
 	Route::get('group/{id}/componenti', ['as' =>'group.componenti', 'uses' => 'GroupController@componenti']);
+	Route::post('group/action', ['as' =>'group.action', 'uses' => 'GroupController@action']);
 
 	Route::resource('groupusers', 'GroupUserController', ['only' => ['index', 'store']]);
 //	Route::get('groupusers/show/{id_group}', ['as' => 'groupusers.showcomponents', 'uses' => 'GroupUserController@showcomponents']);

@@ -66,14 +66,14 @@ if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 
 					<nav>
 						<div class="nav nav-tabs" id="nav-tab" role="tablist">
-							@if(!$event->isOneSpecEvent())
 							@if($event->select_famiglia)
 							<a class="nav-item nav-link active" id="nav-famiglia-tab" data-toggle="tab" href="#nav-famiglia" role="tab" aria-controls="nav-famiglia" aria-selected="true">Utente</a>
-							<a class="nav-item nav-link" id="nav-generali-tab" data-toggle="tab" href="#nav-generali" role="tab" aria-controls="nav-generali" aria-selected="false">Informazioni generali</a>
-							@else
-							<a class="nav-item nav-link active" id="nav-generali-tab" data-toggle="tab" href="#nav-generali" role="tab" aria-controls="nav-generali" aria-selected="true">Informazioni generali</a>
 							@endif
 
+							@if(!$event->isOneSpecEvent())
+							@if(count($specs)>0)
+							<a class="nav-item nav-link" id="nav-generali-tab" data-toggle="tab" href="#nav-generali" role="tab" aria-controls="nav-generali" aria-selected="false">Informazioni generali</a>
+							@endif
 							@if(count($weeks)>0)
 							<a class="nav-item nav-link" id="nav-settimanali-tab" data-toggle="tab" href="#nav-settimanali" role="tab" aria-controls="nav-settimanali" aria-selected="false">Informazioni settimanali</a>
 							@endif
@@ -90,7 +90,13 @@ if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 							{!! Form::label('id_user', 'Seleziona un componente della famiglia per cui stai eseguendo l\'iscrizione all\'evento') !!}
 							{!! Form::select('id_user', ComponenteFamiglia::getComponenti($id_user), null, ['class' => 'form-control', 'required'])!!}
 							<br><br>
+							@if(count($specs) > 0 && !$event->isOneSpecEvent())
 							<button class='btn btn-lg btn-success' id="to_general"><i class="fas fa-angle-double-right"></i> Avanti</button>
+							@elseif(count($weeks) > 0)
+							<button class='btn btn-lg btn-success' id="to_settimana"><i class="fas fa-angle-double-right"></i> Avanti</button>
+							@else
+							<button class='btn btn-lg btn-success' id="to_salva"><i class="fas fa-angle-double-right"></i> Avanti</button>
+							@endif
 						</div>
 						@else
 						{!! Form::hidden('id_user', $id_user) !!}
@@ -314,116 +320,54 @@ if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 						@endif <!-- Controllo se l'evento ha una sola specifica -->
 
 
-						<div class="tab-pane fade @if($event->isOneSpecEvent() ) show active @endif" id="nav-salva" role="tabpanel" aria-labelledby="nav-salva-tab" style="margin-top: 20px;">
+						<div class="tab-pane fade @if($event->isOneSpecEvent() && !$event->select_famiglia) show active @endif" id="nav-salva" role="tabpanel" aria-labelledby="nav-salva-tab" style="margin-top: 20px;">
+							@if(config('app.privacy.gdpr.iscrizione.mostra'))
 							<h3 style="text-align: center">
-								Raccolta dati per l’attività "{{ $event->nome }}" (art. 16, L. n. 222/85) promosse da {{ $oratorio->nome_parrocchia }}
+								{!! \App\Config::render(config('app.privacy.gdpr.titolo'), ['nome_evento' => $event->nome, 'nome_parrocchia' => $oratorio->nome_parrocchia]) !!}
 							</h3>
-							<p>
-								Tenuto conto di quanto previsto dall’art. 91 del Regolamento UE 2016/679, il trattamento dei dati personali da Voi conferiti compilando
-								le pagine precedenti è soggetto al Decreto Generale della CEI "Disposizioni per la tutela del diritto alla buona fama e alla riservatezza
-								dei dati relativi alle persone dei fedeli, degli enti ecclesiastici e delle aggregazioni laicali" del 24 maggio 2018.
-							</p>
-							<p>
-								Ai sensi degli articoli 6 e 7 del Decreto Generale CEI si precisa che:
-							</p>
-							<ol type="a">
-								<li>il titolare del trattamento è l’ente {{ $oratorio->nome_parrocchia }}, con sede in {{ $oratorio->indirizzo_parrocchia}},
-									legalmente rappresentata dal parroco pro tempore;</li>
-								<li>per contattare il titolare del trattamento può essere utilizzata la mail {{ $oratorio->email }};</li>
-								<li>i dati da Voi conferiti sono richiesti e saranno trattati unicamente per organizzare le attività inerenti l'evento "{{ $event->nome }}" promosse da {{ $oratorio->nome_parrocchia }};</li>
-								<li>i medesimi dati non saranno comunicati a soggetti terzi, fatto salvo l’ente {{ $oratorio->nome_diocesi }} e le altre persone giuridiche canoniche,
-									se e nei limiti previsti dall’ordinamento canonico, che assumono la veste di contitolari del trattamento;</li>
-								<li>i dati conferiti saranno conservati fino al termine delle attività inerenti l'evento "{{ $event->nome }}";
-									alcuni dati potranno essere conservati anche oltre tale periodo se e nei limiti in cui tale conservazione risponda ad un legittimo interesse di {{ $oratorio->nome_parrocchia }};</li>
-								<li>l'interessato può chiedere a {{ $oratorio->nome_parrocchia }} l'accesso ai dati personali (propri e del figlio/della figlia),
-									la rettifica o la cancellazione degli stessi, la limitazione del trattamento che lo riguarda oppure può opporsi al loro trattamento;
-									tale richiesta avrà effetto nei confronti di tutti i contitolari del trattamento;</li>
-								<li>l’interessato può, altresì, proporre reclamo all’Autorità di controllo</li>
-							</ol>
-							<p>
-								<b>Tenuto conto che il trattamento dei dati personali sopra indicati è limitato alle sole finalità di cui alla lett. c) dell’Informativa,
-								considerato che il trattamento dei dati personali È NECESSARIO per permettere alla Parrocchia di realizzare in sicurezza le iniziative sopra indicate
-								(compilazione elenchi interni per controllo presenze, ...) e che dunque l’eventuale diniego al trattamento dei dati personali sopra indicati
-								impedisce alla medesima di accogliere la richiesta di iscrizione/partecipazione, letta e ricevuta l’Informativa Privacy,
-								prendiamo atto di quanto sopra in ordine al trattamento dei dati per le finalità indicate alla lettera c) dell’Informativa.</b>
-							</p>
-							<p>
-								<b>Inoltre</b>, premesso che {{ $oratorio->nome_parrocchia }} intenderebbe poter conservare ed utilizzare
-								(ad esempio tramite creazione di mail-list o elenco telefonico) i dati conferiti in queste pagine <b>ANCHE</b> per comunicare le future iniziative ed attività da essa promosse;
-								<br>che il predetto trattamento avrà termine qualora sia revocato il presente consenso;
-								<br>tenuto conto che il trattamento per le suddette finalità <b>NON È NECESSARIO</b> per consentire alla Parrocchia di accogliere e dar corso
-								alla richiesta di iscrizione/partecipazione di cui sopra e, dunque, l’eventuale diniego non impedisce l’accoglimento della medesima, letta e ricevuta l’Informativa Privacy
-							</p>
+							{!! \App\Config::render(config('app.privacy.gdpr.testo'), ['nome_evento' => $event->nome, 'nome_parrocchia' => $oratorio->nome_parrocchia, 'nome_diocesi' => $oratorio->nome_diocesi, 'indirizzo_parrocchia' => $oratorio->indirizzo_parrocchia, 'email_parrocchia' => $oratorio->email]) !!}
+
 							<div class="form-row">
 								<div class="form-group col" style="text-align: center">
 									{!! Form::label('consenso_affiliazione', 'Esprimiamo il consenso') !!}
-									{!! Form::radio('consenso_affiliazione', 1, null, ['class' => 'form-control', 'required']) !!}
+									{!! Form::radio('consenso_affiliazione', 1, null, ['class' => 'form-control', config('app.privacy.gdpr.iscrizione.obbligatorio')==1?'required':'']) !!}
 								</div>
 								<div class="form-group col" style="text-align: center">
 									{!! Form::label('consenso_affiliazione', 'Neghiamo il consenso') !!}
-									{!! Form::radio('consenso_affiliazione', 0, null, ['class' => 'form-control', 'required']) !!}
+									{!! Form::radio('consenso_affiliazione', 0, null, ['class' => 'form-control', config('app.privacy.gdpr.iscrizione.obbligatorio')==1?'required':'']) !!}
 								</div>
 							</div>
+							@else
+							{!! Form::hidden('consenso_affiliazione', 0) !!}
+							@endif
 
+							@if(config('app.privacy.riservatezza.iscrizione.mostra'))
 							<h3 style="text-align: center">
-								Informativa relativa alla tutela della riservatezza, in relazione ai dati personali raccolti per le attività educative della parrocchia.
+								{!! \App\Config::render(config('app.privacy.riservatezza.titolo'), ['nome_evento' => $event->nome, 'nome_parrocchia' => $oratorio->nome_parrocchia]) !!}
 							</h3>
-							<p>
-								Il trattamento dei dati sanitari forniti è soggetto alla normativa canonica in vigore.
-								{{ $oratorio->nome_parrocchia }} dichiara che i dati conferiti saranno utilizzati, quando necessario, ogniqualvolta Vostro/a figlio/a sarà affidato
-								alle sue cure nell’ambito della conduzione dell'evento "{{ $event->nome }}" e non saranno diffusi o comunicati ad altri soggetti.
-								L’eventuale mancanza di comunicazione di elementi sanitari necessari al sicuro accudimento del minore ricade sotto l’esclusiva responsabilità della famiglia;
-								il relativo consenso in tema di tutela della riservatezza È NECESSARIO per permettere alla Parrocchia di realizzare in sicurezza le iniziative inerenti l'evento in questione.
-								È comunque possibile richiedere alla Parrocchia la cancellazione dei propri dati.
-							</p>
+							{!! \App\Config::render(config('app.privacy.riservatezza.testo'), ['nome_evento' => $event->nome, 'nome_parrocchia' => $oratorio->nome_parrocchia, 'nome_diocesi' => $oratorio->nome_diocesi, 'indirizzo_parrocchia' => $oratorio->indirizzo_parrocchia, 'email_parrocchia' => $oratorio->email]) !!}
 
 							<div class="form-row">
 								<div class="form-group col" style="text-align: center">
 									{!! Form::label('consenso_dati_sanitari', 'Esprimiamo il consenso') !!}
-									{!! Form::radio('consenso_dati_sanitari', 1, null, ['class' => 'form-control', 'required']) !!}
+									{!! Form::radio('consenso_dati_sanitari', 1, null, ['class' => 'form-control', config('app.privacy.riservatezza.iscrizione.obbligatorio')==1?'required':'']) !!}
 								</div>
 								<div class="form-group col" style="text-align: center">
 									{!! Form::label('consenso_dati_sanitari', 'Neghiamo il consenso') !!}
-									{!! Form::radio('consenso_dati_sanitari', 0, null, ['class' => 'form-control', 'required']) !!}
+									{!! Form::radio('consenso_dati_sanitari', 0, null, ['class' => 'form-control', config('app.privacy.riservatezza.iscrizione.obbligatorio')==1?'required':'']) !!}
 								</div>
 							</div>
+							@else
+							{!! Form::hidden('consenso_dati_sanitari', 0) !!}
+							@endif
 
+
+
+							@if(config('app.privacy.trattamento_foto.iscrizione.mostra'))
 							<h3 style="text-align: center">
-								Informativa e CONSENSO al trattamento di fotografie e video
+								{!! \App\Config::render(config('app.privacy.trattamento_foto.titolo'), ['nome_evento' => $event->nome, 'nome_parrocchia' => $oratorio->nome_parrocchia]) !!}
 							</h3>
-							<p>
-								Gentili Signori, desideriamo informarVi che il Regolamento UE 2016/679 e il Decreto Generale della CEI del 24 maggio 2018 prevedono la tutela
-								delle persone ogniqualvolta sono trattati dati che le riguardano.
-								Nel rispetto della normativa vigente il trattamento dei dati sarà svolto da {{ $oratorio->nome_parrocchia }} in modo lecito, corretto e trasparente
-								nei confronti dell'interessato, assicurando la tutela dei suoi diritti.
-								Ai sensi degli articoli 13 e seguenti del Regolamento UE 2016/679 e degli articoli 6 e seguenti del Decreto Generale CEI si precisa che:
-							</p>
-							<ol>
-								<li>il titolare del trattamento è l’ente {{ $oratorio->nome_parrocchia }},
-									con sede in {{ $oratorio->indirizzo_parrocchia }}, legalmente rappresentata dal parroco pro tempore; </li>
-									<li>per contattare il titolare del trattamento può essere utilizzata la mail {{ $oratorio->email }};</li>
-
-
-									<li>le foto ed i video saranno trattati unicamente per:
-
-									<ul>
-										<li>dare evidenza delle attività promosse dalla Parrocchia alle quali ha partecipato il figlio/la figlia,
-											anche attraverso pubblicazioni cartacee (bollettino parrocchiale, bacheca in oratorio, volantino …),
-											nonché la 	pagina web e i “social” della Parrocchia;
-										</li>
-										<li>
-											finalità di archiviazione e documentazione delle attività promosse dalla Parrocchia.
-										</li>
-									</ul>
-									<li>le foto ed i video non saranno comunicati a soggetti terzi, fatto salvo l’ente Diocesi di Bergamo e le altre persone giuridiche canoniche;</li>
-									<li>{{ $oratorio->nome_parrocchia }} si impegna ad adottare idonei strumenti a protezione delle immagini pubblicate sulla pagina web e sui “social”;</li>
-									<li>le foto ed i video saranno conservati e trattati fino a revoca del consenso;</li>
-									<li>l'interessato può chiedere a {{ $oratorio->nome_parrocchia }} l'accesso ai dati personali, la rettifica o la cancellazione degli stessi,
-										la limitazione del trattamento oppure può opporsi al loro trattamento; </li>
-									<li>l’interessato può, altresì, proporre reclamo all’Autorità di controllo; </li>
-									<li>{{ $oratorio->nome_parrocchia }} non utilizza processi decisionali automatizzati, compresa la profilazione di cui all’articolo 22, paragrafi 1 e 4 del Regolamento UE 2016/679.</li>
-								</li>
-							</ol>
+							{!! \App\Config::render(config('app.privacy.trattamento_foto.testo'), ['nome_evento' => $event->nome, 'nome_parrocchia' => $oratorio->nome_parrocchia, 'nome_diocesi' => $oratorio->nome_diocesi, 'indirizzo_parrocchia' => $oratorio->indirizzo_parrocchia, 'email_parrocchia' => $oratorio->email]) !!}
 
 							<p>
 								Noi sottoscritti, genitori del minore oggetto di questa iscrizione:
@@ -436,11 +380,11 @@ if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 							<div class="form-row">
 								<div class="form-group col" style="text-align: center">
 									{!! Form::label('consenso_foto', 'Autorizziamo') !!}
-									{!! Form::radio('consenso_foto', 1, null, ['class' => 'form-control', 'required']) !!}
+									{!! Form::radio('consenso_foto', 1, null, ['class' => 'form-control', config('app.privacy.trattamento_foto.iscrizione.obbligatorio')==1?'required':'']) !!}
 								</div>
 								<div class="form-group col" style="text-align: center">
 									{!! Form::label('consenso_foto', 'Non autorizziamo') !!}
-									{!! Form::radio('consenso_foto', 0, null, ['class' => 'form-control', 'required']) !!}
+									{!! Form::radio('consenso_foto', 0, null, ['class' => 'form-control', config('app.privacy.trattamento_foto.iscrizione.obbligatorio')==1?'required':'']) !!}
 								</div>
 							</div>
 
@@ -449,10 +393,12 @@ if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 								e nei limiti indicati nel foglio informativo che ci è stato consegnato.
 							</p>
 
+							@else
+							{!! Form::hidden('consenso_foto', 0) !!}
+							@endif
 
 
-
-							<button class='btn btn-lg btn-success' type="submit"><i class="far fa-save"></i> Salva</button>
+							<button class='btn btn-lg btn-success' type="submit"><i class="far fa-save"></i> Salva iscrizione</button>
 						</div>
 					</div>
 

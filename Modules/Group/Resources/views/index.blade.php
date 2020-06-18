@@ -143,13 +143,13 @@ $(document).ready(function(){
         invia_utenti_selezionati('sms');
       }
     },
-    {
-      text: '<i class="fab fa-telegram-plane"></i> Invia Telegram',
-      className: 'btn btn-sm btn-primary',
-      action: function ( e, dt, button, config ){
-        invia_utenti_selezionati('telegram');
-      }
-    },
+    // {
+    //   text: '<i class="fab fa-telegram-plane"></i> Invia Telegram',
+    //   className: 'btn btn-sm btn-primary',
+    //   action: function ( e, dt, button, config ){
+    //     invia_utenti_selezionati('telegram');
+    //   }
+    // },
   ];
 
   if("{{ Auth::user()->can('edit-gruppo') }}"){
@@ -203,7 +203,7 @@ $(document).ready(function(){
     },
 
     columns: [
-      { data: 'id', name: 'id', visible: false},
+      { data: 'id', name: 'id'},
       { data: 'nome', name: 'nome' },
       { data: 'descrizione', name: 'descrizione' },
       { data: 'responsabile_label', editField: 'id_responsabile' },
@@ -211,7 +211,7 @@ $(document).ready(function(){
     ],
     select: {
       style:    'os',
-      selector: 'td:last-child'
+      selector: 'td:first-child'
     },
 
 
@@ -226,22 +226,23 @@ function invia_utenti_selezionati(action){
   $.each(table.rows('.selected').nodes(), function(i, item) {
     selected_rows.push(item.id);
   });
-  if(selected_rows.length == 0){
-    alert("Devi selezionare almeno un'utente!");
-    return;
-  }
+  // if(selected_rows.length == 0){
+  //   alert("Devi selezionare almeno un'utente!");
+  //   return;
+  // }
 
   //invio in POST l'array e faccio il redirect alla pagina corretta in  base all'azione selezionata
 
   $.ajax({
     type: "POST",
-    url: "{{ route('user.action') }}",
+    url: "{{ route('group.action') }}",
     data: {
-      check_user: JSON.stringify(selected_rows),
+      check_group: JSON.stringify(selected_rows),
       action: action,
       _token : "{{csrf_token()}}",
     },
     success: function(data){
+      //console.log(data);
       window.location = data;
     },
     error: function(XMLHttpRequest, textStatus, exception) { alert("Ajax failure\n" + XMLHttpRequest.responseText + "\n" + exception); },

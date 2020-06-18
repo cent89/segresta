@@ -227,82 +227,43 @@ use App\Nazione;
 
           <div class="form-group row">
             <div class="form-group col">
-              <h3 style="text-align: center">
-                Informativa e consenso ai fini privacy e riservatezza
-              </h3>
-              <p>
-                Tenuto conto di quanto previsto dall’art. 91 del Regolamento UE 2016/679, il trattamento dei dati personali da Voi conferiti
-                in questa pagina e nella sezione "Anagrafica" della piattaforma è soggetto al Decreto Generale della CEI "Disposizioni per la tutela del diritto alla buona fama e alla riservatezza
-                dei dati relativi alle persone dei fedeli, degli enti ecclesiastici e delle aggregazioni laicali" del 24 maggio 2018.
-              </p>
-              <p>
-                Ai sensi degli articoli 6 e 7 del Decreto Generale CEI si precisa che:
-              </p>
-              <ol type="a">
-                <li>
-                  il titolare del trattamento è l’ente {{ $oratorio->nome_parrocchia }}, con sede in {{ $oratorio->indirizzo_parrocchia}},
-                  legalmente rappresentata dal parroco pro tempore;
-                </li>
-                <li>
-                  per contattare il titolare del trattamento può essere utilizzata la mail {{ $oratorio->email }};
-                </li>
-                <li>
-                  i dati da Voi conferiti sono richiesti e saranno trattati unicamente per organizzare le attività promosse da {{ $oratorio->nome_parrocchia }};
-                </li>
-                <li>
-                  i medesimi dati non saranno comunicati a soggetti terzi, fatto salvo l’ente {{ $oratorio->nome_diocesi }} e le altre persone giuridiche canoniche,
-                  se e nei limiti previsti dall’ordinamento canonico, che assumono la veste di contitolari del trattamento;
-                </li>
-                <li>
-                  i dati conferiti saranno conservati fino al termine delle attività svolte;
-                  alcuni dati potranno essere conservati anche oltre tale periodo se e nei limiti in cui tale conservazione risponda ad un legittimo interesse di {{ $oratorio->nome_parrocchia }};
-                </li>
-                <li>
-                  l'interessato può chiedere a {{ $oratorio->nome_parrocchia }} l'accesso ai dati personali (propri e del figlio/della figlia),
-                  la rettifica o la cancellazione degli stessi, la limitazione del trattamento che lo riguarda oppure può opporsi al loro trattamento;
-                  tale richiesta avrà effetto nei confronti di tutti i contitolari del trattamento;
-                </li>
-                <li>
-                  l’interessato può, altresì, proporre reclamo all’Autorità di controllo
-                </li>
-              </ol>
-              <p>
-                Tenuto conto che il trattamento dei dati personali sopra indicati è limitato alle sole finalità di cui alla lett. c) dell’Informativa,
-                considerato che il trattamento dei dati personali È NECESSARIO per permettere alla Parrocchia di realizzare in sicurezza le iniziative che verranno proposte
-                e che dunque l’eventuale diniego al trattamento dei dati personali sopra indicati
-                impedisce alla medesima di accogliere la richiesta di iscrizione, letta  l’Informativa Privacy,
-                prendo atto di quanto sopra in ordine al trattamento dei dati per le finalità indicate alla lettera c) dell’Informativa.
-              </p>
+              @if(config('app.privacy.gdpr_registrazione.mostra'))
+							<h3 style="text-align: center">
+								{!! \App\Config::render(config('app.privacy.gdpr_registrazione.titolo'), ['nome_parrocchia' => $oratorio->nome_parrocchia]) !!}
+							</h3>
+							{!! \App\Config::render(config('app.privacy.gdpr_registrazione.testo'), ['nome_parrocchia' => $oratorio->nome_parrocchia, 'nome_diocesi' => $oratorio->nome_diocesi, 'indirizzo_parrocchia' => $oratorio->indirizzo_parrocchia, 'email_parrocchia' => $oratorio->email]) !!}
 
-              <div class="form-row">
-                <div class="form-group col" style="text-align: center">
-                  {!! Form::label('consenso_privacy', 'Esprimo il consenso') !!}
-                  {!! Form::radio('consenso_privacy', 1, null, ['class' => 'form-control', 'onclick' => 'enable_confirm_button()', 'id' => 'consenso']) !!}
-                </div>
-                <div class="form-group col" style="text-align: center">
-                  {!! Form::label('consenso_privacy', 'Nego il consenso') !!}
-                  {!! Form::radio('consenso_privacy', 0, null, ['class' => 'form-control', 'onclick' => 'enable_confirm_button()']) !!}
-                </div>
-              </div>
+							<div class="form-row">
+								<div class="form-group col" style="text-align: center">
+									{!! Form::label('consenso_gdpr', 'Esprimo il consenso') !!}
+									{!! Form::radio('consenso_gdpr', 1, null, ['class' => 'form-control', 'onclick' => 'enable_confirm_button()', config('app.privacy.gdpr_registrazione.obbligatorio')==1?'required':'']) !!}
+								</div>
+								<div class="form-group col" style="text-align: center">
+									{!! Form::label('consenso_gdpr', 'Nego il consenso') !!}
+									{!! Form::radio('consenso_gdpr', 0, null, ['class' => 'form-control', 'onclick' => 'enable_confirm_button()', config('app.privacy.gdpr_registrazione.obbligatorio')==1?'required':'']) !!}
+								</div>
+							</div>
+							@endif
 
+              @if(config('app.privacy.affiliazione.registrazione.mostra'))
+							<h3 style="text-align: center">
+								{!! \App\Config::render(config('app.privacy.affiliazione.titolo'), ['nome_evento' => '', 'nome_parrocchia' => $oratorio->nome_parrocchia]) !!}
+							</h3>
+							{!! \App\Config::render(config('app.privacy.affiliazione.testo'), ['nome_evento' => '', 'nome_parrocchia' => $oratorio->nome_parrocchia, 'nome_diocesi' => $oratorio->nome_diocesi, 'indirizzo_parrocchia' => $oratorio->indirizzo_parrocchia, 'email_parrocchia' => $oratorio->email]) !!}
 
-              <p>
-                <b>Inoltre</b>, premesso che {{ $oratorio->nome_parrocchia }} intenderebbe poter conservare ed utilizzare
-                (ad esempio tramite creazione di mail-list o elenco telefonico) i dati conferiti in queste pagine <b>ANCHE</b> per comunicare le future iniziative ed attività da essa promosse;
-                <br>che il predetto trattamento avrà termine qualora sia revocato il presente consenso;
-                <br>tenuto conto che il trattamento per le suddette finalità <b>NON È NECESSARIO</b> per consentire alla Parrocchia di accogliere e dar corso
-                alle richieste di iscrizione e, dunque, l’eventuale diniego non impedisce l’accoglimento della medesima, letta l’Informativa Privacy
-              </p>
-              <div class="form-row">
-                <div class="form-group col" style="text-align: center">
-                  {!! Form::label('consenso_affiliazione', 'Esprimo il consenso') !!}
-                  {!! Form::radio('consenso_affiliazione', 1, null, ['class' => 'form-control', 'required']) !!}
-                </div>
-                <div class="form-group col" style="text-align: center">
-                  {!! Form::label('consenso_affiliazione', 'Nego il consenso') !!}
-                  {!! Form::radio('consenso_affiliazione', 0, null, ['class' => 'form-control', 'required']) !!}
-                </div>
-              </div>
+							<div class="form-row">
+								<div class="form-group col" style="text-align: center">
+									{!! Form::label('consenso_affiliazione', 'Esprimo il consenso') !!}
+									{!! Form::radio('consenso_affiliazione', 1, null, ['class' => 'form-control', config('app.privacy.affiliazione.registrazione.obbligatorio')==1?'required':'']) !!}
+								</div>
+								<div class="form-group col" style="text-align: center">
+									{!! Form::label('consenso_affiliazione', 'Nego il consenso') !!}
+									{!! Form::radio('consenso_affiliazione', 0, null, ['class' => 'form-control', config('app.privacy.affiliazione.registrazione.obbligatorio')==1?'required':'']) !!}
+								</div>
+							</div>
+							@else
+							{!! Form::hidden('consenso_affiliazione', 0) !!}
+							@endif
             </div>
           </div>
 
@@ -326,8 +287,13 @@ use App\Nazione;
 @push('scripts')
 <script>
 function enable_confirm_button(){
-  var consenso_1 = $("#consenso").is(":checked");
-  $("#confirm_button").prop('disabled', !consenso_1);
+  var consenso_1 = $("#consenso_gdpr").is(":checked");
+  var richiesto = $("#consenso_gdpr").prop('required');
+  if(richiesto && !consenso_1){
+    $("#confirm_button").prop('disabled', true);
+  }else{
+    $("#confirm_button").prop('disabled', false);
+  }
 }
 
 function update_comune(select_provincia, select_comune){

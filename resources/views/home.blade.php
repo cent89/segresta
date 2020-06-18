@@ -46,6 +46,32 @@ if($modulo_famiglia){
 $modulo_volontario = (Module::find('volontario') != null && Module::find('volontario')->enabled());
 ?>
 
+<style>
+@media (min-width: 576px) {
+  .card-columns {
+    column-count: 1 !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .card-columns {
+    column-count: 1 !important;
+  }
+}
+
+@media (min-width: 992px) {
+  .card-columns {
+    column-count: 2 !important;
+  }
+}
+
+
+@media (min-width: 1200px) {
+  .card-columns {
+    column-count: 2 !important;
+  }
+}
+</style>
 
 @extends('layouts.app')
 @section('content')
@@ -140,7 +166,7 @@ $modulo_volontario = (Module::find('volontario') != null && Module::find('volont
 
                     <br>{{ $madre->full_name }}<br>Madre
                   </div>
-                </div>
+                </div>http://192.168.7.102:8000/home
                 @endif <!-- End famiglia -->
                 @endif
               </div>
@@ -210,7 +236,7 @@ $modulo_volontario = (Module::find('volontario') != null && Module::find('volont
           $color = "#ADD8E6";
           ?>
 
-          <div class="card-deck">
+          <div class="card-columns">
 
             @foreach($events->get() as $event)
 

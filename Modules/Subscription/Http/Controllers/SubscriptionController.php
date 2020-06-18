@@ -106,15 +106,17 @@ class SubscriptionController extends Controller
 			$remove = "<button class='btn btn-sm btn-danger btn-block' id='editor_remove'><i class='fas fa-trash-alt'></i> Rimuovi</button>";
 			$open = "<button class='btn btn-sm btn-primary btn-block' onclick='load_iscrizione(".$entity->id.")' type='button'><i class='fas fa-flag'></i> Apri</button>";
 
-			if(count($moduli) > 0){
-				$print = "<div>".Form::open(['method' => 'GET', 'route' => ['subscription.print', $entity->id]]).
-				"<div class='row'><div class='col-5'>".
-				Form::select('id_modulo', $moduli, null, ['class' => 'form-control', 'style' => 'padding: 2px; height: auto;']).
-				"</div><div class='col-7'><button class='btn btn-sm btn-primary btn-block' type='submit'><i class='fas fa-dolly'></i> Stampa</button></div></div></div>".
-				Form::close();
-			}else{
-				$print = "";
-			}
+			// if(count($moduli) > 0){
+			// 	$print = "<div>".Form::open(['method' => 'GET', 'route' => ['subscription.print', $entity->id]]).
+			// 	"<div class='row'><div class='col-5'>".
+			// 	Form::select('id_modulo', $moduli, null, ['class' => 'form-control', 'style' => 'padding: 2px; height: auto;']).
+			// 	"</div><div class='col-7'><button class='btn btn-sm btn-primary btn-block' type='submit'><i class='fas fa-dolly'></i> Stampa</button></div></div></div>".
+			// 	Form::close();
+			// }else{
+			// 	$print = "";
+			// }
+
+			$print = "<button class='btn btn-sm btn-primary btn-block' onclick='seleziona_modulo_iscrizione(".$entity->id.")' type='button'><i class='far fa-file-pdf'></i> Stampa modulo iscrizione</button>";
 
 			if(!Auth::user()->can('edit-iscrizioni')){
 				$remove = "";
@@ -197,11 +199,13 @@ class SubscriptionController extends Controller
 			$array_moduli = json_decode($event->id_moduli);
 			$moduli = Modulo::whereIn('id', $array_moduli)->orderBy('label', 'ASC')->pluck('label', 'id');
 
-			$print = "<div>".Form::open(['method' => 'GET', 'route' => ['subscription.print', $entity->id]]).
-			"<div class='row'><div class='col-5'>".
-			Form::select('id_modulo', $moduli, null, ['class' => 'form-control', 'style' => 'padding: 2px; height: auto;']).
-			"</div><div class='col-7'><button class='btn btn-sm btn-primary btn-block' type='submit'><i class='fas fa-dolly'></i> Stampa</button></div></div></div>".
-			Form::close();
+			// $print = "<div>".Form::open(['method' => 'GET', 'route' => ['subscription.print', $entity->id]]).
+			// "<div class='row'><div class='col-5'>".
+			// Form::select('id_modulo', $moduli, null, ['class' => 'form-control', 'style' => 'padding: 2px; height: auto;']).
+			// "</div><div class='col-7'><button class='btn btn-sm btn-primary btn-block' type='submit'><i class='fas fa-dolly'></i> Stampa</button></div></div></div>".
+			// Form::close();
+
+			$print = "<button class='btn btn-sm btn-primary btn-block' onclick='seleziona_modulo_iscrizione(".$entity->id.")' type='button'><i class='far fa-file-pdf'></i> Stampa modulo iscrizione</button>";
 
 			if(!Auth::user()->can('edit-iscrizioni') || $entity->confirmed == 1){
 				$remove = "";
@@ -685,7 +689,7 @@ class SubscriptionController extends Controller
 					$componente->notify(new IscrizioneApprovata($sub->id, $event->nome));
 				}
 			}
-			
+
 			Session::flash("flash_message", "Hai approvato ".count(json_decode($check_user))." iscrizioni!");
 			//return redirect()->route('subscription.index');
 		}else{
@@ -935,8 +939,9 @@ class SubscriptionController extends Controller
 		try{
 			$weeks = (new Week)->select('id', 'from_date', 'to_date')->where('id_event', $sub->id_event)->orderBy('from_date', 'asc')->get();
 			if(count($weeks)>0){
-				$template->cloneBlock('settimana', count($weeks));
+				$template->cloneBlock('settimana', count($weeks), true, true);
 				$w = 1;
+				
 				foreach($weeks as $week){
 					$i = 1;
 					$template->setValue('nome_settimana#'.$w, "Settimana $w - dal ".$week->from_date." al ".$week->to_date);

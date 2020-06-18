@@ -7,6 +7,7 @@ Route::group(['middleware' => ['web', 'verified'], 'prefix' => 'admin', 'namespa
 	Route::post('events/store_event', ['as' => 'events.store_event', 'uses' => 'EventController@store_event']);
 	Route::get('events/{id_event}/clone', ['as' => 'events.clone', 'uses' => 'EventController@clone']);
 	Route::get('events/{id_event}/work', ['as' => 'events.work', 'uses' => 'EventController@work']);
+	Route::get('events/seleziona_evento', ['as' => 'events.seleziona_evento', 'uses' => 'EventController@seleziona_evento']);
 	// Route::get('events/destroy', ['as' => 'events.destroy', 'uses' => 'EventController@destroy']);
 	Route::resource('week', 'WeekController', ['only' => ['index', 'update', 'create', 'store']]);
 	// Route::get('week/showcampi/{id_week}', ['as' => 'week.showcampi', 'uses' => 'WeekController@show_campos_week']);

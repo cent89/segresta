@@ -75,25 +75,46 @@ class GroupController extends Controller
     return view('group::componenti')->withGroup(Group::find($id_gruppo));
   }
 
-  // public function report_composer(Request $request){
-  //   $input = $request->all();
-  //   $id = $input['id_group'];
-  //   $group = Group::where('id', $id)->first();
-  //   if($group->id_oratorio==Session::get('session_oratorio')){
-  //     return view('group::report_composer', ['id_group' => $id]);
-  //   }else{
-  //     abort(403, 'Unauthorized action.');
-  //   }
-  //
-  // }
+  public function action(Request $request){
+    $input = $request->all();
+    if(!$request->has('check_group')){
+      Session::flash("flash_message", "Devi selezionare almeno un utente!");
+      return redirect()->route('group.index');
+    }
+    $json = $input['check_group'];
+    // $users = GroupUser::select('*')->whereIn('id_group', json_decode($json));
+    //se l'array è vuoto, seleziono tutti i gruppi
 
-  // public function report_generator(Request $request){
-  //   $input = $request->all();
-  //   $values = Input::get('spec');
-  //   $id_group = Input::get('id_group');
-  //
-  //
-  //   return view('group::report_generator', ['input' => $input]);
-  // }
+    if(count(json_decode($json)) == 0){
+      // $users = User::leftJoin('user_oratorio', 'user_oratorio.id_user', 'users.id')->where('user_oratorio.id_oratorio', Session::get('session_oratorio'))->pluck('users.id')->toArray();
+      // $json = json_encode($users);
+      $json = json_encode(GroupUser::select('*')->pluck('id_user')->toArray());
+    }else{
+      $json = json_encode(GroupUser::select('*')->whereIn('id_group', json_decode($json))->pluck('id_user')->toArray());
+    }
+
+
+    //$json = json_encode($check_user);
+    switch($input['action']){
+      case 'email':
+      return route('email.create', ['users' => $json]);
+      break;
+      case 'sms':
+      return route('sms.create', ['users' => $json]);
+      break;
+      case 'telegram':
+      return route('telegram.create', ['users' => $json]);
+      break;
+      case 'group':
+      return route('groupusers.select', ['users' => $json]);
+      break;
+      case 'firebase':
+      return route('firebase.create', ['users' => $json]);
+      break;
+      // case 'whatsapp':
+      // return route('whatsapp.create', ['users' => $json]);
+      // break;
+    }
+  }
 
 }

@@ -59,7 +59,7 @@ class ConfigController extends Controller
       $config->save();
     }
 
-    Artisan::call('config:cache');
+    // Artisan::call('config:cache');
 
     if($request->has('test_email')){
       // Test invio email

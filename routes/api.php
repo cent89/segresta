@@ -942,7 +942,7 @@ Route::middleware(['auth:api'])->group(function () {
 
     $properties['nato_il'] = [
       'type' => 'string',
-      'default' => Carbon::createFromFormat('d/m/Y', $user->nato_il)->toDateString(),
+      'default' => $user->nato_il,
       'title' => 'Data di nascita',
     ];
     $uiSchema['nato_il'] = ["ui:widget" => 'CustomDatePicker'];
@@ -1104,7 +1104,7 @@ Route::middleware(['auth:api'])->group(function () {
 
       $user->name = $request->formData['name'];
       $user->cognome = $request->formData['cognome'];
-      $user->nato_il = Carbon::parse($request->formData['nato_il'])->format('d/m/Y');
+      $user->nato_il = $request->formData['nato_il'];
       if($request->id_comune_nascita != null && $request->id_comune_nascita != ''){
         $comune = Comune::find($request->id_comune_nascita);
         $user->comuneNascita()->associate($comune);

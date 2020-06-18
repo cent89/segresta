@@ -104,6 +104,42 @@
       'Menu' => 'Lavary\\Menu\\Facade',
       'Module' => 'Nwidart\\Modules\\Facades\\Module',
     ),
+    'privacy' => 
+    array (
+      'gdpr' => 
+      array (
+        'iscrizione' => 
+        array (
+          'mostra' => '1',
+          'obbligatorio' => '1',
+        ),
+        'testo' => '<p>Tenuto conto di quanto previsto dall&rsquo;art. 91 del Regolamento UE 2016/679, il trattamento dei dati personali da Voi conferiti compilando le pagine precedenti &egrave; soggetto al Decreto Generale della CEI "Disposizioni per la tutela del diritto alla buona fama e alla riservatezza dei dati relativi alle persone dei fedeli, degli enti ecclesiastici e delle aggregazioni laicali" del 24 maggio 2018.</p>
+<p>Ai sensi degli articoli 6 e 7 del Decreto Generale CEI si precisa che:</p>
+<ol type="a">
+<li>il titolare del trattamento &egrave; l&rsquo;ente {{ $nome_parrocchia }}, con sede in {{ $indirizzo_parrocchia }}, legalmente rappresentata dal parroco pro tempore;</li>
+<li>per contattare il titolare del trattamento pu&ograve; essere utilizzata la mail {{ $email_parrocchia }};</li>
+<li>i dati da Voi conferiti sono richiesti e saranno trattati unicamente per organizzare le attivit&agrave; inerenti l\\\'evento "{{ $nome_evento }}" promosse da {{ $nome_parrocchia }};</li>
+<li>i medesimi dati non saranno comunicati a soggetti terzi, fatto salvo l&rsquo;ente {{ $nome_diocesi }} e le altre persone giuridiche canoniche, se e nei limiti previsti dall&rsquo;ordinamento canonico, che assumono la veste di contitolari del trattamento;</li>
+<li>i dati conferiti saranno conservati fino al termine delle attivit&agrave; inerenti l\\\'evento "{{ $nome_evento }}"; alcuni dati potranno essere conservati anche oltre tale periodo se e nei limiti in cui tale conservazione risponda ad un legittimo interesse di {{ $nome_parrocchia }};</li>
+<li>l\\\'interessato pu&ograve; chiedere a {{ $nome_parrocchia }} l\\\'accesso ai dati personali (propri e del figlio/della figlia), la rettifica o la cancellazione degli stessi, la limitazione del trattamento che lo riguarda oppure pu&ograve; opporsi al loro trattamento; tale richiesta avr&agrave; effetto nei confronti di tutti i contitolari del trattamento;</li>
+<li>l&rsquo;interessato pu&ograve;, altres&igrave;, proporre reclamo all&rsquo;Autorit&agrave; di controllo</li>
+</ol>
+<p><strong>Tenuto conto che il trattamento dei dati personali sopra indicati &egrave; limitato alle sole finalit&agrave; di cui alla lett. c) dell&rsquo;Informativa, considerato che il trattamento dei dati personali &Egrave; NECESSARIO per permettere alla Parrocchia di realizzare in sicurezza le iniziative sopra indicate (compilazione elenchi interni per controllo presenze, ...) e che dunque l&rsquo;eventuale diniego al trattamento dei dati personali sopra indicati impedisce alla medesima di accogliere la richiesta di iscrizione/partecipazione, letta e ricevuta l&rsquo;Informativa Privacy, prendiamo atto di quanto sopra in ordine al trattamento dei dati per le finalit&agrave; indicate alla lettera c) dell&rsquo;Informativa.</strong></p>
+<p><strong>Inoltre</strong>, premesso che {{ $nome_parrocchia }} intenderebbe poter conservare ed utilizzare (ad esempio tramite creazione di mail-list o elenco telefonico) i dati conferiti in queste pagine <strong>ANCHE</strong> per comunicare le future iniziative ed attivit&agrave; da essa promosse; <br />che il predetto trattamento avr&agrave; termine qualora sia revocato il presente consenso; <br />tenuto conto che il trattamento per le suddette finalit&agrave; <strong>NON &Egrave; NECESSARIO</strong> per consentire alla Parrocchia di accogliere e dar corso alla richiesta di iscrizione/partecipazione di cui sopra e, dunque, l&rsquo;eventuale diniego non impedisce l&rsquo;accoglimento della medesima, letta e ricevuta l&rsquo;Informativa Privacy</p>',
+        'titolo' => 'Raccolta dati per l’attività "{{ $nome_evento}}" (art. 16, L. n. 222/85) promosse da {{ $nome_parrocchia }}',
+      ),
+      'riservatezza' => 
+      array (
+        'iscrizione' => 
+        array (
+          'mostra' => '1',
+          'obbligatorio' => '1',
+        ),
+        'testo' => '<p>Il trattamento dei dati sanitari forniti &egrave; soggetto alla normativa canonica in vigore. {{ $oratorio-&gt;nome_parrocchia }} dichiara che i dati conferiti saranno utilizzati, quando necessario, ogniqualvolta Vostro/a figlio/a sar&agrave; affidato alle sue cure nell&rsquo;ambito della conduzione dell\'evento "{{ $nome_evento }}" e non saranno diffusi o comunicati ad altri soggetti. L&rsquo;eventuale mancanza di comunicazione di elementi sanitari necessari al sicuro accudimento del minore ricade sotto l&rsquo;esclusiva responsabilit&agrave; della famiglia; il relativo consenso in tema di tutela della riservatezza &Egrave; NECESSARIO per permettere alla Parrocchia di realizzare in sicurezza le iniziative inerenti l\'evento in questione. &Egrave; comunque possibile richiedere alla Parrocchia la cancellazione dei propri dati.</p>',
+        'titolo' => 'Informativa relativa alla tutela della riservatezza, in relazione ai dati personali raccolti per le attività educative della parrocchia.',
+      ),
+      'trattamento_foto' => '',
+    ),
   ),
   'attributo' => 
   array (

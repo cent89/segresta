@@ -123,6 +123,8 @@ class UserController extends Controller
       "</div><div class='col-7'><button class='btn btn-sm btn-primary btn-block' type='submit'><i class='fas fa-dolly'></i> Iscrivi all'evento</button></div></div></div>".
       Form::close();
 
+      $iscrivi = "<button class='btn btn-sm btn-primary btn-block' onclick='seleziona_evento(".$entity->id.")' type='button'><i class='fas fa-dolly'></i> Iscrivi ad un evento</button>";
+
 
       if(count($events) == 0){
         $iscrivi = "";

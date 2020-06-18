@@ -12,12 +12,15 @@ class ConfigSeeder extends Seeder
      */
     public function run()
     {
+      $order = 0;
       foreach(Config::getConfig() as $c){
         $config = Config::find($c['key']);
         if($config == null){
           $config = new Config;
+          $c['order'] = $order;
           $config->fill($c);
           $config->save();
+          $order++;
         }
       }
     }

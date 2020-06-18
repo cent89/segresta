@@ -209,5 +209,10 @@ function load_iscrizione(id_subscription){
     'slow');
   }
 
+function seleziona_modulo_iscrizione(id_subscription){
+  $("#modal_dettaglio").load("{!! url('admin/modulo/seleziona_modulo?id_subscription="+id_subscription+"') !!}");
+  $("#modal_entity").modal('show');
+}
+
 </script>
 @endpush

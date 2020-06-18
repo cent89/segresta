@@ -8,6 +8,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Modules\Event\Entities\Event;
 use Modules\Event\Entities\Week;
+use Modules\User\Entities\User;
 use Modules\Event\Entities\EventSpec;
 use Modules\Oratorio\Entities\Oratorio;
 use Modules\Elenco\Entities\Elenco;
@@ -285,4 +286,8 @@ class EventController extends Controller
 			return redirect()->route('events.index');
 		}
 	}
+
+	public function seleziona_evento(Request $request){
+    return view('event::seleziona_evento')->withUser(User::find($request->id_user));
+  }
 }
