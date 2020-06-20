@@ -17,7 +17,7 @@ class Event extends Model implements Auditable
 
     protected $fillable = ['nome', 'anno', 'descrizione', 'id_oratorio', 'active', 'firma', 'image', 'color',
     'more_subscriptions', 'stampa_anagrafica', 'spec_iscrizione', 'grazie', 'template_file', 'pagine_foglio', 'select_famiglia', 'id_moduli', 'is_diocesi',
-     'data_apertura', 'data_chiusura', 'max_posti'];
+     'data_apertura', 'data_chiusura', 'max_posti', 'email_notifica'];
 
      protected $attributes = [
        'max_posti' => 0,

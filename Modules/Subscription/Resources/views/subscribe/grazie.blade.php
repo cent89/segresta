@@ -30,7 +30,7 @@ $array_moduli = json_decode($event->id_moduli);
               <div class="card-footer">
                 {!! Form::open(['method' => 'GET', 'route' => ['subscription.print', $subscription->id]]) !!}
                 {!! Form::hidden('id_modulo', $modulo->id) !!}
-                {!! Form::submit('Stampa modulo', ['class' => 'btn btn-primary form-control']) !!}
+                {!! Form::submit('Scarica modulo', ['class' => 'btn btn-primary form-control']) !!}
                 {!! Form::close() !!}
               </div>
             </div>

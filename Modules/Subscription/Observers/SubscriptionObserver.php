@@ -4,6 +4,7 @@ namespace Modules\Subscription\Observers;
 
 use Modules\Subscription\Entities\Subscription;
 
+
 class SubscriptionObserver
 {
   public function created(Subscription $subscription)

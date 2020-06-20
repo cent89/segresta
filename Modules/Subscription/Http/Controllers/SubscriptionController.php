@@ -25,6 +25,9 @@ use Modules\Contabilita\Entities\ModoPagamento;
 use Modules\Contabilita\Entities\TipoPagamento;
 use Modules\Famiglia\Entities\Famiglia;
 use Modules\Famiglia\Entities\ComponenteFamiglia;
+use Modules\Subscription\Http\Controllers\SubscriptionController;
+use App\Notifications\EmailMessage;
+use Illuminate\Support\Facades\Notification;
 use App\Comune;
 use App\Nazione;
 use Modules\Event\Entities\Week;
@@ -430,6 +433,26 @@ class SubscriptionController extends Controller
 
 				$i++;
 			}
+
+
+			// Invio notifica alla mail indicata
+			try{
+				if($sub->evento->email_notifica != '' || $sub->evento->email_notifica != null){
+					$moduli = [];
+					$array_moduli = json_decode($sub->evento->id_moduli);
+					foreach(Modulo::whereIn('id', $array_moduli)->orderBy('label', 'ASC')->get() as $modulo){
+						$url = SubscriptionController::print_subscription(request()->merge(['id_modulo' => $modulo->id, 'type' => 'file']), $sub->id);
+						$moduli[] = $url;
+					}
+					
+					$oggetto = "Nuova iscrizione a ".$sub->evento->nome;
+					$messaggio = "Buongiorno, l'utente ".$sub->user->full_name." ha inserito una nuova iscrizione per l'evento '".$sub->evento->nome."'. In allegato il modulo d'iscrizione precompilato.";
+					Notification::route('mail', $sub->evento->email_notifica)->notify(new EmailMessage($oggetto, $messaggio, $moduli));
+				}
+			}catch(\Exception $e){
+
+			}
+
 		}
 
 		return redirect()->route('subscribe.grazie', ['id_subscription' => $sub->id]);
@@ -727,7 +750,7 @@ class SubscriptionController extends Controller
 		$input = $request->all();
 
 		$sub = Subscription::findOrFail($id_subscription);
-		$event = Event::findOrFail($sub->id_event);
+		$event = $sub->evento;
 		$oratorio = Oratorio::findOrFail($event->id_oratorio);
 		//utente a cui è intestata l'iscrizione
 		$user = User::findOrFail($sub->id_user);
@@ -799,7 +822,7 @@ class SubscriptionController extends Controller
 		$template->setValue('cellulare', $user->cell_number);
 		$template->setValue('email', $user->email);
 		$cell = ($madre != null)?"Madre: ".$madre->cell_number:"";
-		$cell .= ($padre != null)?" - Padre".$padre->cell_number:"";
+		$cell .= ($padre != null)?" - Padre: ".$padre->cell_number:"";
 		$email = ($madre != null)?"Madre: ".$madre->email:"";
 		$email .= ($padre != null)?" - Padre: ".$padre->email:"";
 		$template->setValue('cellulare_genitore', $cell);
@@ -941,7 +964,7 @@ class SubscriptionController extends Controller
 			if(count($weeks)>0){
 				$template->cloneBlock('settimana', count($weeks), true, true);
 				$w = 1;
-				
+
 				foreach($weeks as $week){
 					$i = 1;
 					$template->setValue('nome_settimana#'.$w, "Settimana $w - dal ".$week->from_date." al ".$week->to_date);
@@ -1023,9 +1046,16 @@ class SubscriptionController extends Controller
 			$response_file = $filename."-2up.pdf";
 			break;
 		}
-		if($request->has('type') && $input['type'] == 'url'){
-			// $url = Storage::disk('public')->url($response_file);
-			$url = Storage::disk('public')->url($response_file);
+		if($request->has('type')){
+			switch($input['type']){
+				case 'url':
+				$url = Storage::disk('public')->url($response_file);
+				break;
+
+				case 'file';
+				$url = $output.$response_file;
+				break;
+			}
 			return $url;
 		}
 		return response()->file($output.$response_file);

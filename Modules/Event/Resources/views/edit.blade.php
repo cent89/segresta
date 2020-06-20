@@ -136,6 +136,12 @@ if($array_moduli == null) $array_moduli = array();
 							}
 							?>
 						</div>
+
+						<div class="form-group col">
+							{!! Form::label('email_notifica', 'Al termine di ogni iscrizione, invia notifica a questo indirizzo email:') !!}
+							<p>Inserisci l'indirizzo email a cui inviare una notifica (con allegato il modulo d'iscrizione in PDF) ogni volta che viene fatta un'iscrizione.</p>
+							{!! Form::text('email_notifica', null, ['class' => 'form-control']) !!}
+						</div>
 					</div>
 
 					<div class="form-row">

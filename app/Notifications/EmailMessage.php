@@ -5,11 +5,12 @@ namespace App\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
 class EmailMessage extends Notification implements ShouldQueue
 {
-  use Queueable;
+  use Queueable, InteractsWithQueue;
   private $oggetto = "";
   private $messaggio = "";
   private $allegato = null;
@@ -49,7 +50,13 @@ class EmailMessage extends Notification implements ShouldQueue
     $message->subject($this->oggetto);
     $message->line($this->messaggio);
     if($this->allegato != null){
-      $message->attach($this->allegato);
+      if(is_array($this->allegato)){
+        foreach ($this->allegato as $key => $value) {
+          $message->attach($value);
+        }
+      }else{
+        $message->attach($this->allegato);
+      }
     }
 
     return $message;
@@ -67,4 +74,15 @@ class EmailMessage extends Notification implements ShouldQueue
       //
     ];
   }
+
+  // public function handle()
+  // {
+  //   Redis::throttle('*')->allow(1)->every(1000)->then(function () {
+  //     // send email to subscriber
+  //     logger($this->email);
+  //   }, function () {
+  //     // could not obtain lock, retry this job in 5 seconds.
+  //     return $this->release(60);
+  //   });
+  // }
 }

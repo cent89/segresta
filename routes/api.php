@@ -205,7 +205,7 @@ Route::post('form_registrazione', function (Request $request){
 
   $properties['nato_il'] = [
     'type' => 'string',
-    'default' => Carbon::now()->toDateString(),
+    'default' => Carbon::now()->format('d/m/Y'),
     'title' => 'Data di nascita',
   ];
   $required[] = 'nato_il';
@@ -370,7 +370,7 @@ Route::post('nuovo_utente', function (Request $request){
     $user->name = $request->formData['name'];
     $user->cognome = $request->formData['cognome'];
     $user->sesso = $request->formData['sesso'];
-    $user->nato_il = Carbon::parse($request->formData['nato_il'])->format('d/m/Y');
+    $user->nato_il = $request->formData['nato_il'];
     if($request->id_comune_nascita != null && $request->id_comune_nascita != ''){
       $comune = Comune::find($request->id_comune_nascita);
       $user->comuneNascita()->associate($comune);
