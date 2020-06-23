@@ -1,8 +1,8 @@
 <?php
-$nome_parrocchia = config('app.nome_parrocchia');
-$indirizzo_parrocchia = config('app.indirizzo_parrocchia');
+$nome_parrocchia = config('app.privacy_policy.nome_parrocchia');
+$indirizzo_parrocchia = config('app.privacy_policy.indirizzo_parrocchia');
 $nome_sito = config('app.url');
-$email_parrocchia = config('app.email_parrocchia');;
+$email_parrocchia = config('app.privacy_policy.email_parrocchia');;
 ?>
 
 @extends('layouts.app')

@@ -176,6 +176,10 @@ public static function getConfig(){
     ['key' => 'PRIVACY_TRATTAMENTO_FOTO_TESTO', 'config' => 'app.privacy.trattamento_foto.testo', 'value' => self::$trattamento_foto_testo_default, 'display_name' => 'Testo consenso trattamento di fotografie e video', 'type' => 'textarea', 'group' => 'GDPR'],
     ['key' => 'PRIVACY_TRATTAMENTO_FOTO_MOSTRA_ISCRIZIONE', 'config' => 'app.privacy.trattamento_foto.iscrizione.mostra', 'value' => '', 'display_name' => 'Mostra Informativa e consenso al trattamento di fotografie e video in fase d\'iscrizione', 'type' => 'boolean', 'group' => 'GDPR'],
     ['key' => 'PRIVACY_TRATTAMENTO_FOTO_OBBLIGATORIO_ISCRIZIONE', 'config' => 'app.privacy.trattamento_foto.iscrizione.obbligatorio', 'value' => '', 'display_name' => 'Accettazione Informativa al trattamento di fotografie e video vincolante per l\'iscrizione agli eventi', 'type' => 'boolean', 'group' => 'GDPR'],
+
+    ['key' => 'PRIVACY_POLICY_NOME_PARROCCHIA', 'config' => 'app.privacy_policy.nome_parrocchia', 'value' => '', 'display_name' => 'Nome parrocchia nella privacy policy', 'type' => 'text', 'group' => 'Privacy Policy'],
+    ['key' => 'PRIVACY_POLICY_INDIRIZZO_PARROCCHIA', 'config' => 'app.privacy_policy.indirizzo_parrocchia', 'value' => '', 'display_name' => 'Indirizzo parrocchia nella privacy policy', 'type' => 'text', 'group' => 'Privacy Policy'],
+    ['key' => 'PRIVACY_POLICY_EMAIL_PARROCCHIA', 'config' => 'app.privacy_policy.email_parrocchia', 'value' => '', 'display_name' => 'Indirizzo email parrocchia nella privacy policy', 'type' => 'text', 'group' => 'Privacy Policy'],
   ];
 }
 

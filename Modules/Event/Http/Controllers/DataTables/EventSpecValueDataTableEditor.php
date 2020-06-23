@@ -65,7 +65,7 @@ class EventSpecValueDataTableEditor extends DataTablesEditor
     if($subscription->confirmed && !Auth::user()->can('edit-admin-iscrizioni')) return array();
 
     $modulo_contabilita = Module::find('contabilita');
-    if($modulo_contabilita == null  || !$modulo_contabilita->enabled() || Auth::user()->hasRole('user')) return array();
+    if($modulo_contabilita == null  || !$modulo_contabilita->enabled() || Auth::user()->hasRole('user')) return $data;
     if($model->pagato == 0 & $data['pagato'] == 1){
       //specifica pagata ora, da mettere a bilancio
       $id_cassa=0;

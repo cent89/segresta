@@ -83,6 +83,10 @@ class EventSpecValueController extends Controller
 				$remove = "";
 			}
 
+			if($subscription->confirmed){
+				$remove = "";
+			}
+
 			return $remove;
 		})
 		->addColumn('DT_RowId', function ($entity){
