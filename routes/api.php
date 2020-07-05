@@ -526,14 +526,15 @@ Route::middleware(['auth:api'])->group(function () {
       $padre = ComponenteFamiglia::getPadre($user->id);
       $madre = ComponenteFamiglia::getMadre($user->id);
 
+
       if($padre == null && $madre == null){
         return response()->json(['result' => 'error', 'title' => 'Famiglia', 'msg' => 'Non hai una indicato i componenti della famiglia nel tuo profilo']);
       }
 
       $opzioni = array();
-      $opzioni[] = ['type' => 'number', 'title' => $user->full_name, 'enum' => [$user->id]];
-      $opzioni[] = ['type' => 'number', 'title' => $padre->full_name, 'enum' => [$padre->id]];
-      $opzioni[] = ['type' => 'number', 'title' => $madre->full_name, 'enum' => [$madre->id]];
+      foreach(ComponenteFamiglia::getComponenti($user->id, false) as $componente){
+        $opzioni[] = ['type' => 'number', 'title' => $componente->full_name2, 'enum' => [$componente->id]];
+      }
 
       $properties['user'] = [
         'type' => 'number',

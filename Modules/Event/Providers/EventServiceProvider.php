@@ -33,7 +33,7 @@ class EventServiceProvider extends ServiceProvider
     $menuList = Menu::get('SegrestaNavBar');
     $menuList->add("Eventi", array("route" => "events.index"))
     ->prepend("<i class='fas fa-calendar-alt' aria-hidden='true'></i> ")
-    ->data('permissions', ['view-event', 'view-certificazione'])->data('order', 20);
+    ->data('permissions', ['view-event', 'edit-certificazione-segreteria'])->data('order', 20);
 
     $menuList->get('eventi')
     ->add('Eventi', array('route'  => 'events.index'))

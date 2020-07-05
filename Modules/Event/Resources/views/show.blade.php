@@ -5,6 +5,8 @@ use App\Permission;
 use Carbon\Carbon;
 
 $now = Carbon::now()->format('d/m/Y');
+$data_apertura = Carbon::createFromFormat('d/m/Y', $event->data_apertura);
+$data_chiusura = Carbon::createFromFormat('d/m/Y', $event->data_chiusura);
 ?>
 
 @extends('layouts.app')
@@ -41,7 +43,8 @@ $now = Carbon::now()->format('d/m/Y');
           {!! $event->descrizione !!}
 
           <div class="card-footer" style="text-align: center">
-            @if($event->data_apertura <= $now && $event->data_chiusura >= $now)
+
+            @if($data_apertura->lessThanOrEqualTo(Carbon::now()) && $data_chiusura->greaterThanOrEqualTo(Carbon::now()))
             @if($event->max_posti == 0 || ($event->max_posti > 0 && $event->iscrizioni->count() <= $event->max_posti))
 
             @guest

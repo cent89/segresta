@@ -444,7 +444,7 @@ class SubscriptionController extends Controller
 						$url = SubscriptionController::print_subscription(request()->merge(['id_modulo' => $modulo->id, 'type' => 'file']), $sub->id);
 						$moduli[] = $url;
 					}
-					
+
 					$oggetto = "Nuova iscrizione a ".$sub->evento->nome;
 					$messaggio = "Buongiorno, l'utente ".$sub->user->full_name." ha inserito una nuova iscrizione per l'evento '".$sub->evento->nome."'. In allegato il modulo d'iscrizione precompilato.";
 					Notification::route('mail', $sub->evento->email_notifica)->notify(new EmailMessage($oggetto, $messaggio, $moduli));
@@ -1040,8 +1040,12 @@ class SubscriptionController extends Controller
 		//stampo 1/2 pagine per foglio in base alle impostazioni
 		$response_file = $filename.".pdf";
 		switch($event->pagine_foglio){
+			case 1:
+			$response_file = $filename.".pdf";
+			break;
+
 			case 2:
-			$cmd = "pdfjam --nup 2x1 --landscape --a4paper --outfile ".$output."/".$filename."-2up.pdf ".$response_file;
+			$cmd = "pdfjam --nup 2x1 --landscape --a4paper --outfile ".$output."/".$filename."-2up.pdf ".$storagePath.$response_file;
 			shell_exec($cmd);
 			$response_file = $filename."-2up.pdf";
 			break;
