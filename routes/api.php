@@ -21,6 +21,7 @@ use Modules\Certificazione\Entities\CertificazioneUtente;
 use Modules\Certificazione\Http\Controllers\CertificazioneUtenteController;
 use Modules\RegistroPresenze\Entities\RegistroPresenze;
 use Modules\RegistroPresenze\Entities\RegistroPresenzeUtente;
+use Modules\Contabilita\Entities\Ricevuta;
 use App\RoleUser;
 use App\Role;
 use Carbon\Carbon;
@@ -1420,6 +1421,39 @@ Route::middleware(['auth:api'])->group(function () {
     }
 
     return response()->json(['utenti_list' => $result]);
+  });
+
+
+  Route::post('ricevute', function (Request $request){
+    if($request->email == ''){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (1)']);
+    }
+
+    $user = User::where('email', $request->email)->first();
+    if($user == null){
+      return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (2)']);
+    }
+
+    $result = [];
+    $componente = ComponenteFamiglia::where('id_user', $user->id)->first();
+    if($componente == null){
+      $componenti = [$user->id];
+    }else{
+      $componenti = ComponenteFamiglia::where('id_famiglia', $componente->id_famiglia)->pluck('id_user');
+    }
+
+
+    foreach(Ricevuta::whereIn('intestata_a', $componenti)->orderBy('data_emissione', 'DESC')->get() as $ricevuta){
+      if(Storage::disk('ricevute')->exists($ricevuta->path_pdf)){
+        $pdf_url = url(Storage::disk('ricevute')->url($ricevuta->path_pdf));
+      }else{
+        $pdf_url = null;
+      }
+      $c = ['id' => $ricevuta->id, 'causale' => $ricevuta->causale, 'pdf_url' => $pdf_url, 'data_emissione' => $ricevuta->data_emissione, 'intestata_a' => $ricevuta->intestataA->full_name];
+      array_push($result, $c);
+    }
+
+    return response()->json($result);
   });
 
 

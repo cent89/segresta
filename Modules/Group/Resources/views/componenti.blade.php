@@ -54,7 +54,7 @@ $(document).ready(function(){
     responsive: true,
     processing: true,
     serverSide: true,
-    dom: '',
+    dom: 'ltp',
     language: { "url": "{{ asset('Italian.json') }}" },
     ajax: "{!! route('groupusers.data', ['id_group' => $group->id]) !!}",
     columns: [

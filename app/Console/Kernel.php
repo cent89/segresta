@@ -33,7 +33,7 @@ class Kernel extends ConsoleKernel
 
       //Email compleanni
       $schedule->call(function() {
-        //invia report presenze alle 8.00 del giorno 3 di ogni mese
+        //invia report compleanni alle 00.00 
         \Modules\User\Http\Controllers\UserController::sendEmailCompleanni();
       })->dailyAt("01:00");
 
