@@ -16,7 +16,7 @@
     'fallback_locale' => 'en',
     'key' => 'base64:vCXs9qjoAWrzu9PTla8Ga2eCpDpjWVK0EAq7H3NEyMg=',
     'cipher' => 'AES-256-CBC',
-    'log' => 'single',
+    'log' => 'daily',
     'log_level' => 'debug',
     'providers' => 
     array (
@@ -1053,6 +1053,83 @@
     'views' => 
     array (
       'bootstrap-items' => 'laravel-menu::bootstrap-navbar-items',
+    ),
+  ),
+  'logging' => 
+  array (
+    'default' => 'daily',
+    'channels' => 
+    array (
+      'stack' => 
+      array (
+        'driver' => 'stack',
+        'channels' => 
+        array (
+          0 => 'single',
+        ),
+        'ignore_exceptions' => false,
+      ),
+      'single' => 
+      array (
+        'driver' => 'single',
+        'path' => '/home/roberto/Documenti/Clienti/Segresta/segresta/storage/logs/laravel.log',
+        'level' => 'debug',
+      ),
+      'daily' => 
+      array (
+        'driver' => 'daily',
+        'path' => '/home/roberto/Documenti/Clienti/Segresta/segresta/storage/logs/laravel.log',
+        'level' => 'debug',
+        'days' => 7,
+      ),
+      'slack' => 
+      array (
+        'driver' => 'slack',
+        'url' => NULL,
+        'username' => 'Laravel Log',
+        'emoji' => ':boom:',
+        'level' => 'critical',
+      ),
+      'papertrail' => 
+      array (
+        'driver' => 'monolog',
+        'level' => 'debug',
+        'handler' => 'Monolog\\Handler\\SyslogUdpHandler',
+        'handler_with' => 
+        array (
+          'host' => NULL,
+          'port' => NULL,
+        ),
+      ),
+      'stderr' => 
+      array (
+        'driver' => 'monolog',
+        'handler' => 'Monolog\\Handler\\StreamHandler',
+        'formatter' => NULL,
+        'with' => 
+        array (
+          'stream' => 'php://stderr',
+        ),
+      ),
+      'syslog' => 
+      array (
+        'driver' => 'syslog',
+        'level' => 'debug',
+      ),
+      'errorlog' => 
+      array (
+        'driver' => 'errorlog',
+        'level' => 'debug',
+      ),
+      'null' => 
+      array (
+        'driver' => 'monolog',
+        'handler' => 'Monolog\\Handler\\NullHandler',
+      ),
+      'emergency' => 
+      array (
+        'path' => '/home/roberto/Documenti/Clienti/Segresta/segresta/storage/logs/laravel.log',
+      ),
     ),
   ),
   'mail' => 
