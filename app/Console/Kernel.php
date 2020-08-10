@@ -14,7 +14,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        \App\Console\Commands\ImportUsers::class
     ];
 
     /**
@@ -33,7 +33,7 @@ class Kernel extends ConsoleKernel
 
       //Email compleanni
       $schedule->call(function() {
-        //invia report compleanni alle 00.00 
+        //invia report compleanni alle 00.00
         \Modules\User\Http\Controllers\UserController::sendEmailCompleanni();
       })->dailyAt("01:00");
 
