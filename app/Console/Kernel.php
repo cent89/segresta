@@ -14,7 +14,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        \App\Console\Commands\ImportUsers::class
+        \App\Console\Commands\ImportUsers::class,
+        \App\Console\Commands\LogClear::class
     ];
 
     /**
@@ -25,6 +26,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+      // Purge logs
+      $schedule->command('log:clear')->daily()->at('23:58');
+      
       // Backup
       if(config('backup.enable')){
         $schedule->command('backup:clean')->daily()->at('00:00');

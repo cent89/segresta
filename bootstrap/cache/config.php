@@ -843,6 +843,18 @@
     array (
       'default' => 'Maatwebsite\\Excel\\DefaultValueBinder',
     ),
+    'cache' => 
+    array (
+      'driver' => 'memory',
+      'batch' => 
+      array (
+        'memory_limit' => 60000,
+      ),
+      'illuminate' => 
+      array (
+        'store' => NULL,
+      ),
+    ),
     'transactions' => 
     array (
       'handler' => 'db',
@@ -872,6 +884,11 @@
       array (
         'driver' => 'local',
         'root' => '/home/roberto/Documenti/Clienti/Segresta/segresta/storage/app',
+      ),
+      'log' => 
+      array (
+        'driver' => 'local',
+        'root' => '/home/roberto/Documenti/Clienti/Segresta/segresta/storage/logs',
       ),
       'public' => 
       array (
@@ -943,6 +960,12 @@
       'default_bucket' => NULL,
     ),
     'cache_store' => 'file',
+    'logging' => 
+    array (
+      'http_log_channel' => NULL,
+      'http_debug_log_channel' => NULL,
+    ),
+    'debug' => false,
   ),
   'generators' => 
   array (
