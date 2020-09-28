@@ -21,7 +21,7 @@ use Session;
 class ModuloController extends Controller
 {
   public function index(ModuloDataTable $dataTable){
-		return $dataTable->render('modulo::index');
+    return $dataTable->render('modulo::index');
   }
 
   public function store(ModuloDataTableEditor $editor){
@@ -51,7 +51,7 @@ class ModuloController extends Controller
       }
       return $edit.$remove.$anteprima.$download;
     })
-		->addColumn('DT_RowId', function ($entity){
+    ->addColumn('DT_RowId', function ($entity){
       return $entity->id;
     })
     ->rawColumns(['action'])
@@ -62,16 +62,16 @@ class ModuloController extends Controller
     $modulo = Modulo::find($id);
     if($modulo!=null){
       $storagePath  = Storage::disk('public')->getDriver()->getAdapter()->getPathPrefix();
-			$file = $storagePath.$modulo->path_file;
-			if(Storage::disk('public')->exists($modulo->path_file)){
-				return response()->download($storagePath.$modulo->path_file);
-			}else{
-				Session::flash('flash_message', 'Il file non esiste!');
-				return redirect()->route('modulo.index');
-			}
+      $file = $storagePath.$modulo->path_file;
+      if(Storage::disk('public')->exists($modulo->path_file)){
+        return response()->download($storagePath.$modulo->path_file);
+      }else{
+        Session::flash('flash_message', 'Il file non esiste!');
+        return redirect()->route('modulo.index');
+      }
     }else{
       Session::flash('flash_message', "Il documento non esiste");
-  		return redirect()->route('modulo.index');
+      return redirect()->route('modulo.index');
     }
   }
 
@@ -135,88 +135,96 @@ class ModuloController extends Controller
     ->where([['event_specs.id_event', $event->id], ['event_specs.general', 1]])
     ->orderBy('event_specs.ordine', 'asc')->get();
     if(count($specs)>0){
-      $template->cloneRow('specifica_g', count($specs));
-      $i = 1;
-      foreach($specs as $spec){
-        $template->setValue('specifica_g#'.$i, $spec->label);
-        $template->setValue('valore_g#'.$i, "");
-        $template->setValue('costo_g#'.$i, '');
-        $template->setValue('acconto_g#'.$i, '');
-        $template->setValue('pagato_g#'.$i, '');
-        $i++;
+      try{
+        $template->cloneRow('specifica_g', count($specs));
+        $i = 1;
+        foreach($specs as $spec){
+          $template->setValue('specifica_g#'.$i, $spec->label);
+          $template->setValue('valore_g#'.$i, "");
+          $template->setValue('costo_g#'.$i, '');
+          $template->setValue('acconto_g#'.$i, '');
+          $template->setValue('pagato_g#'.$i, '');
+          $i++;
+        }
+      }catch(\Exception $e){
+
       }
     }
 
     //specifiche Settimanali
     $weeks = (new Week)->select('id', 'from_date', 'to_date')->where('id_event', $event->id)->orderBy('from_date', 'asc')->get();
     if(count($weeks)>0){
-      $template->cloneBlock('settimana', count($weeks));
-      $w = 1;
-      foreach($weeks as $week){
-        $i = 1;
-        $template->setValue('nome_settimana#'.$w, "Settimana $w - dal ".$week->from_date." al ".$week->to_date);
-        $specs = (new EventSpec)->select()
-        ->where([['event_specs.id_event', $event->id], ['event_specs.general', 0]])
-        ->orderBy('event_specs.ordine', 'asc')->get();
-        if(count($specs)>0){
-          //prima di clonare la riga, devo sapere quante sono dal json_decode
-          $c=0;
-          foreach($specs as $spec){
-            $valid = json_decode($spec->valid_for, true);
-            if(isset($valid[$week->id]) && $valid[$week->id] == 1) $c++;
-          }
-          if($c>0) $template->cloneRow('specifica_w#'.$w, $c);
-          //ora posso popolare la tabella clonata
-          foreach($specs as $spec){
-            $valid = json_decode($spec->valid_for, true);
-            if(isset($valid[$week->id]) && $valid[$week->id] == 1){
-              $template->setValue('specifica_w#'.$w.'#'.$i, $spec->label);
-              $template->setValue('valore_w#'.$w.'#'.$i, '');
-              $costi = json_decode($spec->price, true);
-              $acconti = json_decode($spec->acconto, true);
-              if(isset($acconti[$week->id])){
-                $acconto = $acconti[$week->id];
-              }else{
-                $acconto = 0;
+      try{
+        $template->cloneBlock('settimana', count($weeks));
+        $w = 1;
+        foreach($weeks as $week){
+          $i = 1;
+          $template->setValue('nome_settimana#'.$w, "Settimana $w - dal ".$week->from_date." al ".$week->to_date);
+          $specs = (new EventSpec)->select()
+          ->where([['event_specs.id_event', $event->id], ['event_specs.general', 0]])
+          ->orderBy('event_specs.ordine', 'asc')->get();
+          if(count($specs)>0){
+            //prima di clonare la riga, devo sapere quante sono dal json_decode
+            $c=0;
+            foreach($specs as $spec){
+              $valid = json_decode($spec->valid_for, true);
+              if(isset($valid[$week->id]) && $valid[$week->id] == 1) $c++;
+            }
+            if($c>0) $template->cloneRow('specifica_w#'.$w, $c);
+            //ora posso popolare la tabella clonata
+            foreach($specs as $spec){
+              $valid = json_decode($spec->valid_for, true);
+              if(isset($valid[$week->id]) && $valid[$week->id] == 1){
+                $template->setValue('specifica_w#'.$w.'#'.$i, $spec->label);
+                $template->setValue('valore_w#'.$w.'#'.$i, '');
+                $costi = json_decode($spec->price, true);
+                $acconti = json_decode($spec->acconto, true);
+                if(isset($acconti[$week->id])){
+                  $acconto = $acconti[$week->id];
+                }else{
+                  $acconto = 0;
+                }
+                $template->setValue('costo_w#'.$w.'#'.$i, "");
+                $template->setValue('acconto_w#'.$w.'#'.$i, "");
+                $template->setValue('pagato_w#'.$w.'#'.$i, '');
+                $i++;
               }
-              $template->setValue('costo_w#'.$w.'#'.$i, "");
-              $template->setValue('acconto_w#'.$w.'#'.$i, "");
-              $template->setValue('pagato_w#'.$w.'#'.$i, '');
-              $i++;
             }
           }
+          $w++;
         }
-        $w++;
+      }catch(\Exception $e){
+
       }
     }else{
       $template->deleteBlock('settimana');
     }
 
     //salvo il file docx/pdf nella temp
-		$filename = "/temp/subscription_preview";
-		$storagePath  = Storage::disk('public')->getDriver()->getAdapter()->getPathPrefix();
-		if(!Storage::exists("public/temp")){
-			Storage::makeDirectory("public/temp", 0755, true);
-		}
+    $filename = "/temp/subscription_preview";
+    $storagePath  = Storage::disk('public')->getDriver()->getAdapter()->getPathPrefix();
+    if(!Storage::exists("public/temp")){
+      Storage::makeDirectory("public/temp", 0755, true);
+    }
 
-		//$path = sys_get_temp_dir().$filename.".docx";
-		$path = $storagePath.$filename.".docx";
-		$output = $storagePath;
-		$template->saveAs($path);
+    //$path = sys_get_temp_dir().$filename.".docx";
+    $path = $storagePath.$filename.".docx";
+    $output = $storagePath;
+    $template->saveAs($path);
 
-		//converto il file in pdf
-		$exec = "unoconv -f pdf ".$path;
-		shell_exec($exec);
-		//stampo 1/2 pagine per foglio in base alle impostazioni
-		$response_file = $output.$filename.".pdf";
-		switch($event->pagine_foglio){
-			case 2:
-			$cmd = "pdfjam --nup 2x1 --landscape --a4paper --outfile ".$output."/".$filename."-2up.pdf ".$response_file;
-			shell_exec($cmd);
-			$response_file = $output.$filename."-2up.pdf";
-			break;
-		}
-		return response()->file($response_file);
+    //converto il file in pdf
+    $exec = "unoconv -f pdf ".$path;
+    shell_exec($exec);
+    //stampo 1/2 pagine per foglio in base alle impostazioni
+    $response_file = $output.$filename.".pdf";
+    switch($event->pagine_foglio){
+      case 2:
+      $cmd = "pdfjam --nup 2x1 --landscape --a4paper --outfile ".$output."/".$filename."-2up.pdf ".$response_file;
+      shell_exec($cmd);
+      $response_file = $output.$filename."-2up.pdf";
+      break;
+    }
+    return response()->file($response_file);
 
   }
 

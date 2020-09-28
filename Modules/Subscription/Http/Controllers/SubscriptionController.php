@@ -358,7 +358,8 @@ class SubscriptionController extends Controller
 			}
 			$sub = Subscription::create($input);
 			//salvo le specifiche
-			$specs = $input['specs'];
+
+			$specs = $request->has('specs')?$input['specs']:array();
 			$id_spec = $input['id_spec'];
 			$costo = $input['costo'];
 			$acconto = $input['acconto'];
@@ -895,6 +896,14 @@ class SubscriptionController extends Controller
 		}else{
 			$template->setValue('consenso_dati_sanitari_si', "");
 			$template->setValue('consenso_dati_sanitari_no', "X");
+		}
+
+		if($sub->consenso_foto == true){
+			$template->setValue('consenso_foto_si', "X");
+			$template->setValue('consenso_foto_no', "");
+		}else{
+			$template->setValue('consenso_foto_si', "");
+			$template->setValue('consenso_foto_no', "X");
 		}
 
 		//Attributi

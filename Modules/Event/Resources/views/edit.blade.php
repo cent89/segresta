@@ -13,19 +13,19 @@ if($array_moduli == null) $array_moduli = array();
 @section('content')
 <div class="container">
 	<div class="row">
-    <div class="col">
-      <div class="card bg-transparent border-0">
-        <h1><i class='fas fa-calendar-alt'></i> Eventi</h1>
-        <p class="lead">Modifica l'evento <i>{{ $event->nome }}</i></p>
-        <hr>
-      </div>
-    </div>
-  </div>
+		<div class="col">
+			<div class="card bg-transparent border-0">
+				<h1><i class='fas fa-calendar-alt'></i> Eventi</h1>
+				<p class="lead">Modifica l'evento <i>{{ $event->nome }}</i></p>
+				<hr>
+			</div>
+		</div>
+	</div>
 
 	<div class="row justify-content-center">
 		<div class="col-10">
-      <div class="card">
-        <div class="card-body">
+			<div class="card">
+				<div class="card-body">
 
 					@if($errors->any())
 					<div class="alert alert-danger">
@@ -167,18 +167,29 @@ if($array_moduli == null) $array_moduli = array();
 						</div>
 					</div>
 
-					<h3>Modulo d'iscrizione</h3>
+					<div class="form-row" >
+						<div class="form-group col">
+							<h3>Modulo d'iscrizione</h3>
+						</div>
+
+						<div class="form-group col">
+						</div>
+
+						<div class="form-group col">
+						</div>
+					</div>
+
 					<div class="form-row" >
 						<div class="form-group col">
 							{!! Form::label('id_modulo', 'Seleziona uno o più moduli da generare al termine dell\'iscrizione') !!}
 
 							<table class="table table-bordered" id="moduloTable" style="width: 100%">
-		            <thead>
-		              <tr>
-		                <th style="width: 10%">Seleziona</th>
-		                <th>Nome modulo</th>
-		              </tr>
-		            </thead>
+								<thead>
+									<tr>
+										<th style="width: 10%">Seleziona</th>
+										<th>Nome modulo</th>
+									</tr>
+								</thead>
 								<tbody>
 									@foreach(Modulo::where('id_oratorio', Session::get('session_oratorio'))->orderBy('label', 'ASC')->get() as $modulo)
 									<tr>
@@ -187,7 +198,7 @@ if($array_moduli == null) $array_moduli = array();
 									</tr>
 									@endforeach
 								</tbody>
-		          </table>
+							</table>
 						</div>
 
 						<div class="form-group col">

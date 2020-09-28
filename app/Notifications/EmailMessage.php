@@ -14,16 +14,18 @@ class EmailMessage extends Notification implements ShouldQueue
   private $oggetto = "";
   private $messaggio = "";
   private $allegato = null;
+  private $user = null;
 
   /**
   * Create a new notification instance.
   *
   * @return void
   */
-  public function __construct($oggetto, $messaggio, $allegato = null){
+  public function __construct($oggetto, $messaggio, $allegato = null, $user = null){
     $this->oggetto = $oggetto;
     $this->messaggio = $messaggio;
     $this->allegato = $allegato;
+    $this->user = $user;
   }
 
   /**
@@ -45,6 +47,10 @@ class EmailMessage extends Notification implements ShouldQueue
   */
   public function toMail($notifiable)
   {
+    if($this->user != null){
+      $this->messaggio = "Messaggio inviato da ".$this->user->full_name."<br>Email: ".$this->user->email." - Tel: ".$this->user->telefono."<br>--------------------<br><br>".$this->messaggio;
+    }
+
     $message = new MailMessage;
     $message->greeting($this->oggetto);
     $message->subject($this->oggetto);
@@ -58,6 +64,12 @@ class EmailMessage extends Notification implements ShouldQueue
         $message->attach($this->allegato);
       }
     }
+
+    if($this->user != null){
+      $message->replyTo($this->user->email, $this->user->full_name);
+    }
+
+
 
     return $message;
   }

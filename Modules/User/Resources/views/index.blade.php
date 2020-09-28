@@ -214,6 +214,7 @@ $(document).ready(function(){
     {label: "Patologie e terapie in corso", name: "patologie", type: "textarea"},
     {label: "Allergie e intolleranze", name: "allergie", type: "textarea"},
     {label: "Altro", name: "note", type: "textarea"},
+    {label: "Tag Braccialetto", name: "tag_id", type: "text"},
     {label: "Privacy e consensi", name: "privacy_info", type: "title"},
     {label: "Consenso ad invio comunicazioni", name: "consenso_affiliazione", type:"checkbox", options: [{label:'', value:1}], separator: "", unselectedValue: 0},
     {label: "Ruolo", name: "ruolo_info", type: "title"},

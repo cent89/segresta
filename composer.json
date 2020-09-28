@@ -14,7 +14,7 @@
     "barryvdh/laravel-dompdf": "^0.8.2",
     "h4cc/wkhtmltopdf-amd64": "0.12.x",
     "maatwebsite/excel": "^3.0",
-    "intervention/image": "^2.3",
+    "intervention/image": "^2.5",
     "lavary/laravel-menu": "^1.6",
     "longman/telegram-bot": "^0.39.0",
     "irazasyed/telegram-bot-sdk": "^2.0",

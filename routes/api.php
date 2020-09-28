@@ -88,6 +88,9 @@ Route::post('login', function (Request $request){
     if($user->can('edit-registro_presenze')){
       $menu_items[] = ['text' => 'Registro Presenze', 'navigation' => 'RegistroPresenze'];
     }
+    if($user->can('edit-users') || $user->can('view-users')){
+      $menu_items[] = ['text' => 'Anagrafica', 'navigation' => 'Anagrafica'];
+    }
 
     return response()->json(['result' => 'ok', 'user' => $result, 'menu_items' => $menu_items]);
   }else{
@@ -1151,8 +1154,9 @@ Route::middleware(['auth:api'])->group(function () {
       }
 
       $oratorio = Oratorio::find($request->id_oratorio);
+      $user = User::where('email', $request->email)->first();
 
-      Notification::route('mail', $oratorio->email)->notify(new EmailMessage($request->oggetto, $request->messaggio));
+      Notification::route('mail', $oratorio->email)->notify(new EmailMessage($request->oggetto, $request->messaggio, null, $user));
 
       return response()->json(['result' => 'ok', 'title' => 'Ok!', 'msg' => 'Messaggio inviato correttamente!']);
     }catch(\Exception $e){
@@ -1227,7 +1231,7 @@ Route::middleware(['auth:api'])->group(function () {
       return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore di autenticazione (2)']);
     }
 
-    $pdf = CertificazioneUtenteController::genera_certificazione_pdf($user->id, $request->certificazione_id, $request->signature, $request->familiare_id);
+    $pdf = CertificazioneUtenteController::genera_certificazione_pdf($user->id, $request->certificazione_id, $request->signature1, $request->signature2, $request->familiare_id, $request->id_oratorio);
     $pdf_url = url(Storage::disk('certificazioni')->url($pdf));
     return response()->json(['result' => 'ok', 'title' => 'Certificazione salvata', 'msg' => 'La tua certificazione è stata ricevuta e salvata correttamente', 'pdf_url' => $pdf_url]);
   });
@@ -1322,7 +1326,16 @@ Route::middleware(['auth:api'])->group(function () {
     }
 
     try{
-      RegistroPresenzeUtente::firstOrCreate(['id_registro' => $request->registro_id, 'id_user' => $request->user_id, 'presente' => 1]);
+      $user = User::find($request->user_id);
+      if($user == null){
+        $user = User::where('tag_id', $request->tag_id)->first();
+      }
+      if(RegistroPresenzeUtente::where([['id_registro', $request->registro_id], ['id_user', $user->id]])->count() > 0){
+        $message = "Utente già presente nel registro!";
+      }else{
+        RegistroPresenzeUtente::firstOrCreate(['id_registro' => $request->registro_id, 'id_user' => $user->id, 'presente' => 1]);
+        $message = "Presenza registrata!";
+      }
 
       $result = [];
       $presenze = RegistroPresenzeUtente::select('registro_presenze_utente.*')
@@ -1338,7 +1351,7 @@ Route::middleware(['auth:api'])->group(function () {
       }
 
 
-      return response()->json(['result' => 'ok', 'title' => 'Ok', 'msg' => 'Presenza registrata', 'utenti_registro' => $result]);
+      return response()->json(['result' => 'ok', 'title' => 'Ok', 'msg' => $message, 'utenti_registro' => $result]);
     }catch(\Exception $e){
       return response()->json(['result' => 'error', 'title' => 'Errore', 'msg' => 'Errore, presenza non registrata']);
     }
@@ -1454,6 +1467,23 @@ Route::middleware(['auth:api'])->group(function () {
     }
 
     return response()->json($result);
+  });
+
+
+
+  // Salva tag nfc
+  Route::post('users/salva_tag', function (Request $request){
+    $user = User::where('id', $request->user_id)->first();
+    //cerco se lo stesso tag è già associato ad un utente
+    if(User::where([['id', '!=', $user->id], ['tag_id', $request->tag_id]])->count() > 0){
+      return response()->json(['result' => 'error', 'title' => 'Tag già associato', 'msg' => 'Il braccialetto utilizzato è già associato ad un\'altra persona!']);
+    }
+
+    $user->tag_id = $request->tag_id;
+    $user->save();
+
+    return response()->json(['result' => 'ok', 'title' => 'Ok', 'msg' => 'Braccialetto associato!']);
+
   });
 
 
