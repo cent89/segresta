@@ -78,6 +78,13 @@ if($array_moduli == null) $array_moduli = array();
 							{!! Form::checkbox('more_subscriptions', 1, $event->more_subscriptions, ['class' => 'form-control']) !!}
 						</div>
 
+						<div class="form-group col">
+							{!! Form::label('firma_genitori', 'Richiedi la firma dei genitori al termine dell\'iscrizione') !!}
+							<p>Verrà la richiesta la firma dei genitori prima di completare l'iscrizione.</p>
+							{!! Form::hidden('firma_genitori', 0) !!}
+							{!! Form::checkbox('firma_genitori', 1, $event->firma_genitori, ['class' => 'form-control']) !!}
+						</div>
+
 
 						@if(Module::find('famiglia') != null && Module::find('famiglia')->enabled())
 						<div class="form-group col">

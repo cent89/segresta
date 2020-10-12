@@ -17,6 +17,7 @@ class Kernel extends HttpKernel
     \Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::class,
     \Spatie\CookieConsent\CookieConsentMiddleware::class,
 
+
   ];
 
   /**
@@ -59,5 +60,6 @@ class Kernel extends HttpKernel
     'ability' => \Zizaco\Entrust\Middleware\EntrustAbility::class,
     'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
     'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
+    'checkIscrizione' => \App\Http\Middleware\CheckIscrizione::class,
   ];
 }

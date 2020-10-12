@@ -7,6 +7,7 @@ use Yajra\DataTables\DataTablesEditor;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Subscription\Entities\Subscription;
 use Modules\Subscription\Notifications\IscrizioneApprovata;
+use Modules\Famiglia\Entities\ComponenteFamiglia;
 use Modules\User\Entities\User;
 use Modules\Event\Entities\Event;
 
@@ -57,10 +58,17 @@ class SubscriptionDataTableEditor extends DataTablesEditor
 
   public function updating(Model $model, array $data)
   {
-    if($model->confirmed == 0 && $data['confirmed'] == 1){
+    if(boolval($model->confirmed) == false && boolval($data['confirmed']) == true){
       $user = User::find($model->id_user);
       $event = Event::find($model->id_event);
       $user->notify(new IscrizioneApprovata($model->id, $event->nome));
+
+      // Mando la mail anche a padre e padre
+      $componenti = ComponenteFamiglia::getComponenti($user->id, false);
+      foreach($componenti as $componente){
+        if($componente->id == $user->id) continue;
+        $componente->notify(new IscrizioneApprovata($model->id, $event->nome));
+      }
     }
     return $data;
   }

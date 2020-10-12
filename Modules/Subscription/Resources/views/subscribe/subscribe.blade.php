@@ -49,7 +49,7 @@ if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 	</div>
 
 	<div class="row justify-content-center" style="margin-top: 20px;">
-		<div class="col-md-6">
+		<div class="col-md-10">
 			<div class="card">
 				<div class="card-body">
 					{!! Form::open(['route' => 'subscribe.savesubscribe', 'id' => 'prova']) !!}
@@ -72,7 +72,7 @@ if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 
 							@if(!$event->isOneSpecEvent())
 							@if(count($specs)>0)
-							<a class="nav-item nav-link" id="nav-generali-tab" data-toggle="tab" href="#nav-generali" role="tab" aria-controls="nav-generali" aria-selected="false">Informazioni generali</a>
+							<a class="nav-item nav-link" id="nav-generali-tab" data-toggle="tab" href="#nav-generali" role="tab" aria-controls="nav-generali" aria-selected="true">Informazioni generali</a>
 							@endif
 							@if(count($weeks)>0)
 							<a class="nav-item nav-link" id="nav-settimanali-tab" data-toggle="tab" href="#nav-settimanali" role="tab" aria-controls="nav-settimanali" aria-selected="false">Informazioni settimanali</a>
@@ -144,22 +144,29 @@ if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 
 								<!-- COSTO  -->
 								<div class="form-group col-2">
-									{!! Form::label('costo['.$index.']', "Prezzo") !!}
+
 									@if(Auth::user()->hasRole('user'))
+									@if(floatval($price[0]) > 0)
+									{!! Form::label('costo['.$index.']', "Prezzo") !!}
 									{!! Form::hidden('costo['.$index.']', $price[0]) !!}
 									{{ number_format(floatval($price[0]), 2, ',', '') }}€
+									@endif
 									@else
+									{!! Form::label('costo['.$index.']', "Prezzo") !!}
 									{!! Form::number('costo['.$index.']', $price[0], ['class' => 'form-control', 'step' => '0.1']) !!}
 									@endif
 								</div>
 
 								<!-- ACCONTO  -->
 								<div class="form-group col-2">
-									{!! Form::label('acconto['.$index.']', "Acconto") !!}
 									@if(Auth::user()->hasRole('user'))
+									@if(floatval($price[0]) > 0)
+									{!! Form::label('acconto['.$index.']', "Acconto") !!}
 									{!! Form::hidden('acconto['.$index.']', 0) !!}
 									{{ number_format(floatval($price[0]), 2, ',', '') }}€
+									@endif
 									@else
+									{!! Form::label('acconto['.$index.']', "Acconto") !!}
 									{!! Form::number('acconto['.$index.']', $acconto[0], ['class' => 'form-control', 'step' => '0.1']) !!}
 									@endif
 								</div>
@@ -397,6 +404,24 @@ if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 							{!! Form::hidden('consenso_foto', 0) !!}
 							@endif
 
+							@if($event->firma_genitori)
+							<div class="form-row" style="width: 100%; margin-top: 40px">
+							  <div class="form-group col" style="height: 350px; width: 100%; text-align: center">
+							    <h3>Firma padre</h3>
+							    <canvas id="signature_padre-pad" class="signature-pad"></canvas>
+							    {!! Form::hidden('signature_padre', null, ['id' => 'signature_padre']) !!}
+							  </div>
+							</div>
+
+							<div class="form-row" style="width: 100%; margin-top: 40px">
+							  <div class="form-group col" style="height: 350px; width: 100%; text-align: center">
+							    <h3>Firma madre</h3>
+							    <canvas id="signature_madre-pad" class="signature-pad"></canvas>
+							    {!! Form::hidden('signature_madre', null, ['id' => 'signature_madre']) !!}
+							  </div>
+							</div>
+							@endif
+
 
 							<button class='btn btn-lg btn-success' type="submit"><i class="far fa-save"></i> Salva iscrizione</button>
 						</div>
@@ -416,6 +441,21 @@ if(Module::find('famiglia') != null && Module::find('famiglia')->enabled() ){
 <script>
 var form = document.getElementById("prova");
 form.noValidate = true;
+
+var canvas_padre = document.getElementById("signature_padre-pad");
+var canvas_madre = document.getElementById("signature_madre-pad");
+var signaturePad_padre;
+var signaturePad_madre;
+
+function resizeCanvas(){
+  var ratio =  Math.max(window.devicePixelRatio || 1, 1);
+  canvas_padre.width = 1000 * ratio;
+  canvas_padre.height = 300 * ratio;
+  canvas_padre.getContext("2d").scale(ratio, ratio);
+  canvas_madre.width = 1000 * ratio;
+  canvas_madre.height = 300 * ratio;
+  canvas_madre.getContext("2d").scale(ratio, ratio);
+}
 
 form.onsubmit = function(e) {
   e.preventDefault();
@@ -450,6 +490,24 @@ $(document).ready(function(){
     sideBySide: true,
     format: 'DD/MM/YYYY'
   });
+
+	if("{{$event->firma_genitori}}"){
+		signaturePad_padre = new SignaturePad(canvas_padre, {
+	    onEnd: function () {
+	      $("#signature_padre-pad").val(signaturePad_padre.toDataURL());
+	    }
+	  });
+	  signaturePad_madre = new SignaturePad(canvas_madre, {
+	    onEnd: function () {
+	      $("#signature_madre-pad").val(signaturePad_madre.toDataURL());
+	    }
+	  });
+
+	  window.addEventListener("resize", resizeCanvas);
+	  resizeCanvas();
+	}
+
+
 
 });
 

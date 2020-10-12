@@ -7,7 +7,7 @@
     'name' => 'Segresta 2.0',
     'env' => 'production',
     'debug' => true,
-    'url' => 'http://192.168.7.102:8000',
+    'url' => 'http://172.16.139.242:8000',
     'nome_parrocchia' => 'NOME PARROCCHIA',
     'indirizzo_parrocchia' => 'INDIRIZZO PARROCCHIA',
     'email_parrocchia' => 'EMAIL PARROCCHIA',
@@ -895,7 +895,7 @@
         'driver' => 'local',
         'root' => '/home/roberto/Documenti/Clienti/Segresta/segresta/storage/app/public',
         'visibility' => 'public',
-        'url' => 'http://192.168.7.102:8000/storage',
+        'url' => 'http://172.16.139.242:8000/storage',
       ),
       'webdav' => 
       array (
@@ -909,28 +909,28 @@
       array (
         'driver' => 'local',
         'root' => '/home/roberto/Documenti/Clienti/Segresta/segresta/storage/app/public/modelli_certificazioni',
-        'url' => 'http://192.168.7.102:8000/storage/modelli_certificazioni',
+        'url' => 'http://172.16.139.242:8000/storage/modelli_certificazioni',
         'visibility' => 'public',
       ),
       'modelli_ricevute' => 
       array (
         'driver' => 'local',
         'root' => '/home/roberto/Documenti/Clienti/Segresta/segresta/storage/app/public/modelli_ricevute',
-        'url' => 'http://192.168.7.102:8000/storage/modelli_ricevute',
+        'url' => 'http://172.16.139.242:8000/storage/modelli_ricevute',
         'visibility' => 'public',
       ),
       'certificazioni' => 
       array (
         'driver' => 'local',
         'root' => '/home/roberto/Documenti/Clienti/Segresta/segresta/storage/app/public/certificazioni',
-        'url' => 'http://192.168.7.102:8000/storage/certificazioni',
+        'url' => 'http://172.16.139.242:8000/storage/certificazioni',
         'visibility' => 'public',
       ),
       'ricevute' => 
       array (
         'driver' => 'local',
         'root' => '/home/roberto/Documenti/Clienti/Segresta/segresta/storage/app/public/ricevute',
-        'url' => 'http://192.168.7.102:8000/storage/ricevute',
+        'url' => 'http://172.16.139.242:8000/storage/ricevute',
         'visibility' => 'public',
       ),
       'dropbox' => 
@@ -1502,13 +1502,13 @@
     array (
       'client_id' => '222725687752-rdues2edc7rabretqhv605olg8rmre2v.apps.googleusercontent.com',
       'client_secret' => 'X6JdT4TAWHhSM8sPUU49wLUr',
-      'redirect' => 'http://192.168.7.102:8000/auth/google/callback',
+      'redirect' => 'http://172.16.139.242:8000/auth/google/callback',
     ),
     'facebook' => 
     array (
       'client_id' => '573215073574741',
       'client_secret' => '008679dea9d7b630780b53413aca90d3',
-      'redirect' => 'http://192.168.7.102:8000/auth/facebook/callback',
+      'redirect' => 'http://172.16.139.242:8000/auth/facebook/callback',
     ),
   ),
   'session' => 

@@ -58,6 +58,13 @@ use Modules\Modulo\Entities\Modulo;
 							{!! Form::checkbox('more_subscriptions', 1, false, ['class' => 'form-control']) !!}
 						</div>
 
+						{!! Form::hidden('firma_genitori', 0) !!}
+						<!-- <div class="form-group col">
+							{!! Form::label('firma_genitori', 'Richiedi la firma dei genitori al termine dell\'iscrizione') !!}
+							<p>Verrà la richiesta la firma dei genitori prima di completare l'iscrizione.</p>
+							{!! Form::checkbox('firma_genitori', 1, false, ['class' => 'form-control']) !!}
+						</div> -->
+
 						@if(Module::find('famiglia') != null && Module::find('famiglia')->enabled())
 						<div class="form-group col">
 							{!! Form::label('select_famiglia', 'Richiedi l\'iscrizione per un membro della famiglia') !!}

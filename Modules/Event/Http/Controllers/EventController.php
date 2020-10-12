@@ -145,14 +145,14 @@ class EventController extends Controller
 		}
 
 		//elenco
-		$elencos = Elenco::where('id_event', $event->id)->get();
-			if(count($elencos)>0){
-			foreach($elencos as $elenco){
-				$newElenco = $elenco->replicate();
-				$newElenco->id_event = $newEvent->id;
-				$newElenco->save();
-			}
-		}
+		// $elencos = Elenco::where('id_event', $event->id)->get();
+		// 	if(count($elencos)>0){
+		// 	foreach($elencos as $elenco){
+		// 		$newElenco = $elenco->replicate();
+		// 		$newElenco->id_event = $newEvent->id;
+		// 		$newElenco->save();
+		// 	}
+		// }
 
 		Session::put('work_event', $newEvent->id);
 		Session::flash('flash_message', 'Evento clonato correttamente!');

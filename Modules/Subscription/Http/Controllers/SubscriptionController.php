@@ -52,8 +52,10 @@ class SubscriptionController extends Controller
 {
 
 	public function __construct(){
-		$this->middleware('permission:view-iscrizioni')->only(['index', 'data']);
+		$this->middleware('permission:edit-admin-iscrizioni')->only(['index', 'data']);
+		$this->middleware('permission:view-iscrizioni')->only(['index_iscrizioni', 'data_iscrizioni']);
 		$this->middleware('permission:edit-iscrizioni')->only(['action', 'store']);
+		$this->middleware('checkIscrizione')->only(['print_subscription']);
 	}
 
 	/**
@@ -360,11 +362,11 @@ class SubscriptionController extends Controller
 			//salvo le specifiche
 
 			$specs = $request->has('specs')?$input['specs']:array();
-			$id_spec = $input['id_spec'];
-			$costo = $input['costo'];
-			$acconto = $input['acconto'];
-			$pagato = $input['pagato'];
-			$week = $input['id_week'];
+			$id_spec = $request->has('id_spec')?$input['id_spec']:array();
+			$costo = $request->has('costo')?$input['costo']:array();
+			$acconto = $request->has('acconto')?$input['acconto']:array();
+			$pagato = $request->has('pagato')?$input['pagato']:array();
+			$week = $request->has('id_week')?$input['id_week']:array();
 			$i=0;
 			foreach($specs as $spec){
 				$e = new EventSpecValue;
@@ -372,9 +374,9 @@ class SubscriptionController extends Controller
 				$e->valore=$spec;
 				$e->id_subscription = $sub->id;
 				$e->id_week=$week[$i];
-				$e->costo = floatval($costo[$i]);
-				$e->acconto = floatval($acconto[$i]);
-				$e->pagato = $pagato[$i];
+				$e->costo = array_key_exists($i, $costo)?floatval($costo[$i]):0;
+				$e->acconto = array_key_exists($i, $acconto)?floatval($acconto[$i]):0;
+				$e->pagato = array_key_exists($i, $pagato)?floatval($pagato[$i]):0;
 				$e->save();
 
 				//contabilita
@@ -407,7 +409,7 @@ class SubscriptionController extends Controller
 						$bilancio->id_cassa = $id_cassa;
 						$bilancio->id_subscription = $sub->id;
 						$bilancio->descrizione = "Incasso da iscrizione";
-						$bilancio->importo = floatval($costo[$i]);
+						$bilancio->importo = array_key_exists($i, $costo)?floatval($costo[$i]):0;
 						$bilancio->data = date('d/m/Y');
 						$bilancio->tipo_incasso = 1;
 						$bilancio->save();
@@ -707,7 +709,7 @@ class SubscriptionController extends Controller
 				$event = Event::findOrFail($sub->id_event);
 				$user->notify(new IscrizioneApprovata($sub->id, $event->nome));
 				// Mando la mail anche a padre e padre
-				$componenti = ComponenteFamiglia::getComponenti($user->id);
+				$componenti = ComponenteFamiglia::getComponenti($user->id, false);
 				foreach($componenti as $componente){
 					if($componente->id == $user->id) continue;
 					$componente->notify(new IscrizioneApprovata($sub->id, $event->nome));
