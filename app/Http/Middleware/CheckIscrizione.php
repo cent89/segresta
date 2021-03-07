@@ -24,10 +24,11 @@ class CheckIscrizione
 
     // Controllo se l'iscrizione è dell'utente loggato o famigliari
     $iscrizione = Subscription::find($request->id_subscription);
-    $padre = ComponenteFamiglia::getPadre(Auth::user()->id);
-    $madre = ComponenteFamiglia::getMadre(Auth::user()->id);
-    if($iscrizione->id_user == Auth::user()->id || ($padre != null && $iscrizione->id_user == $padre->id) || ($madre != null && $iscrizione->id_user == $madre->id)){
-      return $next($request);
+    $componenti = ComponenteFamiglia::getComponenti(Auth::user()->id, false);
+    foreach($componenti as $componente){
+      if($componente->id == $iscrizione->id_user){
+        return $next($request);
+      }
     }
 
     return redirect('home');
